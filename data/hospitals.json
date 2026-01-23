@@ -1,0 +1,5948 @@
+{
+  "version": "1.0",
+  "source": "CMS Hospital Data + ANCC Magnet + AAMC Teaching + KLAS EMR",
+  "hospital_count": 307,
+  "hospitals": [
+    {
+      "id": "OH001",
+      "name": "Cleveland Clinic Main Campus",
+      "city": "Cleveland",
+      "state": "OH",
+      "zip": "44195",
+      "beds": 1400,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "cleveland clinic main campus"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH002",
+      "name": "University Hospitals Cleveland Medical Center",
+      "city": "Cleveland",
+      "state": "OH",
+      "zip": "44106",
+      "beds": 1032,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "university hospitals cleveland mc",
+        "university hospitals cleveland medical center",
+        "s cleveland"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH003",
+      "name": "Ohio State University Wexner Medical Center",
+      "city": "Columbus",
+      "state": "OH",
+      "zip": "43210",
+      "beds": 1338,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "ohio state university wexner mc",
+        "ohio state wexner",
+        "ohio state university wexner medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH004",
+      "name": "Cincinnati Children's Hospital Medical Center",
+      "city": "Cincinnati",
+      "state": "OH",
+      "zip": "45229",
+      "beds": 607,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "cincinnati children's hospital mc",
+        "cincinnati children's hospital medical center",
+        "cincinnati"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH005",
+      "name": "UC Health University of Cincinnati Medical Center",
+      "city": "Cincinnati",
+      "state": "OH",
+      "zip": "45219",
+      "beds": 724,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "uc health of cincinnati",
+        "uc health university of cincinnati mc",
+        "uc health university of cincinnati medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH006",
+      "name": "MetroHealth Medical Center",
+      "city": "Cleveland",
+      "state": "OH",
+      "zip": "44109",
+      "beds": 731,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - County",
+      "lookup_keys": [
+        "metrohealth",
+        "metrohealth mc",
+        "metrohealth medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH007",
+      "name": "Akron General Medical Center",
+      "city": "Akron",
+      "state": "OH",
+      "zip": "44307",
+      "beds": 532,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "akron general medical center",
+        "akron general mc",
+        "akron general"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH008",
+      "name": "Summa Health Akron City Hospital",
+      "city": "Akron",
+      "state": "OH",
+      "zip": "44304",
+      "beds": 445,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "summa health akron city hospital",
+        "summa health akron city"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH009",
+      "name": "Akron Children's Hospital",
+      "city": "Akron",
+      "state": "OH",
+      "zip": "44308",
+      "beds": 392,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "akron children's hospital",
+        "akron"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH010",
+      "name": "OhioHealth Riverside Methodist Hospital",
+      "city": "Columbus",
+      "state": "OH",
+      "zip": "43214",
+      "beds": 1059,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "ohiohealth riverside methodist hospital",
+        "ohiohealth riverside methodist"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH011",
+      "name": "OhioHealth Grant Medical Center",
+      "city": "Columbus",
+      "state": "OH",
+      "zip": "43215",
+      "beds": 613,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "ohiohealth grant medical center",
+        "ohiohealth grant",
+        "ohiohealth grant mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH012",
+      "name": "Mount Carmel West Hospital",
+      "city": "Columbus",
+      "state": "OH",
+      "zip": "43222",
+      "beds": 436,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Church",
+      "lookup_keys": [
+        "mount carmel west",
+        "mt carmel west hospital",
+        "mount carmel west hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH013",
+      "name": "Mount Carmel East Hospital",
+      "city": "Columbus",
+      "state": "OH",
+      "zip": "43213",
+      "beds": 410,
+      "trauma_level": "Level III",
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Church",
+      "lookup_keys": [
+        "mount carmel east hospital",
+        "mount carmel east",
+        "mt carmel east hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH014",
+      "name": "Nationwide Children's Hospital",
+      "city": "Columbus",
+      "state": "OH",
+      "zip": "43205",
+      "beds": 574,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "nationwide children's hospital",
+        "nationwide"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH015",
+      "name": "The Christ Hospital",
+      "city": "Cincinnati",
+      "state": "OH",
+      "zip": "45219",
+      "beds": 555,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "the christ hospital",
+        "the christ"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH016",
+      "name": "TriHealth Good Samaritan Hospital",
+      "city": "Cincinnati",
+      "state": "OH",
+      "zip": "45220",
+      "beds": 525,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "trihealth good samaritan hospital",
+        "trihealth good samaritan"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH017",
+      "name": "TriHealth Bethesda North Hospital",
+      "city": "Cincinnati",
+      "state": "OH",
+      "zip": "45242",
+      "beds": 362,
+      "trauma_level": "Level III",
+      "teaching_hospital": false,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "trihealth bethesda north hospital",
+        "trihealth bethesda north"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH018",
+      "name": "Mercy Health West Hospital",
+      "city": "Cincinnati",
+      "state": "OH",
+      "zip": "45211",
+      "beds": 350,
+      "trauma_level": "Level III",
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Church",
+      "lookup_keys": [
+        "mercy health west hospital",
+        "mercy health west"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH019",
+      "name": "Mercy Health Fairfield Hospital",
+      "city": "Fairfield",
+      "state": "OH",
+      "zip": "45014",
+      "beds": 229,
+      "trauma_level": null,
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Church",
+      "lookup_keys": [
+        "mercy health fairfield hospital",
+        "mercy health fairfield"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH020",
+      "name": "Kettering Health Main Campus",
+      "city": "Kettering",
+      "state": "OH",
+      "zip": "45429",
+      "beds": 465,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Church",
+      "lookup_keys": [
+        "kettering health main campus"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH021",
+      "name": "Miami Valley Hospital",
+      "city": "Dayton",
+      "state": "OH",
+      "zip": "45409",
+      "beds": 848,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "miami valley",
+        "miami valley hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH022",
+      "name": "Dayton Children's Hospital",
+      "city": "Dayton",
+      "state": "OH",
+      "zip": "45404",
+      "beds": 178,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "dayton",
+        "dayton children's hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH023",
+      "name": "ProMedica Toledo Hospital",
+      "city": "Toledo",
+      "state": "OH",
+      "zip": "43606",
+      "beds": 651,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "promedica toledo",
+        "promedica toledo hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH024",
+      "name": "Mercy Health St. Vincent Medical Center",
+      "city": "Toledo",
+      "state": "OH",
+      "zip": "43608",
+      "beds": 445,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Church",
+      "lookup_keys": [
+        "mercy health st vincent medical center",
+        "mercy health st. vincent",
+        "mercy health st. vincent medical center",
+        "mercy health st. vincent mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH025",
+      "name": "Mercy Health St. Elizabeth Youngstown Hospital",
+      "city": "Youngstown",
+      "state": "OH",
+      "zip": "44501",
+      "beds": 431,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Church",
+      "lookup_keys": [
+        "mercy health st. elizabeth youngstown hospital",
+        "mercy health st. elizabeth youngstown",
+        "mercy health st elizabeth youngstown hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH026",
+      "name": "Aultman Hospital",
+      "city": "Canton",
+      "state": "OH",
+      "zip": "44710",
+      "beds": 534,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "aultman",
+        "aultman hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH027",
+      "name": "Mercy Medical Center Canton",
+      "city": "Canton",
+      "state": "OH",
+      "zip": "44708",
+      "beds": 348,
+      "trauma_level": "Level III",
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Church",
+      "lookup_keys": [
+        "mercy medical center canton",
+        "mercy mc canton",
+        "mercy canton"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH028",
+      "name": "Cleveland Clinic Fairview Hospital",
+      "city": "Cleveland",
+      "state": "OH",
+      "zip": "44111",
+      "beds": 488,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "cleveland clinic fairview hospital",
+        "cleveland clinic fairview"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH029",
+      "name": "Cleveland Clinic Hillcrest Hospital",
+      "city": "Mayfield Heights",
+      "state": "OH",
+      "zip": "44124",
+      "beds": 393,
+      "trauma_level": "Level III",
+      "teaching_hospital": false,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "cleveland clinic hillcrest hospital",
+        "cleveland clinic hillcrest"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH030",
+      "name": "Cleveland Clinic Marymount Hospital",
+      "city": "Garfield Heights",
+      "state": "OH",
+      "zip": "44125",
+      "beds": 269,
+      "trauma_level": null,
+      "teaching_hospital": false,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "cleveland clinic marymount",
+        "cleveland clinic marymt hospital",
+        "cleveland clinic marymount hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH031",
+      "name": "Cleveland Clinic Akron General",
+      "city": "Akron",
+      "state": "OH",
+      "zip": "44307",
+      "beds": 532,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "cleveland clinic akron general"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH032",
+      "name": "UH Ahuja Medical Center",
+      "city": "Beachwood",
+      "state": "OH",
+      "zip": "44122",
+      "beds": 144,
+      "trauma_level": null,
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "uh ahuja mc",
+        "uh ahuja",
+        "uh ahuja medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH033",
+      "name": "UH Parma Medical Center",
+      "city": "Parma",
+      "state": "OH",
+      "zip": "44129",
+      "beds": 303,
+      "trauma_level": "Level III",
+      "teaching_hospital": false,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "uh parma medical center",
+        "uh parma",
+        "uh parma mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH034",
+      "name": "Lake Health West Medical Center",
+      "city": "Willoughby",
+      "state": "OH",
+      "zip": "44094",
+      "beds": 215,
+      "trauma_level": null,
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "lake health west mc",
+        "lake health west",
+        "lake health west medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH035",
+      "name": "Southwest General Health Center",
+      "city": "Middleburg Heights",
+      "state": "OH",
+      "zip": "44130",
+      "beds": 350,
+      "trauma_level": "Level III",
+      "teaching_hospital": false,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "southwest general health center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH036",
+      "name": "Mercy Health Lorain Hospital",
+      "city": "Lorain",
+      "state": "OH",
+      "zip": "44053",
+      "beds": 203,
+      "trauma_level": null,
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Church",
+      "lookup_keys": [
+        "mercy health lorain",
+        "mercy health lorain hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH037",
+      "name": "Firelands Regional Medical Center",
+      "city": "Sandusky",
+      "state": "OH",
+      "zip": "44870",
+      "beds": 237,
+      "trauma_level": "Level III",
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Meditech",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "firelands",
+        "firelands regional medical center",
+        "firelands regional mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH038",
+      "name": "Genesis Healthcare System",
+      "city": "Zanesville",
+      "state": "OH",
+      "zip": "43701",
+      "beds": 321,
+      "trauma_level": "Level III",
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "genesis system",
+        "genesis healthcare system"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH039",
+      "name": "Licking Memorial Hospital",
+      "city": "Newark",
+      "state": "OH",
+      "zip": "43055",
+      "beds": 227,
+      "trauma_level": null,
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Meditech",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "licking memorial hospital",
+        "licking memorial"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH040",
+      "name": "Adena Regional Medical Center",
+      "city": "Chillicothe",
+      "state": "OH",
+      "zip": "45601",
+      "beds": 261,
+      "trauma_level": "Level III",
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "adena regional mc",
+        "adena regional medical center",
+        "adena"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH041",
+      "name": "OhioHealth Marion General Hospital",
+      "city": "Marion",
+      "state": "OH",
+      "zip": "43302",
+      "beds": 186,
+      "trauma_level": null,
+      "teaching_hospital": false,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "ohiohealth marion general",
+        "ohiohealth marion general hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH042",
+      "name": "OhioHealth Mansfield Hospital",
+      "city": "Mansfield",
+      "state": "OH",
+      "zip": "44903",
+      "beds": 269,
+      "trauma_level": "Level III",
+      "teaching_hospital": false,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "ohiohealth mansfield hospital",
+        "ohiohealth mansfield"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH043",
+      "name": "OhioHealth Dublin Methodist Hospital",
+      "city": "Dublin",
+      "state": "OH",
+      "zip": "43016",
+      "beds": 94,
+      "trauma_level": null,
+      "teaching_hospital": false,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "ohiohealth dublin methodist",
+        "ohiohealth dublin methodist hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH044",
+      "name": "Mount Carmel Grove City",
+      "city": "Grove City",
+      "state": "OH",
+      "zip": "43123",
+      "beds": 210,
+      "trauma_level": null,
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Church",
+      "lookup_keys": [
+        "mt carmel grove city",
+        "mount carmel grove city"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OH045",
+      "name": "OhioHealth Doctors Hospital",
+      "city": "Columbus",
+      "state": "OH",
+      "zip": "43228",
+      "beds": 241,
+      "trauma_level": null,
+      "teaching_hospital": false,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "ohiohealth doctors",
+        "ohiohealth doctors hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL001",
+      "name": "Jackson Memorial Hospital",
+      "city": "Miami",
+      "state": "FL",
+      "zip": "33136",
+      "beds": 1547,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - Hospital District",
+      "lookup_keys": [
+        "jackson memorial",
+        "jackson memorial hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL002",
+      "name": "Memorial Regional Hospital",
+      "city": "Hollywood",
+      "state": "FL",
+      "zip": "33021",
+      "beds": 820,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - Hospital District",
+      "lookup_keys": [
+        "memorial",
+        "memorial regional hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL003",
+      "name": "Tampa General Hospital",
+      "city": "Tampa",
+      "state": "FL",
+      "zip": "33606",
+      "beds": 1041,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - Hospital District",
+      "lookup_keys": [
+        "tampa general hospital",
+        "tampa general"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL004",
+      "name": "UF Health Shands Hospital",
+      "city": "Gainesville",
+      "state": "FL",
+      "zip": "32610",
+      "beds": 951,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "uf health shands hospital",
+        "uf health shands"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL005",
+      "name": "AdventHealth Orlando",
+      "city": "Orlando",
+      "state": "FL",
+      "zip": "32804",
+      "beds": 1368,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Church",
+      "lookup_keys": [
+        "adventhealth orlando"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL006",
+      "name": "Baptist Hospital of Miami",
+      "city": "Miami",
+      "state": "FL",
+      "zip": "33176",
+      "beds": 728,
+      "trauma_level": "Level II",
+      "teaching_hospital": false,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "baptist hospital of miami",
+        "baptist of miami"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL007",
+      "name": "Cleveland Clinic Florida",
+      "city": "Weston",
+      "state": "FL",
+      "zip": "33331",
+      "beds": 155,
+      "trauma_level": null,
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "cleveland clinic florida"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL008",
+      "name": "Moffitt Cancer Center",
+      "city": "Tampa",
+      "state": "FL",
+      "zip": "33612",
+      "beds": 206,
+      "trauma_level": null,
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "moffitt cancer center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL009",
+      "name": "Mayo Clinic Florida",
+      "city": "Jacksonville",
+      "state": "FL",
+      "zip": "32224",
+      "beds": 304,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "mayo clinic florida"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL010",
+      "name": "Broward Health Medical Center",
+      "city": "Fort Lauderdale",
+      "state": "FL",
+      "zip": "33316",
+      "beds": 716,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - Hospital District",
+      "lookup_keys": [
+        "broward health mc",
+        "broward health medical center",
+        "broward health"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL011",
+      "name": "Sarasota Memorial Hospital",
+      "city": "Sarasota",
+      "state": "FL",
+      "zip": "34239",
+      "beds": 839,
+      "trauma_level": "Level II",
+      "teaching_hospital": false,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - Hospital District",
+      "lookup_keys": [
+        "sarasota memorial",
+        "sarasota memorial hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL012",
+      "name": "Orlando Health Orlando Regional Medical Center",
+      "city": "Orlando",
+      "state": "FL",
+      "zip": "32806",
+      "beds": 808,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "orlando health orlando",
+        "orlando health orlando regional medical center",
+        "orlando health orlando regional mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL013",
+      "name": "St. Joseph's Hospital Tampa",
+      "city": "Tampa",
+      "state": "FL",
+      "zip": "33607",
+      "beds": 897,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Church",
+      "lookup_keys": [
+        "st. joseph's hospital tampa",
+        "st. joseph's tampa",
+        "st joseph's hospital tampa"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL014",
+      "name": "Morton Plant Hospital",
+      "city": "Clearwater",
+      "state": "FL",
+      "zip": "33756",
+      "beds": 687,
+      "trauma_level": "Level II",
+      "teaching_hospital": false,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "morton plant hospital",
+        "morton plant"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL015",
+      "name": "Lee Memorial Hospital",
+      "city": "Fort Myers",
+      "state": "FL",
+      "zip": "33901",
+      "beds": 418,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - Hospital District",
+      "lookup_keys": [
+        "lee memorial",
+        "lee memorial hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL016",
+      "name": "NCH Baker Hospital",
+      "city": "Naples",
+      "state": "FL",
+      "zip": "34102",
+      "beds": 664,
+      "trauma_level": "Level II",
+      "teaching_hospital": false,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "nch baker hospital",
+        "nch baker"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL017",
+      "name": "Lakeland Regional Health Medical Center",
+      "city": "Lakeland",
+      "state": "FL",
+      "zip": "33805",
+      "beds": 864,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "lakeland regional health mc",
+        "lakeland regional health medical center",
+        "lakeland health"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL018",
+      "name": "UF Health Jacksonville",
+      "city": "Jacksonville",
+      "state": "FL",
+      "zip": "32209",
+      "beds": 695,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "uf health jacksonville"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL019",
+      "name": "Baptist Medical Center Jacksonville",
+      "city": "Jacksonville",
+      "state": "FL",
+      "zip": "32207",
+      "beds": 941,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "baptist jacksonville",
+        "baptist medical center jacksonville",
+        "baptist mc jacksonville"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL020",
+      "name": "St. Vincent's Medical Center Riverside",
+      "city": "Jacksonville",
+      "state": "FL",
+      "zip": "32204",
+      "beds": 528,
+      "trauma_level": "Level II",
+      "teaching_hospital": false,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Church",
+      "lookup_keys": [
+        "st vincent's medical center riverside",
+        "st. vincent's riverside",
+        "st. vincent's mc riverside",
+        "st. vincent's medical center riverside"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL021",
+      "name": "Memorial Hospital West",
+      "city": "Pembroke Pines",
+      "state": "FL",
+      "zip": "33028",
+      "beds": 384,
+      "trauma_level": "Level II",
+      "teaching_hospital": false,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - Hospital District",
+      "lookup_keys": [
+        "memorial hospital west",
+        "memorial west"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL022",
+      "name": "Joe DiMaggio Children's Hospital",
+      "city": "Hollywood",
+      "state": "FL",
+      "zip": "33021",
+      "beds": 226,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Government - Hospital District",
+      "lookup_keys": [
+        "joe dimaggio",
+        "joe dimaggio children's hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL023",
+      "name": "Nicklaus Children's Hospital",
+      "city": "Miami",
+      "state": "FL",
+      "zip": "33155",
+      "beds": 289,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "nicklaus children's hospital",
+        "nicklaus"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL024",
+      "name": "All Children's Hospital Johns Hopkins",
+      "city": "St. Petersburg",
+      "state": "FL",
+      "zip": "33701",
+      "beds": 259,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "all children's hospital johns hopkins",
+        "all johns hopkins"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL025",
+      "name": "Advent Health Celebration",
+      "city": "Celebration",
+      "state": "FL",
+      "zip": "34747",
+      "beds": 237,
+      "trauma_level": null,
+      "teaching_hospital": false,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Church",
+      "lookup_keys": [
+        "advent health celebration"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL026",
+      "name": "HCA Florida JFK Hospital",
+      "city": "Atlantis",
+      "state": "FL",
+      "zip": "33462",
+      "beds": 424,
+      "trauma_level": "Level I",
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Proprietary",
+      "lookup_keys": [
+        "hca florida jfk",
+        "hca florida jfk hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL027",
+      "name": "HCA Florida Kendall Hospital",
+      "city": "Miami",
+      "state": "FL",
+      "zip": "33175",
+      "beds": 417,
+      "trauma_level": "Level II",
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Proprietary",
+      "lookup_keys": [
+        "hca florida kendall hospital",
+        "hca florida kendall"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL028",
+      "name": "HCA Florida Aventura Hospital",
+      "city": "Aventura",
+      "state": "FL",
+      "zip": "33180",
+      "beds": 407,
+      "trauma_level": "Level II",
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Proprietary",
+      "lookup_keys": [
+        "hca florida aventura hospital",
+        "hca florida aventura"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL029",
+      "name": "HCA Florida Palms West Hospital",
+      "city": "Loxahatchee",
+      "state": "FL",
+      "zip": "33470",
+      "beds": 204,
+      "trauma_level": null,
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Proprietary",
+      "lookup_keys": [
+        "hca florida palms west",
+        "hca florida palms west hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL030",
+      "name": "HCA Florida Osceola Hospital",
+      "city": "Kissimmee",
+      "state": "FL",
+      "zip": "34741",
+      "beds": 404,
+      "trauma_level": "Level II",
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Proprietary",
+      "lookup_keys": [
+        "hca florida osceola",
+        "hca florida osceola hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL031",
+      "name": "HCA Florida Brandon Hospital",
+      "city": "Brandon",
+      "state": "FL",
+      "zip": "33511",
+      "beds": 436,
+      "trauma_level": "Level III",
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Proprietary",
+      "lookup_keys": [
+        "hca florida brandon",
+        "hca florida brandon hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL032",
+      "name": "HCA Florida Oak Hill Hospital",
+      "city": "Brooksville",
+      "state": "FL",
+      "zip": "34601",
+      "beds": 262,
+      "trauma_level": null,
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Proprietary",
+      "lookup_keys": [
+        "hca florida oak hill",
+        "hca florida oak hill hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL033",
+      "name": "Delray Medical Center",
+      "city": "Delray Beach",
+      "state": "FL",
+      "zip": "33484",
+      "beds": 493,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Proprietary",
+      "lookup_keys": [
+        "delray",
+        "delray medical center",
+        "delray mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL034",
+      "name": "Palm Beach Gardens Medical Center",
+      "city": "Palm Beach Gardens",
+      "state": "FL",
+      "zip": "33410",
+      "beds": 199,
+      "trauma_level": null,
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Proprietary",
+      "lookup_keys": [
+        "palm beach gardens mc",
+        "palm beach gardens medical center",
+        "palm beach gardens"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL035",
+      "name": "Wellington Regional Medical Center",
+      "city": "Wellington",
+      "state": "FL",
+      "zip": "33414",
+      "beds": 235,
+      "trauma_level": "Level II",
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Proprietary",
+      "lookup_keys": [
+        "wellington",
+        "wellington regional mc",
+        "wellington regional medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL036",
+      "name": "Bayfront Health St. Petersburg",
+      "city": "St. Petersburg",
+      "state": "FL",
+      "zip": "33701",
+      "beds": 395,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Proprietary",
+      "lookup_keys": [
+        "bayfront health st. petersburg",
+        "bayfront health st petersburg"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL037",
+      "name": "Ascension Sacred Heart Pensacola",
+      "city": "Pensacola",
+      "state": "FL",
+      "zip": "32504",
+      "beds": 566,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Church",
+      "lookup_keys": [
+        "ascension sacred heart pensacola"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL038",
+      "name": "Baptist Hospital Pensacola",
+      "city": "Pensacola",
+      "state": "FL",
+      "zip": "32501",
+      "beds": 492,
+      "trauma_level": "Level II",
+      "teaching_hospital": false,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "baptist pensacola",
+        "baptist hospital pensacola"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL039",
+      "name": "Tallahassee Memorial HealthCare",
+      "city": "Tallahassee",
+      "state": "FL",
+      "zip": "32308",
+      "beds": 772,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "tallahassee memorial",
+        "tallahassee memorial healthcare"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "FL040",
+      "name": "Halifax Health Medical Center",
+      "city": "Daytona Beach",
+      "state": "FL",
+      "zip": "32114",
+      "beds": 657,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - Hospital District",
+      "lookup_keys": [
+        "halifax health",
+        "halifax health medical center",
+        "halifax health mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX001",
+      "name": "Houston Methodist Hospital",
+      "city": "Houston",
+      "state": "TX",
+      "zip": "77030",
+      "beds": 952,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "houston methodist hospital",
+        "houston methodist"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX002",
+      "name": "MD Anderson Cancer Center",
+      "city": "Houston",
+      "state": "TX",
+      "zip": "77030",
+      "beds": 651,
+      "trauma_level": null,
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "md anderson cancer center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX003",
+      "name": "Texas Children's Hospital",
+      "city": "Houston",
+      "state": "TX",
+      "zip": "77030",
+      "beds": 973,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "texas",
+        "texas children's hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX004",
+      "name": "UT Southwestern Medical Center",
+      "city": "Dallas",
+      "state": "TX",
+      "zip": "75390",
+      "beds": 740,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "ut southwestern",
+        "ut southwestern medical center",
+        "ut southwestern mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX005",
+      "name": "Baylor University Medical Center",
+      "city": "Dallas",
+      "state": "TX",
+      "zip": "75246",
+      "beds": 914,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "baylor university mc",
+        "baylor",
+        "baylor university medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX006",
+      "name": "Memorial Hermann Texas Medical Center",
+      "city": "Houston",
+      "state": "TX",
+      "zip": "77030",
+      "beds": 1059,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "memorial hermann texas",
+        "memorial hermann texas medical center",
+        "memorial hermann texas mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX007",
+      "name": "Parkland Memorial Hospital",
+      "city": "Dallas",
+      "state": "TX",
+      "zip": "75235",
+      "beds": 862,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - Hospital District",
+      "lookup_keys": [
+        "parkland memorial",
+        "parkland memorial hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX008",
+      "name": "John Peter Smith Hospital",
+      "city": "Fort Worth",
+      "state": "TX",
+      "zip": "76104",
+      "beds": 573,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - Hospital District",
+      "lookup_keys": [
+        "john peter smith hospital",
+        "john peter smith"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX009",
+      "name": "Ben Taub Hospital",
+      "city": "Houston",
+      "state": "TX",
+      "zip": "77030",
+      "beds": 586,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - Hospital District",
+      "lookup_keys": [
+        "ben taub",
+        "ben taub hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX010",
+      "name": "University Health System San Antonio",
+      "city": "San Antonio",
+      "state": "TX",
+      "zip": "78229",
+      "beds": 716,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - Hospital District",
+      "lookup_keys": [
+        "san antonio",
+        "university health system san antonio"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX011",
+      "name": "Dell Seton Medical Center at UT",
+      "city": "Austin",
+      "state": "TX",
+      "zip": "78701",
+      "beds": 211,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "dell seton at ut",
+        "dell seton medical center at ut",
+        "dell seton mc at ut"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX012",
+      "name": "St. David's Medical Center",
+      "city": "Austin",
+      "state": "TX",
+      "zip": "78705",
+      "beds": 369,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Proprietary",
+      "lookup_keys": [
+        "st. david's mc",
+        "st. david's medical center",
+        "st david's medical center",
+        "st. david's"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX013",
+      "name": "Medical City Dallas Hospital",
+      "city": "Dallas",
+      "state": "TX",
+      "zip": "75230",
+      "beds": 658,
+      "trauma_level": "Level I",
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Proprietary",
+      "lookup_keys": [
+        "medical city dallas",
+        "medical city dallas hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX014",
+      "name": "Methodist Hospital San Antonio",
+      "city": "San Antonio",
+      "state": "TX",
+      "zip": "78229",
+      "beds": 1536,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Proprietary",
+      "lookup_keys": [
+        "methodist san antonio",
+        "methodist hospital san antonio"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX015",
+      "name": "Harris Health Lyndon B. Johnson Hospital",
+      "city": "Houston",
+      "state": "TX",
+      "zip": "77026",
+      "beds": 328,
+      "trauma_level": "Level III",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - Hospital District",
+      "lookup_keys": [
+        "harris health lyndon b. johnson",
+        "harris health lyndon b. johnson hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX016",
+      "name": "Cook Children's Medical Center",
+      "city": "Fort Worth",
+      "state": "TX",
+      "zip": "76104",
+      "beds": 443,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "cook children's medical center",
+        "cook",
+        "cook children's mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX017",
+      "name": "Texas Health Presbyterian Dallas",
+      "city": "Dallas",
+      "state": "TX",
+      "zip": "75231",
+      "beds": 875,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "texas health presbyterian dallas"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX018",
+      "name": "Texas Health Harris Methodist Fort Worth",
+      "city": "Fort Worth",
+      "state": "TX",
+      "zip": "76104",
+      "beds": 724,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "texas health harris methodist fort worth"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX019",
+      "name": "Baylor Scott White Medical Center Temple",
+      "city": "Temple",
+      "state": "TX",
+      "zip": "76508",
+      "beds": 636,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "baylor scott white medical center temple",
+        "baylor scott white temple",
+        "baylor scott white mc temple"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX020",
+      "name": "Baylor Scott White Medical Center Dallas",
+      "city": "Dallas",
+      "state": "TX",
+      "zip": "75246",
+      "beds": 914,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "baylor scott white dallas",
+        "baylor scott white medical center dallas",
+        "baylor scott white mc dallas"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX021",
+      "name": "Houston Methodist The Woodlands Hospital",
+      "city": "The Woodlands",
+      "state": "TX",
+      "zip": "77384",
+      "beds": 293,
+      "trauma_level": "Level II",
+      "teaching_hospital": false,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "houston methodist the woodlands hospital",
+        "houston methodist the woodlands"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX022",
+      "name": "Houston Methodist Sugar Land Hospital",
+      "city": "Sugar Land",
+      "state": "TX",
+      "zip": "77479",
+      "beds": 263,
+      "trauma_level": null,
+      "teaching_hospital": false,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "houston methodist sugar land",
+        "houston methodist sugar land hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX023",
+      "name": "Memorial Hermann Memorial City",
+      "city": "Houston",
+      "state": "TX",
+      "zip": "77024",
+      "beds": 445,
+      "trauma_level": "Level II",
+      "teaching_hospital": false,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "memorial hermann memorial city"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX024",
+      "name": "Memorial Hermann Katy",
+      "city": "Katy",
+      "state": "TX",
+      "zip": "77450",
+      "beds": 208,
+      "trauma_level": "Level III",
+      "teaching_hospital": false,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "memorial hermann katy"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX025",
+      "name": "CHRISTUS Santa Rosa Hospital Medical Center",
+      "city": "San Antonio",
+      "state": "TX",
+      "zip": "78229",
+      "beds": 750,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Church",
+      "lookup_keys": [
+        "christus santa rosa hospital mc",
+        "christus santa rosa",
+        "christus santa rosa hospital medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX026",
+      "name": "CHRISTUS Spohn Hospital Corpus Christi",
+      "city": "Corpus Christi",
+      "state": "TX",
+      "zip": "78404",
+      "beds": 680,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Church",
+      "lookup_keys": [
+        "christus spohn corpus christi",
+        "christus spohn hospital corpus christi"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX027",
+      "name": "Valley Baptist Medical Center Harlingen",
+      "city": "Harlingen",
+      "state": "TX",
+      "zip": "78550",
+      "beds": 586,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Proprietary",
+      "lookup_keys": [
+        "valley baptist mc harlingen",
+        "valley baptist medical center harlingen",
+        "valley baptist harlingen"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX028",
+      "name": "El Paso Children's Hospital",
+      "city": "El Paso",
+      "state": "TX",
+      "zip": "79905",
+      "beds": 122,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "el paso",
+        "el paso children's hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX029",
+      "name": "University Medical Center El Paso",
+      "city": "El Paso",
+      "state": "TX",
+      "zip": "79905",
+      "beds": 385,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - Hospital District",
+      "lookup_keys": [
+        "el paso",
+        "university medical center el paso",
+        "university mc el paso"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TX030",
+      "name": "Medical Center Hospital Odessa",
+      "city": "Odessa",
+      "state": "TX",
+      "zip": "79761",
+      "beds": 388,
+      "trauma_level": "Level II",
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - Hospital District",
+      "lookup_keys": [
+        "odessa",
+        "mc hospital odessa",
+        "medical center hospital odessa"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA001",
+      "name": "Cedars-Sinai Medical Center",
+      "city": "Los Angeles",
+      "state": "CA",
+      "zip": "90048",
+      "beds": 958,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "cedars-sinai mc",
+        "cedars-sinai",
+        "cedars-sinai medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA002",
+      "name": "UCLA Medical Center",
+      "city": "Los Angeles",
+      "state": "CA",
+      "zip": "90095",
+      "beds": 520,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "ucla",
+        "ucla mc",
+        "ucla medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA003",
+      "name": "Stanford Health Care",
+      "city": "Stanford",
+      "state": "CA",
+      "zip": "94305",
+      "beds": 613,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "stanford health care"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA004",
+      "name": "UCSF Medical Center",
+      "city": "San Francisco",
+      "state": "CA",
+      "zip": "94143",
+      "beds": 785,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "ucsf mc",
+        "ucsf medical center",
+        "ucsf"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA005",
+      "name": "Kaiser Permanente Los Angeles Medical Center",
+      "city": "Los Angeles",
+      "state": "CA",
+      "zip": "90027",
+      "beds": 467,
+      "trauma_level": "Level II",
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "kaiser permanente los angeles medical center",
+        "kaiser permanente los angeles",
+        "kaiser permanente los angeles mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA006",
+      "name": "UC Davis Medical Center",
+      "city": "Sacramento",
+      "state": "CA",
+      "zip": "95817",
+      "beds": 627,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "uc davis mc",
+        "uc davis medical center",
+        "uc davis"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA007",
+      "name": "Scripps Mercy Hospital San Diego",
+      "city": "San Diego",
+      "state": "CA",
+      "zip": "92103",
+      "beds": 700,
+      "trauma_level": "Level I",
+      "teaching_hospital": false,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "scripps mercy san diego",
+        "scripps mercy hospital san diego"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA008",
+      "name": "UC San Diego Medical Center",
+      "city": "San Diego",
+      "state": "CA",
+      "zip": "92103",
+      "beds": 808,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "uc san diego mc",
+        "uc san diego",
+        "uc san diego medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA009",
+      "name": "Zuckerberg San Francisco General Hospital",
+      "city": "San Francisco",
+      "state": "CA",
+      "zip": "94110",
+      "beds": 598,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - Local",
+      "lookup_keys": [
+        "zuckerberg san francisco general",
+        "zuckerberg san francisco general hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA010",
+      "name": "LAC+USC Medical Center",
+      "city": "Los Angeles",
+      "state": "CA",
+      "zip": "90033",
+      "beds": 600,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - County",
+      "lookup_keys": [
+        "lac+usc",
+        "lac+usc mc",
+        "lac+usc medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA011",
+      "name": "Harbor-UCLA Medical Center",
+      "city": "Torrance",
+      "state": "CA",
+      "zip": "90502",
+      "beds": 570,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - County",
+      "lookup_keys": [
+        "harbor-ucla medical center",
+        "harbor-ucla mc",
+        "harbor-ucla"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA012",
+      "name": "Hoag Memorial Hospital Presbyterian",
+      "city": "Newport Beach",
+      "state": "CA",
+      "zip": "92663",
+      "beds": 498,
+      "trauma_level": "Level II",
+      "teaching_hospital": false,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "hoag memorial presbyterian",
+        "hoag memorial hospital presbyterian"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA013",
+      "name": "Sharp Memorial Hospital",
+      "city": "San Diego",
+      "state": "CA",
+      "zip": "92123",
+      "beds": 675,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "sharp memorial hospital",
+        "sharp memorial"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA014",
+      "name": "UCI Medical Center",
+      "city": "Orange",
+      "state": "CA",
+      "zip": "92868",
+      "beds": 417,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "uci mc",
+        "uci medical center",
+        "uci"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA015",
+      "name": "Loma Linda University Medical Center",
+      "city": "Loma Linda",
+      "state": "CA",
+      "zip": "92354",
+      "beds": 900,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Church",
+      "lookup_keys": [
+        "loma linda university medical center",
+        "loma linda university mc",
+        "loma linda"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA016",
+      "name": "CHOC Children's Hospital",
+      "city": "Orange",
+      "state": "CA",
+      "zip": "92868",
+      "beds": 334,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "choc",
+        "choc children's hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA017",
+      "name": "Children's Hospital Los Angeles",
+      "city": "Los Angeles",
+      "state": "CA",
+      "zip": "90027",
+      "beds": 495,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "children's hospital los angeles",
+        "los angeles"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA018",
+      "name": "Lucile Packard Children's Hospital Stanford",
+      "city": "Palo Alto",
+      "state": "CA",
+      "zip": "94304",
+      "beds": 361,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "lucile packard children's hospital stanford",
+        "lucile packard stanford"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA019",
+      "name": "Rady Children's Hospital San Diego",
+      "city": "San Diego",
+      "state": "CA",
+      "zip": "92123",
+      "beds": 505,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "rady children's hospital san diego",
+        "rady san diego"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA020",
+      "name": "Valley Children's Hospital",
+      "city": "Madera",
+      "state": "CA",
+      "zip": "93636",
+      "beds": 358,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "valley children's hospital",
+        "valley"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA021",
+      "name": "Community Regional Medical Center Fresno",
+      "city": "Fresno",
+      "state": "CA",
+      "zip": "93721",
+      "beds": 685,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "community regional medical center fresno",
+        "community fresno",
+        "community regional mc fresno"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA022",
+      "name": "Sutter Medical Center Sacramento",
+      "city": "Sacramento",
+      "state": "CA",
+      "zip": "95816",
+      "beds": 523,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "sutter medical center sacramento",
+        "sutter sacramento",
+        "sutter mc sacramento"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA023",
+      "name": "Kaiser Permanente San Francisco Medical Center",
+      "city": "San Francisco",
+      "state": "CA",
+      "zip": "94115",
+      "beds": 247,
+      "trauma_level": null,
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "kaiser permanente san francisco medical center",
+        "kaiser permanente san francisco mc",
+        "kaiser permanente san francisco"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA024",
+      "name": "Kaiser Permanente Oakland Medical Center",
+      "city": "Oakland",
+      "state": "CA",
+      "zip": "94611",
+      "beds": 349,
+      "trauma_level": "Level II",
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "kaiser permanente oakland medical center",
+        "kaiser permanente oakland",
+        "kaiser permanente oakland mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA025",
+      "name": "Providence Cedars-Sinai Tarzana Medical Center",
+      "city": "Tarzana",
+      "state": "CA",
+      "zip": "91356",
+      "beds": 249,
+      "trauma_level": null,
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "providence cedars-sinai tarzana",
+        "providence cedars-sinai tarzana mc",
+        "providence cedars-sinai tarzana medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA026",
+      "name": "Huntington Hospital",
+      "city": "Pasadena",
+      "state": "CA",
+      "zip": "91105",
+      "beds": 619,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "huntington hospital",
+        "huntington"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA027",
+      "name": "St. Joseph Hospital Orange",
+      "city": "Orange",
+      "state": "CA",
+      "zip": "92868",
+      "beds": 525,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Church",
+      "lookup_keys": [
+        "st joseph hospital orange",
+        "st. joseph hospital orange",
+        "st. joseph orange"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA028",
+      "name": "Long Beach Memorial Medical Center",
+      "city": "Long Beach",
+      "state": "CA",
+      "zip": "90806",
+      "beds": 462,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "long beach memorial",
+        "long beach memorial medical center",
+        "long beach memorial mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA029",
+      "name": "PIH Health Whittier Hospital",
+      "city": "Whittier",
+      "state": "CA",
+      "zip": "90602",
+      "beds": 523,
+      "trauma_level": "Level II",
+      "teaching_hospital": false,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "pih health whittier",
+        "pih health whittier hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CA030",
+      "name": "Riverside Community Hospital",
+      "city": "Riverside",
+      "state": "CA",
+      "zip": "92501",
+      "beds": 478,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Proprietary",
+      "lookup_keys": [
+        "riverside community hospital",
+        "riverside community"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NY001",
+      "name": "NYU Langone Medical Center",
+      "city": "New York",
+      "state": "NY",
+      "zip": "10016",
+      "beds": 834,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "nyu langone mc",
+        "nyu langone medical center",
+        "nyu langone"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NY002",
+      "name": "Mount Sinai Hospital",
+      "city": "New York",
+      "state": "NY",
+      "zip": "10029",
+      "beds": 1134,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "mt sinai hospital",
+        "mount sinai hospital",
+        "mount sinai"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NY003",
+      "name": "NewYork-Presbyterian Hospital Columbia",
+      "city": "New York",
+      "state": "NY",
+      "zip": "10032",
+      "beds": 765,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "newyork-presbyterian hospital columbia",
+        "newyork-presbyterian columbia"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NY004",
+      "name": "NewYork-Presbyterian Hospital Weill Cornell",
+      "city": "New York",
+      "state": "NY",
+      "zip": "10065",
+      "beds": 862,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "newyork-presbyterian weill cornell",
+        "newyork-presbyterian hospital weill cornell"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NY005",
+      "name": "Memorial Sloan Kettering Cancer Center",
+      "city": "New York",
+      "state": "NY",
+      "zip": "10065",
+      "beds": 514,
+      "trauma_level": null,
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "memorial sloan kettering cancer center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NY006",
+      "name": "Montefiore Medical Center Moses",
+      "city": "Bronx",
+      "state": "NY",
+      "zip": "10467",
+      "beds": 802,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "montefiore mc moses",
+        "montefiore moses",
+        "montefiore medical center moses"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NY007",
+      "name": "Montefiore Medical Center Weiler",
+      "city": "Bronx",
+      "state": "NY",
+      "zip": "10461",
+      "beds": 689,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "montefiore weiler",
+        "montefiore mc weiler",
+        "montefiore medical center weiler"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NY008",
+      "name": "Northwell Health North Shore University Hospital",
+      "city": "Manhasset",
+      "state": "NY",
+      "zip": "11030",
+      "beds": 738,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "northwell health north shore",
+        "northwell health north shore university hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NY009",
+      "name": "Northwell Health Long Island Jewish Medical Center",
+      "city": "New Hyde Park",
+      "state": "NY",
+      "zip": "11040",
+      "beds": 583,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "northwell health long island jewish",
+        "northwell health long island jewish medical center",
+        "northwell health long island jewish mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NY010",
+      "name": "Stony Brook University Hospital",
+      "city": "Stony Brook",
+      "state": "NY",
+      "zip": "11794",
+      "beds": 603,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "stony brook university hospital",
+        "stony brook"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NY011",
+      "name": "Strong Memorial Hospital",
+      "city": "Rochester",
+      "state": "NY",
+      "zip": "14642",
+      "beds": 886,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "strong memorial",
+        "strong memorial hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NY012",
+      "name": "SUNY Upstate University Hospital",
+      "city": "Syracuse",
+      "state": "NY",
+      "zip": "13210",
+      "beds": 530,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "suny upstate university hospital",
+        "suny upstate"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NY013",
+      "name": "Albany Medical Center",
+      "city": "Albany",
+      "state": "NY",
+      "zip": "12208",
+      "beds": 734,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "albany mc",
+        "albany",
+        "albany medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NY014",
+      "name": "Jacobi Medical Center",
+      "city": "Bronx",
+      "state": "NY",
+      "zip": "10461",
+      "beds": 457,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - City",
+      "lookup_keys": [
+        "jacobi mc",
+        "jacobi",
+        "jacobi medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NY015",
+      "name": "Bellevue Hospital Center",
+      "city": "New York",
+      "state": "NY",
+      "zip": "10016",
+      "beds": 844,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - City",
+      "lookup_keys": [
+        "bellevue center",
+        "bellevue hospital center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NY016",
+      "name": "Kings County Hospital Center",
+      "city": "Brooklyn",
+      "state": "NY",
+      "zip": "11203",
+      "beds": 627,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - City",
+      "lookup_keys": [
+        "kings county hospital center",
+        "kings county center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NY017",
+      "name": "Maimonides Medical Center",
+      "city": "Brooklyn",
+      "state": "NY",
+      "zip": "11219",
+      "beds": 711,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "maimonides mc",
+        "maimonides",
+        "maimonides medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NY018",
+      "name": "NYC Health + Hospitals/Lincoln",
+      "city": "Bronx",
+      "state": "NY",
+      "zip": "10454",
+      "beds": 362,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - City",
+      "lookup_keys": [
+        "nyc health + s/lincoln",
+        "nyc health + hospitals/lincoln"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NY019",
+      "name": "Westchester Medical Center",
+      "city": "Valhalla",
+      "state": "NY",
+      "zip": "10595",
+      "beds": 870,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - County",
+      "lookup_keys": [
+        "westchester mc",
+        "westchester medical center",
+        "westchester"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NY020",
+      "name": "Erie County Medical Center",
+      "city": "Buffalo",
+      "state": "NY",
+      "zip": "14215",
+      "beds": 573,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - County",
+      "lookup_keys": [
+        "erie county mc",
+        "erie county medical center",
+        "erie county"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NY021",
+      "name": "Kaleida Health Buffalo General Medical Center",
+      "city": "Buffalo",
+      "state": "NY",
+      "zip": "14203",
+      "beds": 503,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "kaleida health buffalo general mc",
+        "kaleida health buffalo general medical center",
+        "kaleida health buffalo general"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NY022",
+      "name": "Cohen Children's Medical Center",
+      "city": "New Hyde Park",
+      "state": "NY",
+      "zip": "11040",
+      "beds": 202,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "cohen",
+        "cohen children's mc",
+        "cohen children's medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "PA001",
+      "name": "Hospital of the University of Pennsylvania",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19104",
+      "beds": 789,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "of the of pennsylvania",
+        "hospital of the university of pennsylvania"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "PA002",
+      "name": "UPMC Presbyterian",
+      "city": "Pittsburgh",
+      "state": "PA",
+      "zip": "15213",
+      "beds": 757,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "upmc presbyterian"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "PA003",
+      "name": "Children's Hospital of Philadelphia",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19104",
+      "beds": 594,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "of philadelphia",
+        "children's hospital of philadelphia"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "PA004",
+      "name": "Thomas Jefferson University Hospital",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19107",
+      "beds": 957,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "thomas jefferson",
+        "thomas jefferson university hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "PA005",
+      "name": "Penn Presbyterian Medical Center",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19104",
+      "beds": 331,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "penn presbyterian medical center",
+        "penn presbyterian",
+        "penn presbyterian mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "PA006",
+      "name": "Temple University Hospital",
+      "city": "Philadelphia",
+      "state": "PA",
+      "zip": "19140",
+      "beds": 732,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "temple university hospital",
+        "temple"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "PA007",
+      "name": "Allegheny General Hospital",
+      "city": "Pittsburgh",
+      "state": "PA",
+      "zip": "15212",
+      "beds": 622,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "allegheny general hospital",
+        "allegheny general"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "PA008",
+      "name": "UPMC Shadyside",
+      "city": "Pittsburgh",
+      "state": "PA",
+      "zip": "15232",
+      "beds": 520,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "upmc shadyside"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "PA009",
+      "name": "Geisinger Medical Center",
+      "city": "Danville",
+      "state": "PA",
+      "zip": "17822",
+      "beds": 545,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "geisinger mc",
+        "geisinger medical center",
+        "geisinger"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "PA010",
+      "name": "Penn State Health Milton S. Hershey Medical Center",
+      "city": "Hershey",
+      "state": "PA",
+      "zip": "17033",
+      "beds": 551,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "penn state health milton s. hershey mc",
+        "penn state health milton s. hershey",
+        "penn state health milton s. hershey medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "PA011",
+      "name": "Lehigh Valley Hospital Cedar Crest",
+      "city": "Allentown",
+      "state": "PA",
+      "zip": "18103",
+      "beds": 808,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "lehigh valley hospital cedar crest",
+        "lehigh valley cedar crest"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "PA012",
+      "name": "UPMC Children's Hospital of Pittsburgh",
+      "city": "Pittsburgh",
+      "state": "PA",
+      "zip": "15224",
+      "beds": 315,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "upmc of pittsburgh",
+        "upmc children's hospital of pittsburgh"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "IL001",
+      "name": "Northwestern Memorial Hospital",
+      "city": "Chicago",
+      "state": "IL",
+      "zip": "60611",
+      "beds": 894,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "northwestern memorial",
+        "northwestern memorial hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "IL002",
+      "name": "Rush University Medical Center",
+      "city": "Chicago",
+      "state": "IL",
+      "zip": "60612",
+      "beds": 664,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "rush university mc",
+        "rush",
+        "rush university medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "IL003",
+      "name": "University of Chicago Medical Center",
+      "city": "Chicago",
+      "state": "IL",
+      "zip": "60637",
+      "beds": 640,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "of chicago",
+        "university of chicago mc",
+        "university of chicago medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "IL004",
+      "name": "Loyola University Medical Center",
+      "city": "Maywood",
+      "state": "IL",
+      "zip": "60153",
+      "beds": 547,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "loyola",
+        "loyola university mc",
+        "loyola university medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "IL005",
+      "name": "Advocate Christ Medical Center",
+      "city": "Oak Lawn",
+      "state": "IL",
+      "zip": "60453",
+      "beds": 785,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "advocate christ medical center",
+        "advocate christ",
+        "advocate christ mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "IL006",
+      "name": "University of Illinois Hospital",
+      "city": "Chicago",
+      "state": "IL",
+      "zip": "60612",
+      "beds": 462,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "of illinois",
+        "university of illinois hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "IL007",
+      "name": "Advocate Lutheran General Hospital",
+      "city": "Park Ridge",
+      "state": "IL",
+      "zip": "60068",
+      "beds": 625,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "advocate lutheran general",
+        "advocate lutheran general hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "IL008",
+      "name": "OSF Saint Francis Medical Center",
+      "city": "Peoria",
+      "state": "IL",
+      "zip": "61637",
+      "beds": 616,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Church",
+      "lookup_keys": [
+        "osf saint francis",
+        "osf saint francis mc",
+        "osf saint francis medical center",
+        "osf st francis medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "IL009",
+      "name": "Carle Foundation Hospital",
+      "city": "Urbana",
+      "state": "IL",
+      "zip": "61801",
+      "beds": 433,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "carle foundation",
+        "carle foundation hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "IL010",
+      "name": "Ann & Robert H. Lurie Children's Hospital",
+      "city": "Chicago",
+      "state": "IL",
+      "zip": "60611",
+      "beds": 360,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "ann & robert h. lurie children's hospital",
+        "ann & robert h. lurie"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MA001",
+      "name": "Massachusetts General Hospital",
+      "city": "Boston",
+      "state": "MA",
+      "zip": "02114",
+      "beds": 1057,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "massachusetts general",
+        "massachusetts general hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MA002",
+      "name": "Brigham and Women's Hospital",
+      "city": "Boston",
+      "state": "MA",
+      "zip": "02115",
+      "beds": 793,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "brigham and women's hospital",
+        "brigham and women's"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MA003",
+      "name": "Boston Children's Hospital",
+      "city": "Boston",
+      "state": "MA",
+      "zip": "02115",
+      "beds": 415,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "boston",
+        "boston children's hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MA004",
+      "name": "Beth Israel Deaconess Medical Center",
+      "city": "Boston",
+      "state": "MA",
+      "zip": "02215",
+      "beds": 673,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "beth israel deaconess medical center",
+        "beth israel deaconess",
+        "beth israel deaconess mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MA005",
+      "name": "Tufts Medical Center",
+      "city": "Boston",
+      "state": "MA",
+      "zip": "02111",
+      "beds": 415,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "tufts medical center",
+        "tufts",
+        "tufts mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MA006",
+      "name": "UMass Memorial Medical Center",
+      "city": "Worcester",
+      "state": "MA",
+      "zip": "01655",
+      "beds": 781,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "umass memorial medical center",
+        "umass memorial mc",
+        "umass memorial"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MA007",
+      "name": "Boston Medical Center",
+      "city": "Boston",
+      "state": "MA",
+      "zip": "02118",
+      "beds": 514,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "boston mc",
+        "boston",
+        "boston medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MA008",
+      "name": "Dana-Farber Cancer Institute",
+      "city": "Boston",
+      "state": "MA",
+      "zip": "02215",
+      "beds": 30,
+      "trauma_level": null,
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "dana-farber cancer institute"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MI001",
+      "name": "Michigan Medicine",
+      "city": "Ann Arbor",
+      "state": "MI",
+      "zip": "48109",
+      "beds": 1000,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "michigan medicine"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MI002",
+      "name": "Henry Ford Hospital",
+      "city": "Detroit",
+      "state": "MI",
+      "zip": "48202",
+      "beds": 877,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "henry ford",
+        "henry ford hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MI003",
+      "name": "Beaumont Hospital Royal Oak",
+      "city": "Royal Oak",
+      "state": "MI",
+      "zip": "48073",
+      "beds": 1070,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "beaumont hospital royal oak",
+        "beaumont royal oak"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MI004",
+      "name": "Spectrum Health Butterworth Hospital",
+      "city": "Grand Rapids",
+      "state": "MI",
+      "zip": "49503",
+      "beds": 1074,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "spectrum health butterworth hospital",
+        "spectrum health butterworth"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MI005",
+      "name": "Detroit Medical Center",
+      "city": "Detroit",
+      "state": "MI",
+      "zip": "48201",
+      "beds": 730,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Proprietary",
+      "lookup_keys": [
+        "detroit mc",
+        "detroit medical center",
+        "detroit"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NC001",
+      "name": "Duke University Hospital",
+      "city": "Durham",
+      "state": "NC",
+      "zip": "27710",
+      "beds": 1048,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "duke",
+        "duke university hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NC002",
+      "name": "UNC Medical Center",
+      "city": "Chapel Hill",
+      "state": "NC",
+      "zip": "27514",
+      "beds": 853,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "unc",
+        "unc mc",
+        "unc medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NC003",
+      "name": "Atrium Health Carolinas Medical Center",
+      "city": "Charlotte",
+      "state": "NC",
+      "zip": "28203",
+      "beds": 1286,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "atrium health carolinas medical center",
+        "atrium health carolinas",
+        "atrium health carolinas mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NC004",
+      "name": "Wake Forest Baptist Medical Center",
+      "city": "Winston-Salem",
+      "state": "NC",
+      "zip": "27157",
+      "beds": 885,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "wake forest baptist mc",
+        "wake forest baptist medical center",
+        "wake forest baptist"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NC005",
+      "name": "Vidant Medical Center",
+      "city": "Greenville",
+      "state": "NC",
+      "zip": "27834",
+      "beds": 974,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "vidant",
+        "vidant medical center",
+        "vidant mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "GA001",
+      "name": "Emory University Hospital",
+      "city": "Atlanta",
+      "state": "GA",
+      "zip": "30322",
+      "beds": 733,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "emory",
+        "emory university hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "GA002",
+      "name": "Grady Memorial Hospital",
+      "city": "Atlanta",
+      "state": "GA",
+      "zip": "30303",
+      "beds": 953,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - Hospital District",
+      "lookup_keys": [
+        "grady memorial",
+        "grady memorial hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "GA003",
+      "name": "Piedmont Atlanta Hospital",
+      "city": "Atlanta",
+      "state": "GA",
+      "zip": "30309",
+      "beds": 529,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "piedmont atlanta hospital",
+        "piedmont atlanta"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "GA004",
+      "name": "Wellstar Kennestone Hospital",
+      "city": "Marietta",
+      "state": "GA",
+      "zip": "30060",
+      "beds": 633,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "wellstar kennestone hospital",
+        "wellstar kennestone"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "GA005",
+      "name": "Augusta University Medical Center",
+      "city": "Augusta",
+      "state": "GA",
+      "zip": "30912",
+      "beds": 478,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "augusta",
+        "augusta university medical center",
+        "augusta university mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "GA006",
+      "name": "Memorial Health University Medical Center",
+      "city": "Savannah",
+      "state": "GA",
+      "zip": "31404",
+      "beds": 612,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "memorial health university medical center",
+        "memorial health",
+        "memorial health university mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "GA007",
+      "name": "Children's Healthcare of Atlanta",
+      "city": "Atlanta",
+      "state": "GA",
+      "zip": "30342",
+      "beds": 673,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "children's healthcare of atlanta",
+        "of atlanta"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TN001",
+      "name": "Vanderbilt University Medical Center",
+      "city": "Nashville",
+      "state": "TN",
+      "zip": "37232",
+      "beds": 1091,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "vanderbilt university medical center",
+        "vanderbilt",
+        "vanderbilt university mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TN002",
+      "name": "UT Medical Center Knoxville",
+      "city": "Knoxville",
+      "state": "TN",
+      "zip": "37920",
+      "beds": 581,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "ut medical center knoxville",
+        "ut mc knoxville",
+        "ut knoxville"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TN003",
+      "name": "Regional One Health",
+      "city": "Memphis",
+      "state": "TN",
+      "zip": "38103",
+      "beds": 624,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - County",
+      "lookup_keys": [
+        "one health",
+        "regional one health"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TN004",
+      "name": "Methodist Le Bonheur Healthcare",
+      "city": "Memphis",
+      "state": "TN",
+      "zip": "38104",
+      "beds": 771,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "methodist le bonheur healthcare",
+        "methodist le bonheur"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TN005",
+      "name": "Erlanger Medical Center",
+      "city": "Chattanooga",
+      "state": "TN",
+      "zip": "37403",
+      "beds": 778,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - Hospital District",
+      "lookup_keys": [
+        "erlanger mc",
+        "erlanger",
+        "erlanger medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "TN006",
+      "name": "Le Bonheur Children's Hospital",
+      "city": "Memphis",
+      "state": "TN",
+      "zip": "38105",
+      "beds": 255,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "le bonheur",
+        "le bonheur children's hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "AZ001",
+      "name": "Mayo Clinic Hospital Phoenix",
+      "city": "Phoenix",
+      "state": "AZ",
+      "zip": "85054",
+      "beds": 304,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "mayo clinic hospital phoenix",
+        "mayo clinic phoenix"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "AZ002",
+      "name": "Banner University Medical Center Phoenix",
+      "city": "Phoenix",
+      "state": "AZ",
+      "zip": "85006",
+      "beds": 725,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "banner university mc phoenix",
+        "banner university medical center phoenix",
+        "banner phoenix"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "AZ003",
+      "name": "Banner University Medical Center Tucson",
+      "city": "Tucson",
+      "state": "AZ",
+      "zip": "85724",
+      "beds": 479,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "banner university mc tucson",
+        "banner university medical center tucson",
+        "banner tucson"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "AZ004",
+      "name": "Phoenix Children's Hospital",
+      "city": "Phoenix",
+      "state": "AZ",
+      "zip": "85016",
+      "beds": 433,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "phoenix children's hospital",
+        "phoenix"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "AZ005",
+      "name": "HonorHealth Scottsdale Osborn Medical Center",
+      "city": "Scottsdale",
+      "state": "AZ",
+      "zip": "85251",
+      "beds": 337,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "honorhealth scottsdale osborn",
+        "honorhealth scottsdale osborn mc",
+        "honorhealth scottsdale osborn medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CO001",
+      "name": "UCHealth University of Colorado Hospital",
+      "city": "Aurora",
+      "state": "CO",
+      "zip": "80045",
+      "beds": 620,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "uchealth university of colorado hospital",
+        "uchealth of colorado"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CO002",
+      "name": "Denver Health Medical Center",
+      "city": "Denver",
+      "state": "CO",
+      "zip": "80204",
+      "beds": 525,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - Hospital District",
+      "lookup_keys": [
+        "denver health mc",
+        "denver health medical center",
+        "denver health"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CO003",
+      "name": "Children's Hospital Colorado",
+      "city": "Aurora",
+      "state": "CO",
+      "zip": "80045",
+      "beds": 434,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "colorado",
+        "children's hospital colorado"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CO004",
+      "name": "St. Anthony Hospital",
+      "city": "Lakewood",
+      "state": "CO",
+      "zip": "80228",
+      "beds": 238,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "st anthony hospital",
+        "st. anthony hospital",
+        "st. anthony"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "WA001",
+      "name": "University of Washington Medical Center",
+      "city": "Seattle",
+      "state": "WA",
+      "zip": "98195",
+      "beds": 529,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "university of washington mc",
+        "university of washington medical center",
+        "of washington"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "WA002",
+      "name": "Harborview Medical Center",
+      "city": "Seattle",
+      "state": "WA",
+      "zip": "98104",
+      "beds": 413,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - County",
+      "lookup_keys": [
+        "harborview medical center",
+        "harborview mc",
+        "harborview"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "WA003",
+      "name": "Virginia Mason Medical Center",
+      "city": "Seattle",
+      "state": "WA",
+      "zip": "98101",
+      "beds": 336,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "virginia mason mc",
+        "virginia mason medical center",
+        "virginia mason"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "WA004",
+      "name": "Seattle Children's Hospital",
+      "city": "Seattle",
+      "state": "WA",
+      "zip": "98105",
+      "beds": 407,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "seattle children's hospital",
+        "seattle"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "WA005",
+      "name": "Providence Regional Medical Center Everett",
+      "city": "Everett",
+      "state": "WA",
+      "zip": "98201",
+      "beds": 501,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Church",
+      "lookup_keys": [
+        "providence regional medical center everett",
+        "providence everett",
+        "providence regional mc everett"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MD001",
+      "name": "Johns Hopkins Hospital",
+      "city": "Baltimore",
+      "state": "MD",
+      "zip": "21287",
+      "beds": 1162,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "johns hopkins",
+        "johns hopkins hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MD002",
+      "name": "University of Maryland Medical Center",
+      "city": "Baltimore",
+      "state": "MD",
+      "zip": "21201",
+      "beds": 806,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "university of maryland mc",
+        "of maryland",
+        "university of maryland medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MD003",
+      "name": "MedStar Washington Hospital Center",
+      "city": "Washington",
+      "state": "DC",
+      "zip": "20010",
+      "beds": 912,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "medstar washington hospital center",
+        "medstar washington center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MD004",
+      "name": "Shock Trauma Center",
+      "city": "Baltimore",
+      "state": "MD",
+      "zip": "21201",
+      "beds": 114,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "shock trauma center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MN001",
+      "name": "Mayo Clinic Hospital Rochester",
+      "city": "Rochester",
+      "state": "MN",
+      "zip": "55905",
+      "beds": 1265,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "mayo clinic rochester",
+        "mayo clinic hospital rochester"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MN002",
+      "name": "Hennepin Healthcare",
+      "city": "Minneapolis",
+      "state": "MN",
+      "zip": "55415",
+      "beds": 484,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - County",
+      "lookup_keys": [
+        "hennepin healthcare",
+        "hennepin"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MN003",
+      "name": "Abbott Northwestern Hospital",
+      "city": "Minneapolis",
+      "state": "MN",
+      "zip": "55407",
+      "beds": 629,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "abbott northwestern hospital",
+        "abbott northwestern"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MN004",
+      "name": "M Health Fairview University of Minnesota Medical Center",
+      "city": "Minneapolis",
+      "state": "MN",
+      "zip": "55455",
+      "beds": 839,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "m health fairview of minnesota",
+        "m health fairview university of minnesota mc",
+        "m health fairview university of minnesota medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MO001",
+      "name": "Barnes-Jewish Hospital",
+      "city": "St. Louis",
+      "state": "MO",
+      "zip": "63110",
+      "beds": 1337,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "barnes-jewish",
+        "barnes-jewish hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MO002",
+      "name": "University of Missouri Health Care",
+      "city": "Columbia",
+      "state": "MO",
+      "zip": "65212",
+      "beds": 523,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "university of missouri health care",
+        "of missouri health care"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MO003",
+      "name": "Saint Luke's Hospital of Kansas City",
+      "city": "Kansas City",
+      "state": "MO",
+      "zip": "64111",
+      "beds": 527,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "st luke's hospital of kansas city",
+        "saint luke's hospital of kansas city",
+        "saint luke's of kansas city"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MO004",
+      "name": "St. Louis Children's Hospital",
+      "city": "St. Louis",
+      "state": "MO",
+      "zip": "63110",
+      "beds": 290,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "st louis children's hospital",
+        "st. louis",
+        "st. louis children's hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "IN001",
+      "name": "Indiana University Health Methodist Hospital",
+      "city": "Indianapolis",
+      "state": "IN",
+      "zip": "46202",
+      "beds": 785,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "indiana university health methodist hospital",
+        "indiana health methodist"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "IN002",
+      "name": "Eskenazi Health",
+      "city": "Indianapolis",
+      "state": "IN",
+      "zip": "46202",
+      "beds": 316,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - County",
+      "lookup_keys": [
+        "eskenazi health"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "IN003",
+      "name": "Riley Hospital for Children",
+      "city": "Indianapolis",
+      "state": "IN",
+      "zip": "46202",
+      "beds": 316,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "riley hospital for children",
+        "riley for"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "WI001",
+      "name": "UW Health University Hospital",
+      "city": "Madison",
+      "state": "WI",
+      "zip": "53792",
+      "beds": 592,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "uw health university hospital",
+        "uw health"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "WI002",
+      "name": "Froedtert Hospital",
+      "city": "Milwaukee",
+      "state": "WI",
+      "zip": "53226",
+      "beds": 604,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "froedtert hospital",
+        "froedtert"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "WI003",
+      "name": "Children's Wisconsin",
+      "city": "Milwaukee",
+      "state": "WI",
+      "zip": "53226",
+      "beds": 306,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "wisconsin",
+        "children's wisconsin"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CT001",
+      "name": "Yale New Haven Hospital",
+      "city": "New Haven",
+      "state": "CT",
+      "zip": "06510",
+      "beds": 1541,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "yale new haven",
+        "yale new haven hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "CT002",
+      "name": "Hartford Hospital",
+      "city": "Hartford",
+      "state": "CT",
+      "zip": "06102",
+      "beds": 867,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "hartford",
+        "hartford hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OR001",
+      "name": "OHSU Hospital",
+      "city": "Portland",
+      "state": "OR",
+      "zip": "97239",
+      "beds": 576,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "ohsu hospital",
+        "ohsu"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OR002",
+      "name": "Providence Portland Medical Center",
+      "city": "Portland",
+      "state": "OR",
+      "zip": "97213",
+      "beds": 483,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Church",
+      "lookup_keys": [
+        "providence portland",
+        "providence portland medical center",
+        "providence portland mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "LA001",
+      "name": "Ochsner Medical Center",
+      "city": "New Orleans",
+      "state": "LA",
+      "zip": "70121",
+      "beds": 767,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "ochsner mc",
+        "ochsner",
+        "ochsner medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "LA002",
+      "name": "University Medical Center New Orleans",
+      "city": "New Orleans",
+      "state": "LA",
+      "zip": "70112",
+      "beds": 446,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "university mc new orleans",
+        "university medical center new orleans",
+        "new orleans"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "LA003",
+      "name": "Our Lady of the Lake Regional Medical Center",
+      "city": "Baton Rouge",
+      "state": "LA",
+      "zip": "70808",
+      "beds": 800,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Church",
+      "lookup_keys": [
+        "our lady of the lake regional medical center",
+        "our lady of the lake regional mc",
+        "our lady of the lake"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "SC001",
+      "name": "MUSC Health University Medical Center",
+      "city": "Charleston",
+      "state": "SC",
+      "zip": "29425",
+      "beds": 750,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "musc health",
+        "musc health university medical center",
+        "musc health university mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "SC002",
+      "name": "Prisma Health Richland Hospital",
+      "city": "Columbia",
+      "state": "SC",
+      "zip": "29203",
+      "beds": 649,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "prisma health richland hospital",
+        "prisma health richland"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "SC003",
+      "name": "Prisma Health Greenville Memorial Hospital",
+      "city": "Greenville",
+      "state": "SC",
+      "zip": "29605",
+      "beds": 746,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "prisma health greenville memorial hospital",
+        "prisma health greenville memorial"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "AL001",
+      "name": "UAB Hospital",
+      "city": "Birmingham",
+      "state": "AL",
+      "zip": "35249",
+      "beds": 1157,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "uab",
+        "uab hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "AL002",
+      "name": "Children's of Alabama",
+      "city": "Birmingham",
+      "state": "AL",
+      "zip": "35233",
+      "beds": 392,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "children's of alabama",
+        "of alabama"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "AL003",
+      "name": "Huntsville Hospital",
+      "city": "Huntsville",
+      "state": "AL",
+      "zip": "35801",
+      "beds": 881,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "huntsville",
+        "huntsville hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "KY001",
+      "name": "UK HealthCare",
+      "city": "Lexington",
+      "state": "KY",
+      "zip": "40536",
+      "beds": 945,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "uk healthcare"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "KY002",
+      "name": "UofL Health - University Hospital",
+      "city": "Louisville",
+      "state": "KY",
+      "zip": "40202",
+      "beds": 404,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "uofl health - university hospital",
+        "uofl health -"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "KY003",
+      "name": "Norton Hospital",
+      "city": "Louisville",
+      "state": "KY",
+      "zip": "40202",
+      "beds": 400,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "norton hospital",
+        "norton"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "VA001",
+      "name": "University of Virginia Medical Center",
+      "city": "Charlottesville",
+      "state": "VA",
+      "zip": "22908",
+      "beds": 612,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "of virginia",
+        "university of virginia mc",
+        "university of virginia medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "VA002",
+      "name": "VCU Medical Center",
+      "city": "Richmond",
+      "state": "VA",
+      "zip": "23298",
+      "beds": 865,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "vcu medical center",
+        "vcu mc",
+        "vcu"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "VA003",
+      "name": "Inova Fairfax Hospital",
+      "city": "Falls Church",
+      "state": "VA",
+      "zip": "22042",
+      "beds": 923,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "inova fairfax hospital",
+        "inova fairfax"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "VA004",
+      "name": "Sentara Norfolk General Hospital",
+      "city": "Norfolk",
+      "state": "VA",
+      "zip": "23507",
+      "beds": 525,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "sentara norfolk general",
+        "sentara norfolk general hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "UT001",
+      "name": "Intermountain Medical Center",
+      "city": "Murray",
+      "state": "UT",
+      "zip": "84107",
+      "beds": 504,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "intermountain mc",
+        "intermountain medical center",
+        "intermtain medical center",
+        "intermountain"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "UT002",
+      "name": "University of Utah Hospital",
+      "city": "Salt Lake City",
+      "state": "UT",
+      "zip": "84132",
+      "beds": 550,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "of utah",
+        "university of utah hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "UT003",
+      "name": "Primary Children's Hospital",
+      "city": "Salt Lake City",
+      "state": "UT",
+      "zip": "84113",
+      "beds": 289,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Cerner",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "primary",
+        "primary children's hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OK001",
+      "name": "OU Medical Center",
+      "city": "Oklahoma City",
+      "state": "OK",
+      "zip": "73104",
+      "beds": 734,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Proprietary",
+      "lookup_keys": [
+        "ou mc",
+        "ou medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "OK002",
+      "name": "Saint Francis Hospital",
+      "city": "Tulsa",
+      "state": "OK",
+      "zip": "74136",
+      "beds": 971,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "saint francis",
+        "saint francis hospital",
+        "st francis hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NE001",
+      "name": "Nebraska Medicine",
+      "city": "Omaha",
+      "state": "NE",
+      "zip": "68198",
+      "beds": 809,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "nebraska medicine"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NE002",
+      "name": "Children's Hospital & Medical Center Omaha",
+      "city": "Omaha",
+      "state": "NE",
+      "zip": "68114",
+      "beds": 145,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "& omaha",
+        "children's hospital & mc omaha",
+        "children's hospital & medical center omaha"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "KS001",
+      "name": "University of Kansas Health System",
+      "city": "Kansas City",
+      "state": "KS",
+      "zip": "66160",
+      "beds": 792,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "of kansas",
+        "university of kansas health system"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "KS002",
+      "name": "Wesley Medical Center",
+      "city": "Wichita",
+      "state": "KS",
+      "zip": "67214",
+      "beds": 760,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Proprietary",
+      "lookup_keys": [
+        "wesley",
+        "wesley mc",
+        "wesley medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "IA001",
+      "name": "University of Iowa Hospitals and Clinics",
+      "city": "Iowa City",
+      "state": "IA",
+      "zip": "52242",
+      "beds": 811,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "university of iowa hospitals and clinics",
+        "of iowa s and clinics"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "IA002",
+      "name": "Mercy Medical Center Des Moines",
+      "city": "Des Moines",
+      "state": "IA",
+      "zip": "50314",
+      "beds": 802,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "mercy des moines",
+        "mercy medical center des moines",
+        "mercy mc des moines"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "AR001",
+      "name": "UAMS Medical Center",
+      "city": "Little Rock",
+      "state": "AR",
+      "zip": "72205",
+      "beds": 450,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "uams medical center",
+        "uams mc",
+        "uams"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "AR002",
+      "name": "Arkansas Children's Hospital",
+      "city": "Little Rock",
+      "state": "AR",
+      "zip": "72202",
+      "beds": 336,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Children",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "arkansas",
+        "arkansas children's hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MS001",
+      "name": "University of Mississippi Medical Center",
+      "city": "Jackson",
+      "state": "MS",
+      "zip": "39216",
+      "beds": 722,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "university of mississippi medical center",
+        "of mississippi",
+        "university of mississippi mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NM001",
+      "name": "UNM Hospital",
+      "city": "Albuquerque",
+      "state": "NM",
+      "zip": "87131",
+      "beds": 537,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - State",
+      "lookup_keys": [
+        "unm hospital",
+        "unm"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NV001",
+      "name": "UMC of Southern Nevada",
+      "city": "Las Vegas",
+      "state": "NV",
+      "zip": "89102",
+      "beds": 541,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": false,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Government - Hospital District",
+      "lookup_keys": [
+        "umc of southern nevada"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NV002",
+      "name": "Renown Regional Medical Center",
+      "city": "Reno",
+      "state": "NV",
+      "zip": "89502",
+      "beds": 808,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "renown regional mc",
+        "renown regional medical center",
+        "renown"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "WV001",
+      "name": "WVU Medicine Ruby Memorial Hospital",
+      "city": "Morgantown",
+      "state": "WV",
+      "zip": "26506",
+      "beds": 690,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "wvu medicine ruby memorial hospital",
+        "wvu medicine ruby memorial"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "WV002",
+      "name": "CAMC General Hospital",
+      "city": "Charleston",
+      "state": "WV",
+      "zip": "25301",
+      "beds": 454,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "camc general hospital",
+        "camc general"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NJ001",
+      "name": "Hackensack University Medical Center",
+      "city": "Hackensack",
+      "state": "NJ",
+      "zip": "07601",
+      "beds": 781,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "hackensack university mc",
+        "hackensack",
+        "hackensack university medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NJ002",
+      "name": "Robert Wood Johnson University Hospital",
+      "city": "New Brunswick",
+      "state": "NJ",
+      "zip": "08901",
+      "beds": 965,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "robert wood johnson",
+        "robert wood johnson university hospital"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NJ003",
+      "name": "Cooper University Hospital",
+      "city": "Camden",
+      "state": "NJ",
+      "zip": "08103",
+      "beds": 635,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "cooper university hospital",
+        "cooper"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NJ004",
+      "name": "Morristown Medical Center",
+      "city": "Morristown",
+      "state": "NJ",
+      "zip": "07960",
+      "beds": 735,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "morristown",
+        "morristown mc",
+        "morristown medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "NH001",
+      "name": "Dartmouth-Hitchcock Medical Center",
+      "city": "Lebanon",
+      "state": "NH",
+      "zip": "03756",
+      "beds": 396,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "dartmouth-hitchcock",
+        "dartmouth-hitchcock mc",
+        "dartmouth-hitchcock medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "ME001",
+      "name": "Maine Medical Center",
+      "city": "Portland",
+      "state": "ME",
+      "zip": "04102",
+      "beds": 637,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "maine mc",
+        "maine",
+        "maine medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "VT001",
+      "name": "University of Vermont Medical Center",
+      "city": "Burlington",
+      "state": "VT",
+      "zip": "05401",
+      "beds": 562,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "university of vermont mc",
+        "of vermont",
+        "university of vermont medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "RI001",
+      "name": "Rhode Island Hospital",
+      "city": "Providence",
+      "state": "RI",
+      "zip": "02903",
+      "beds": 719,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "rhode island hospital",
+        "rhode island"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "DE001",
+      "name": "Christiana Hospital",
+      "city": "Newark",
+      "state": "DE",
+      "zip": "19718",
+      "beds": 907,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "christiana hospital",
+        "christiana"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "HI001",
+      "name": "The Queen's Medical Center",
+      "city": "Honolulu",
+      "state": "HI",
+      "zip": "96813",
+      "beds": 575,
+      "trauma_level": "Level I",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "the queen's medical center",
+        "the queen's",
+        "the queen's mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "AK001",
+      "name": "Providence Alaska Medical Center",
+      "city": "Anchorage",
+      "state": "AK",
+      "zip": "99508",
+      "beds": 401,
+      "trauma_level": "Level II",
+      "teaching_hospital": false,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Church",
+      "lookup_keys": [
+        "providence alaska mc",
+        "providence alaska",
+        "providence alaska medical center"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "ID001",
+      "name": "St. Luke's Boise Medical Center",
+      "city": "Boise",
+      "state": "ID",
+      "zip": "83712",
+      "beds": 660,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "st. luke's boise mc",
+        "st luke's boise medical center",
+        "st. luke's boise medical center",
+        "st. luke's boise"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "MT001",
+      "name": "Billings Clinic",
+      "city": "Billings",
+      "state": "MT",
+      "zip": "59101",
+      "beds": 304,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "billings clinic"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "WY001",
+      "name": "Cheyenne Regional Medical Center",
+      "city": "Cheyenne",
+      "state": "WY",
+      "zip": "82001",
+      "beds": 222,
+      "trauma_level": "Level II",
+      "teaching_hospital": false,
+      "magnet_status": false,
+      "emr_system": "Cerner",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "cheyenne regional medical center",
+        "cheyenne",
+        "cheyenne regional mc"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "ND001",
+      "name": "Sanford Medical Center Fargo",
+      "city": "Fargo",
+      "state": "ND",
+      "zip": "58122",
+      "beds": 583,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "sanford mc fargo",
+        "sanford fargo",
+        "sanford medical center fargo"
+      ],
+      "has_emergency": true
+    },
+    {
+      "id": "SD001",
+      "name": "Sanford USD Medical Center",
+      "city": "Sioux Falls",
+      "state": "SD",
+      "zip": "57117",
+      "beds": 545,
+      "trauma_level": "Level II",
+      "teaching_hospital": true,
+      "magnet_status": true,
+      "emr_system": "Epic",
+      "hospital_type": "Acute Care Hospitals",
+      "ownership": "Voluntary non-profit - Private",
+      "lookup_keys": [
+        "sanford usd mc",
+        "sanford usd medical center",
+        "sanford usd"
+      ],
+      "has_emergency": true
+    }
+  ]
+}
