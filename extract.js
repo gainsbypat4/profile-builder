@@ -1,7 +1,4 @@
-import Anthropic from "@anthropic-ai/sdk";
-
 export default async function handler(req, res) {
-  // Enable CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -21,13 +18,17 @@ export default async function handler(req, res) {
   }
 
   try {
-    const client = new Anthropic();
-
-    const message = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 2000,
-      messages: [
-        {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": process.env.ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01"
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 2000,
+        messages: [{
           role: "user",
           content: `Extract structured data from this nurse resume. Return ONLY valid JSON, no other text, no markdown code blocks.
 
@@ -66,31 +67,20 @@ Return this exact JSON structure (fill in what you find, use null for missing fi
   ],
   "yearsExperience": 0,
   "primarySpecialty": ""
-}
-
-Important:
-- Extract ALL work history entries you can find
-- For each job, identify the unit type (ICU, Med-Surg, ER, L&D, OR, Telemetry, etc.)
-- Look for charge nurse experience
-- Extract all certifications mentioned (BLS, ACLS, PALS, CCRN, TNCC, etc.)
-- Identify if they have a compact license
-- Return ONLY the JSON object, nothing else`
-        }
-      ]
+}`
+        }]
+      })
     });
 
-    const responseText = message.content[0].text;
+    const data = await response.json();
     
-    // Try to parse the JSON
-    let parsed;
-    try {
-      // Remove any potential markdown code blocks
-      const cleanJson = responseText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-      parsed = JSON.parse(cleanJson);
-    } catch (parseError) {
-      console.error("Failed to parse AI response:", responseText);
-      return res.status(500).json({ error: "Failed to parse AI response", raw: responseText });
+    if (data.error) {
+      return res.status(500).json({ error: data.error.message });
     }
+
+    const responseText = data.content[0].text;
+    const cleanJson = responseText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+    const parsed = JSON.parse(cleanJson);
 
     return res.status(200).json(parsed);
   } catch (error) {
