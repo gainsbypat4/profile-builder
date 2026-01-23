@@ -1,4 +1,112 @@
 import Anthropic from "@anthropic-ai/sdk";
+import hospitalData from "../data/hospitals.json";
+
+// Build hospital lookup index (runs once when server starts)
+let hospitalIndex = null;
+
+function getHospitalIndex() {
+  if (!hospitalIndex) {
+    hospitalIndex = {};
+    for (const hospital of hospitalData.hospitals) {
+      // Index by all lookup keys
+      const keys = hospital.lookup_keys || [];
+      for (const key of keys) {
+        if (key && key.length > 2) {
+          hospitalIndex[key] = hospital;
+        }
+      }
+      // Also index by lowercase name
+      hospitalIndex[hospital.name.toLowerCase()] = hospital;
+    }
+    console.log(`Hospital index built: ${Object.keys(hospitalIndex).length} keys for ${hospitalData.hospitals.length} hospitals`);
+  }
+  return hospitalIndex;
+}
+
+function findHospital(facilityName, state = null) {
+  if (!facilityName) return null;
+  
+  const index = getHospitalIndex();
+  const searchName = facilityName.toLowerCase().trim();
+  
+  // Try exact match
+  if (index[searchName]) {
+    const match = index[searchName];
+    if (!state || match.state === state.toUpperCase()) {
+      return formatHospitalData(match);
+    }
+  }
+  
+  // Try removing common suffixes for matching
+  const simplified = searchName
+    .replace(/medical center/gi, '')
+    .replace(/hospital/gi, '')
+    .replace(/regional/gi, '')
+    .replace(/health system/gi, '')
+    .replace(/healthcare/gi, '')
+    .trim();
+  
+  if (simplified && index[simplified]) {
+    const match = index[simplified];
+    if (!state || match.state === state.toUpperCase()) {
+      return formatHospitalData(match);
+    }
+  }
+  
+  // Try partial matching - look for hospital names contained in the search
+  for (const [key, hospital] of Object.entries(index)) {
+    if (key.length > 4) { // Only match on meaningful keys
+      if (searchName.includes(key) || key.includes(simplified)) {
+        if (!state || hospital.state === state.toUpperCase()) {
+          return formatHospitalData(hospital);
+        }
+      }
+    }
+  }
+  
+  return null;
+}
+
+function formatHospitalData(h) {
+  return {
+    verified: true,
+    officialName: h.name,
+    city: h.city,
+    state: h.state,
+    beds: h.beds || null,
+    traumaLevel: h.trauma_level || null,
+    teachingHospital: h.teaching_hospital || false,
+    magnetStatus: h.magnet_status || false,
+    emrSystem: h.emr_system || null,
+    hospitalType: h.hospital_type || null
+  };
+}
+
+function enrichWorkHistory(workHistory) {
+  if (!workHistory || !Array.isArray(workHistory)) {
+    return workHistory;
+  }
+  
+  return workHistory.map(job => {
+    const hospitalInfo = findHospital(job.facility);
+    
+    if (hospitalInfo) {
+      return {
+        ...job,
+        hospitalData: hospitalInfo
+      };
+    }
+    
+    // No match found
+    return {
+      ...job,
+      hospitalData: {
+        verified: false,
+        message: "Hospital not found in database"
+      }
+    };
+  });
+}
 
 export default async function handler(req, res) {
   // Handle CORS
@@ -52,9 +160,11 @@ Return this exact JSON structure:
   "workHistory": [
     {
       "title": "Job title",
-      "facility": "Hospital/facility name",
+      "facility": "Hospital/facility name exactly as written",
+      "city": "City if mentioned",
+      "state": "State abbreviation if mentioned",
       "dates": "Employment dates",
-      "unit": "Unit type if mentioned (ICU, ER, etc)"
+      "unit": "Unit type if mentioned (ICU, ER, Med-Surg, etc)"
     }
   ],
   "education": "Degree and school",
@@ -63,6 +173,7 @@ Return this exact JSON structure:
 }
 
 Important:
+- Extract the facility name exactly as it appears on the resume
 - Look for charge nurse experience
 - Extract all certifications mentioned (BLS, ACLS, PALS, CCRN, TNCC, etc.)
 - Identify if they have a compact license
@@ -97,7 +208,20 @@ Important:
       });
     }
 
+    // Enrich work history with hospital data
+    if (parsed.workHistory) {
+      parsed.workHistory = enrichWorkHistory(parsed.workHistory);
+    }
+
+    // Add metadata
+    parsed._meta = {
+      enrichedAt: new Date().toISOString(),
+      hospitalDatabaseVersion: hospitalData.version,
+      hospitalsInDatabase: hospitalData.hospital_count
+    };
+
     return res.status(200).json(parsed);
+
   } catch (error) {
     console.error("API Error:", error);
     
