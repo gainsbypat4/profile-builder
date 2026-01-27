@@ -17,6 +17,9 @@
   <style>
     * { font-family: 'Inter', sans-serif; }
     .highlight-box { background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); }
+    @media print {
+      .no-print { display: none !important; }
+    }
   </style>
   <script>
     if (typeof pdfjsLib !== 'undefined') {
@@ -44,7 +47,6 @@
       "adventhealth orlando": { name: "AdventHealth Orlando", beds: 1368, trauma: "Level I", emr: "Cerner", teaching: true }
     };
 
-    // Find hospital data
     function findHospital(name) {
       if (!name) return null;
       const search = name.toLowerCase();
@@ -54,7 +56,6 @@
       return null;
     }
 
-    // Extract text from PDF
     async function extractPDF(file) {
       try {
         const arrayBuffer = await file.arrayBuffer();
@@ -67,265 +68,207 @@
         }
         return text;
       } catch (err) {
-        console.error('PDF extraction error:', err);
         throw new Error('Failed to read PDF file');
       }
     }
 
-    // Extract text from DOCX
     async function extractDOCX(file) {
       try {
         const arrayBuffer = await file.arrayBuffer();
         const result = await mammoth.extractRawText({ arrayBuffer });
         return result.value;
       } catch (err) {
-        console.error('DOCX extraction error:', err);
         throw new Error('Failed to read Word file');
       }
     }
 
     // Generate DOCX export
-    async function exportDOCX(data, companyName, additionalData) {
-      const { Document, Packer, Paragraph, TextRun, HeadingLevel, BorderStyle, ShadingType } = docx;
-      
+    async function exportDOCX(data, companyName, additional) {
+      const { Document, Packer, Paragraph, TextRun, BorderStyle, ShadingType, AlignmentType } = docx;
       const children = [];
       
-      // Company header
       if (companyName) {
         children.push(new Paragraph({
-          children: [new TextRun({ text: companyName, bold: true, size: 28, color: "0284c7" })],
+          children: [new TextRun({ text: companyName, bold: true, size: 24, color: "0284c7" })],
+          spacing: { after: 150 }
+        }));
+      }
+      
+      children.push(new Paragraph({
+        children: [new TextRun({ text: data.personalInfo?.fullName || 'Candidate', bold: true, size: 40 })],
+        spacing: { after: 80 }
+      }));
+      
+      const contact = [data.personalInfo?.email, data.personalInfo?.phone, data.personalInfo?.location].filter(Boolean).join(' | ');
+      if (contact) {
+        children.push(new Paragraph({
+          children: [new TextRun({ text: contact, size: 20, color: "666666" })],
           spacing: { after: 200 }
         }));
       }
       
-      // Candidate name
-      children.push(new Paragraph({
-        children: [new TextRun({ text: data.personalInfo?.fullName || 'Candidate', bold: true, size: 48 })],
-        spacing: { after: 100 }
-      }));
-      
-      // Contact
-      const contact = [data.personalInfo?.email, data.personalInfo?.phone, data.personalInfo?.location].filter(Boolean).join(' | ');
-      if (contact) {
-        children.push(new Paragraph({
-          children: [new TextRun({ text: contact, size: 22, color: "666666" })],
-          spacing: { after: 300 }
-        }));
-      }
-      
-      // Quick stats
+      // Quick stats line
       const stats = [];
-      if (data.yearsExperience) stats.push(data.yearsExperience + ' Years Experience');
+      if (data.yearsExperience) stats.push(data.yearsExperience + ' Years Exp');
       if (data.licenses?.length) {
-        const states = data.licenses.map(l => l.state).join(', ');
+        const states = data.licenses.map(l => l.state).filter(Boolean).join(', ');
         const compact = data.licenses.some(l => l.compact) ? ' (Compact)' : '';
-        stats.push('Licensed: ' + states + compact);
+        if (states) stats.push('Licensed: ' + states + compact);
       }
-      if (data.primarySpecialty) stats.push('Specialty: ' + data.primarySpecialty);
-      if (data.certifications?.length) stats.push(data.certifications.length + ' Certifications');
+      if (data.primarySpecialty) stats.push(data.primarySpecialty);
       
       if (stats.length) {
         children.push(new Paragraph({
           shading: { fill: "E0F2FE", type: ShadingType.CLEAR },
-          children: [new TextRun({ text: 'QUICK STATS: ' + stats.join('  |  '), bold: true, size: 22 })],
-          spacing: { before: 100, after: 100 }
+          children: [new TextRun({ text: stats.join('  •  '), bold: true, size: 20 })],
+          spacing: { before: 80, after: 80 }
         }));
       }
       
-      // Certifications
+      // Certifications inline
       if (data.certifications?.length) {
         children.push(new Paragraph({
-          children: [new TextRun({ text: 'Certifications: ' + data.certifications.join(', '), size: 22 })],
-          spacing: { after: 300 }
-        }));
-      }
-      
-      // Credentials section
-      children.push(new Paragraph({
-        children: [new TextRun({ text: 'CREDENTIALS & EDUCATION', bold: true, size: 28, color: "0284c7" })],
-        spacing: { before: 300, after: 200 },
-        border: { bottom: { color: "0284c7", size: 1, style: BorderStyle.SINGLE } }
-      }));
-      
-      // Licenses
-      if (data.licenses?.length) {
-        children.push(new Paragraph({
-          children: [new TextRun({ text: 'Licenses:', bold: true, size: 24 })],
-          spacing: { after: 100 }
-        }));
-        data.licenses.forEach(lic => {
-          children.push(new Paragraph({
-            children: [new TextRun({ text: '• ' + lic.state + ' - ' + (lic.type || 'RN') + (lic.compact ? ' (Compact)' : ''), size: 22 })],
-            spacing: { after: 50 }
-          }));
-        });
-      }
-      
-      // Nursys
-      if (additionalData?.nursysLink) {
-        children.push(new Paragraph({
-          children: [new TextRun({ text: 'Nursys: ' + additionalData.nursysLink, size: 20, color: "0284c7" })],
-          spacing: { after: 100 }
-        }));
-      }
-      
-      // Education
-      if (data.education) {
-        children.push(new Paragraph({
-          children: [new TextRun({ text: 'Education:', bold: true, size: 24 })],
-          spacing: { before: 150, after: 100 }
-        }));
-        children.push(new Paragraph({
-          children: [new TextRun({ text: data.education.degree + ' - ' + data.education.school, size: 22 })],
-          spacing: { after: 50 }
-        }));
-        if (data.education.graduationDate) {
-          children.push(new Paragraph({
-            children: [new TextRun({ text: 'Graduated: ' + data.education.graduationDate, size: 20, color: "666666" })],
-            spacing: { after: 100 }
-          }));
-        }
-      }
-      
-      // Driver's license
-      if (additionalData?.driversLicense?.state) {
-        children.push(new Paragraph({
-          children: [new TextRun({ text: "Driver's License: " + additionalData.driversLicense.state + ' - Exp: ' + (additionalData.driversLicense.expiration || 'N/A'), size: 20 })],
+          children: [new TextRun({ text: 'Certs: ' + data.certifications.join(', '), size: 18 })],
           spacing: { after: 200 }
         }));
       }
       
-      // Work history
+      // Credentials header
       children.push(new Paragraph({
-        children: [new TextRun({ text: 'WORK HISTORY', bold: true, size: 28, color: "0284c7" })],
-        spacing: { before: 300, after: 200 },
-        border: { bottom: { color: "0284c7", size: 1, style: BorderStyle.SINGLE } }
+        children: [new TextRun({ text: 'CREDENTIALS', bold: true, size: 22, color: "0284c7" })],
+        spacing: { before: 150, after: 100 },
+        border: { bottom: { color: "E5E7EB", size: 1, style: BorderStyle.SINGLE } }
       }));
       
+      // Licenses inline
+      if (data.licenses?.length) {
+        const licText = data.licenses.map(l => l.state + ' ' + (l.type || 'RN') + (l.compact ? ' (Compact)' : '')).join(' | ');
+        children.push(new Paragraph({
+          children: [new TextRun({ text: 'Licenses: ' + licText, size: 18 })],
+          spacing: { after: 60 }
+        }));
+      }
+      
+      // Education inline
+      if (data.education) {
+        children.push(new Paragraph({
+          children: [new TextRun({ text: 'Education: ' + data.education.degree + ', ' + data.education.school + (data.education.graduationDate ? ' (' + data.education.graduationDate + ')' : ''), size: 18 })],
+          spacing: { after: 60 }
+        }));
+      }
+      
+      // Additional info
+      if (additional?.nursysLink) {
+        children.push(new Paragraph({
+          children: [new TextRun({ text: 'Nursys: ' + additional.nursysLink, size: 16, color: "0284c7" })],
+          spacing: { after: 60 }
+        }));
+      }
+      if (additional?.driversLicense?.state) {
+        children.push(new Paragraph({
+          children: [new TextRun({ text: "DL: " + additional.driversLicense.state + ' (Exp: ' + (additional.driversLicense.expiration || 'N/A') + ')', size: 16 })],
+          spacing: { after: 100 }
+        }));
+      }
+      
+      // Work history header
+      children.push(new Paragraph({
+        children: [new TextRun({ text: 'WORK HISTORY', bold: true, size: 22, color: "0284c7" })],
+        spacing: { before: 150, after: 100 },
+        border: { bottom: { color: "E5E7EB", size: 1, style: BorderStyle.SINGLE } }
+      }));
+      
+      // Jobs - compact format
       if (data.workHistory?.length) {
         data.workHistory.forEach(job => {
-          children.push(new Paragraph({
-            children: [new TextRun({ text: job.title || 'Position', bold: true, size: 26 })],
-            spacing: { before: 250, after: 50 }
-          }));
+          const hospital = findHospital(job.facility);
+          
           children.push(new Paragraph({
             children: [
-              new TextRun({ text: job.facility || '', size: 22 }),
-              new TextRun({ text: job.city && job.state ? ' - ' + job.city + ', ' + job.state : '', size: 22, color: "666666" })
+              new TextRun({ text: job.title || 'Position', bold: true, size: 20 }),
+              new TextRun({ text: ' | ' + (job.facility || ''), size: 18 }),
+              new TextRun({ text: ' | ' + (job.city || '') + ', ' + (job.state || ''), size: 18, color: "666666" }),
+              new TextRun({ text: ' | ' + (job.startDate || '') + ' - ' + (job.endDate || 'Present'), size: 16, italics: true, color: "888888" })
             ],
-            spacing: { after: 50 }
-          }));
-          children.push(new Paragraph({
-            children: [new TextRun({ text: (job.startDate || '') + ' - ' + (job.endDate || 'Present'), size: 20, italics: true, color: "666666" })],
-            spacing: { after: 100 }
+            spacing: { before: 120, after: 40 }
           }));
           
           if (job.unit) {
             children.push(new Paragraph({
-              children: [new TextRun({ text: 'Unit: ' + job.unit, size: 20, color: "0284c7" })],
-              spacing: { after: 100 }
+              children: [new TextRun({ text: 'Unit: ' + job.unit, size: 16, color: "0284c7" })],
+              spacing: { after: 40 }
             }));
           }
           
-          // Hospital data
-          const hospital = findHospital(job.facility);
           if (hospital) {
             children.push(new Paragraph({
-              shading: { fill: "FEF3C7", type: ShadingType.CLEAR },
-              children: [new TextRun({ text: 'Facility: ' + hospital.beds + ' beds | ' + hospital.trauma + ' | ' + (hospital.teaching ? 'Teaching' : 'Non-Teaching') + ' | ' + hospital.emr + ' EMR', size: 20 })],
-              spacing: { after: 100 }
+              children: [new TextRun({ text: '→ ' + hospital.beds + ' beds | ' + hospital.trauma + ' | ' + hospital.emr, size: 16, color: "92400E" })],
+              spacing: { after: 40 }
             }));
           }
           
-          // Responsibilities
           if (job.responsibilities?.length) {
-            job.responsibilities.forEach(resp => {
-              children.push(new Paragraph({
-                children: [new TextRun({ text: '• ' + resp, size: 22 })],
-                spacing: { after: 50 }
-              }));
-            });
+            const respText = job.responsibilities.slice(0, 3).join(' • ');
+            children.push(new Paragraph({
+              children: [new TextRun({ text: respText, size: 16 })],
+              spacing: { after: 40 }
+            }));
           }
           
           if (job.chargeExperience) {
             children.push(new Paragraph({
-              children: [new TextRun({ text: '★ Charge Nurse Experience', bold: true, size: 22, color: "7C3AED" })],
-              spacing: { before: 100, after: 100 }
+              children: [new TextRun({ text: '★ Charge Nurse Experience', bold: true, size: 16, color: "7C3AED" })],
+              spacing: { after: 60 }
             }));
           }
         });
       }
       
-      // References
-      const refs = additionalData?.references?.filter(r => r.name) || [];
+      // References - compact
+      const refs = additional?.references?.filter(r => r.name) || [];
       if (refs.length) {
         children.push(new Paragraph({
-          children: [new TextRun({ text: 'PROFESSIONAL REFERENCES', bold: true, size: 28, color: "0284c7" })],
-          spacing: { before: 300, after: 200 },
-          border: { bottom: { color: "0284c7", size: 1, style: BorderStyle.SINGLE } }
+          children: [new TextRun({ text: 'REFERENCES', bold: true, size: 22, color: "0284c7" })],
+          spacing: { before: 150, after: 100 },
+          border: { bottom: { color: "E5E7EB", size: 1, style: BorderStyle.SINGLE } }
         }));
         
         refs.forEach(ref => {
+          const refLine = [ref.name, ref.title, ref.relationship, ref.phone, ref.email].filter(Boolean).join(' | ');
           children.push(new Paragraph({
-            children: [new TextRun({ text: ref.name, bold: true, size: 24 })],
-            spacing: { before: 150, after: 50 }
+            children: [new TextRun({ text: refLine, size: 18 })],
+            spacing: { after: 60 }
           }));
-          if (ref.title) {
-            children.push(new Paragraph({
-              children: [new TextRun({ text: ref.title, size: 22 })],
-              spacing: { after: 30 }
-            }));
-          }
-          if (ref.relationship) {
-            children.push(new Paragraph({
-              children: [new TextRun({ text: ref.relationship, size: 20, color: "666666" })],
-              spacing: { after: 30 }
-            }));
-          }
-          const contactInfo = [ref.phone, ref.email].filter(Boolean).join(' | ');
-          if (contactInfo) {
-            children.push(new Paragraph({
-              children: [new TextRun({ text: contactInfo, size: 22 })],
-              spacing: { after: 100 }
-            }));
-          }
         });
       }
       
-      // Footer
       children.push(new Paragraph({
-        children: [new TextRun({ text: 'Generated by Profile Builder Pro - ' + new Date().toLocaleDateString(), size: 18, color: "999999" })],
-        spacing: { before: 400 },
-        alignment: docx.AlignmentType.CENTER
+        children: [new TextRun({ text: 'Generated by Profile Builder Pro • ' + new Date().toLocaleDateString(), size: 14, color: "999999" })],
+        spacing: { before: 200 },
+        alignment: AlignmentType.CENTER
       }));
       
       const doc = new Document({
         sections: [{
-          properties: {
-            page: { margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 } }
-          },
+          properties: { page: { margin: { top: 720, right: 720, bottom: 720, left: 720 } } },
           children
         }]
       });
       
       const blob = await Packer.toBlob(doc);
-      const fileName = ((data.personalInfo?.fullName || 'Candidate').replace(/\s+/g, '_')) + '_Profile.docx';
-      saveAs(blob, fileName);
+      saveAs(blob, ((data.personalInfo?.fullName || 'Candidate').replace(/\s+/g, '_')) + '_Profile.docx');
     }
 
-    // Generate PDF export
     function exportPDF(element, name) {
-      const opt = {
-        margin: 0.5,
+      html2pdf().set({
+        margin: 0.3,
         filename: ((name || 'Candidate').replace(/\s+/g, '_')) + '_Profile.pdf',
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2 },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-      };
-      html2pdf().set(opt).from(element).save();
+      }).from(element).save();
     }
 
-    // Main App
     function App() {
       const [resumeText, setResumeText] = useState('');
       const [loading, setLoading] = useState(false);
@@ -401,7 +344,6 @@
           if (data.error) {
             setError(data.error);
           } else {
-            // Enrich with hospital data
             if (data.workHistory) {
               data.workHistory = data.workHistory.map(job => ({
                 ...job,
@@ -458,33 +400,23 @@
 
       return (
         <div className="min-h-screen bg-gray-50">
-          {/* Header */}
-          <header className="bg-white border-b sticky top-0 z-50">
-            <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <header className="bg-white border-b sticky top-0 z-50 no-print">
+            <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <div>
-                  <h1 className="text-xl font-bold text-gray-800">Profile Builder Pro</h1>
-                  <p className="text-xs text-gray-500">Healthcare Staffing Resume Processor</p>
-                </div>
+                <h1 className="text-lg font-bold text-gray-800">Profile Builder Pro</h1>
               </div>
               
               {profile && (
-                <div className="flex gap-3">
-                  <button onClick={handleExportDOCX} disabled={exporting} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
+                <div className="flex gap-2">
+                  <button onClick={handleExportDOCX} disabled={exporting} className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:opacity-50">
                     Download DOCX
                   </button>
-                  <button onClick={handleExportPDF} disabled={exporting} className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 flex items-center gap-2">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
+                  <button onClick={handleExportPDF} disabled={exporting} className="px-3 py-1.5 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 disabled:opacity-50">
                     Download PDF
                   </button>
                 </div>
@@ -492,163 +424,114 @@
             </div>
           </header>
 
-          <main className="max-w-7xl mx-auto px-6 py-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <main className="max-w-7xl mx-auto px-6 py-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               
               {/* Left Column */}
-              <div className="space-y-6">
+              <div className="space-y-4 no-print">
                 
                 {/* Company Branding */}
-                <div className="bg-white rounded-xl border p-6">
-                  <h2 className="text-lg font-semibold mb-4">Company Branding</h2>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
-                      <input
-                        type="text"
-                        value={companyName}
-                        onChange={(e) => setCompanyName(e.target.value)}
-                        placeholder="Your Staffing Agency"
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Company Logo</label>
-                      <div className="flex items-center gap-4">
-                        <input type="file" ref={logoRef} onChange={handleLogoUpload} accept="image/*" className="hidden" />
-                        <button onClick={() => logoRef.current?.click()} className="px-4 py-2 border-2 border-dashed rounded-lg hover:border-blue-400 text-gray-600">
-                          Upload Logo
-                        </button>
-                        {companyLogo && (
-                          <div className="flex items-center gap-2">
-                            <img src={companyLogo} alt="Logo" className="h-10 object-contain" />
-                            <button onClick={() => setCompanyLogo(null)} className="text-red-500 text-sm">Remove</button>
-                          </div>
-                        )}
-                      </div>
+                <div className="bg-white rounded-xl border p-4">
+                  <h2 className="text-sm font-semibold mb-3">Company Branding</h2>
+                  <div className="flex gap-4">
+                    <input
+                      type="text"
+                      value={companyName}
+                      onChange={(e) => setCompanyName(e.target.value)}
+                      placeholder="Company Name"
+                      className="flex-1 px-3 py-2 border rounded-lg text-sm"
+                    />
+                    <div className="flex items-center gap-2">
+                      <input type="file" ref={logoRef} onChange={handleLogoUpload} accept="image/*" className="hidden" />
+                      <button onClick={() => logoRef.current?.click()} className="px-3 py-2 border rounded-lg text-sm hover:bg-gray-50">
+                        {companyLogo ? 'Change Logo' : 'Add Logo'}
+                      </button>
+                      {companyLogo && (
+                        <>
+                          <img src={companyLogo} alt="Logo" className="h-8 object-contain" />
+                          <button onClick={() => setCompanyLogo(null)} className="text-red-500 text-xs">✕</button>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
 
                 {/* Resume Upload */}
-                <div className="bg-white rounded-xl border p-6">
-                  <h2 className="text-lg font-semibold mb-4">Upload Resume</h2>
+                <div className="bg-white rounded-xl border p-4">
+                  <h2 className="text-sm font-semibold mb-3">Upload Resume</h2>
                   
-                  {/* File Upload */}
                   <div 
                     onClick={() => fileRef.current?.click()}
-                    className="border-2 border-dashed rounded-xl p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition mb-4"
+                    className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition mb-3"
                   >
-                    <input 
-                      type="file" 
-                      ref={fileRef} 
-                      onChange={(e) => handleFile(e.target.files[0])} 
-                      accept=".pdf,.docx,.doc,.txt" 
-                      className="hidden" 
-                    />
+                    <input type="file" ref={fileRef} onChange={(e) => handleFile(e.target.files[0])} accept=".pdf,.docx,.doc,.txt" className="hidden" />
                     {fileLoading ? (
-                      <div className="text-blue-600">Extracting text...</div>
+                      <div className="text-blue-600 text-sm">Extracting text...</div>
                     ) : fileName ? (
                       <div>
-                        <div className="text-green-600 font-medium">{fileName}</div>
-                        <div className="text-sm text-gray-500">File loaded successfully</div>
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); setFileName(''); setResumeText(''); }}
-                          className="text-sm text-red-500 mt-2"
-                        >
-                          Remove
-                        </button>
+                        <div className="text-green-600 font-medium text-sm">{fileName}</div>
+                        <button onClick={(e) => { e.stopPropagation(); setFileName(''); setResumeText(''); }} className="text-xs text-red-500 mt-1">Remove</button>
                       </div>
                     ) : (
-                      <div>
-                        <div className="text-gray-600 font-medium">Drop resume here or click to browse</div>
-                        <div className="text-sm text-gray-400 mt-1">PDF, DOCX, or TXT</div>
-                      </div>
+                      <div className="text-gray-500 text-sm">Drop PDF, DOCX, or TXT here</div>
                     )}
                   </div>
-
-                  <div className="text-center text-gray-400 text-sm mb-4">— or paste text —</div>
 
                   <textarea
                     value={resumeText}
                     onChange={(e) => { setResumeText(e.target.value); setFileName(''); }}
-                    placeholder="Paste resume text here..."
-                    className="w-full h-40 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 resize-none text-sm"
+                    placeholder="Or paste resume text..."
+                    className="w-full h-32 px-3 py-2 border rounded-lg text-sm resize-none"
                   />
 
-                  {error && (
-                    <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-                      {error}
-                    </div>
-                  )}
+                  {error && <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-red-700 text-xs">{error}</div>}
 
-                  <button
-                    onClick={handleExtract}
-                    disabled={loading || fileLoading}
-                    className="mt-4 w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2"
-                  >
+                  <button onClick={handleExtract} disabled={loading || fileLoading} className="mt-3 w-full py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm">
                     {loading ? 'Processing...' : 'Extract & Build Profile'}
                   </button>
                 </div>
 
                 {/* Additional Info */}
                 {profile && (
-                  <div className="bg-white rounded-xl border p-6">
-                    <h2 className="text-lg font-semibold mb-4">Additional Information</h2>
+                  <div className="bg-white rounded-xl border p-4">
+                    <h2 className="text-sm font-semibold mb-3">Additional Information</h2>
                     
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Nursys Verification Link</label>
+                    <div className="grid grid-cols-2 gap-3 mb-3">
                       <input
                         type="url"
                         value={additional.nursysLink}
                         onChange={(e) => setAdditional(prev => ({ ...prev, nursysLink: e.target.value }))}
-                        placeholder="https://www.nursys.com/..."
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                        placeholder="Nursys Link"
+                        className="px-3 py-2 border rounded-lg text-sm"
                       />
-                    </div>
-
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Driver's License</label>
-                      <div className="grid grid-cols-3 gap-2">
+                      <div className="flex gap-2">
                         <input
                           type="text"
                           value={additional.driversLicense.state}
                           onChange={(e) => setAdditional(prev => ({ ...prev, driversLicense: { ...prev.driversLicense, state: e.target.value }}))}
-                          placeholder="State"
-                          className="px-3 py-2 border rounded-lg text-sm"
-                        />
-                        <input
-                          type="text"
-                          value={additional.driversLicense.number}
-                          onChange={(e) => setAdditional(prev => ({ ...prev, driversLicense: { ...prev.driversLicense, number: e.target.value }}))}
-                          placeholder="License #"
-                          className="px-3 py-2 border rounded-lg text-sm"
+                          placeholder="DL State"
+                          className="w-20 px-2 py-2 border rounded-lg text-sm"
                         />
                         <input
                           type="text"
                           value={additional.driversLicense.expiration}
                           onChange={(e) => setAdditional(prev => ({ ...prev, driversLicense: { ...prev.driversLicense, expiration: e.target.value }}))}
-                          placeholder="Exp Date"
-                          className="px-3 py-2 border rounded-lg text-sm"
+                          placeholder="DL Exp"
+                          className="flex-1 px-2 py-2 border rounded-lg text-sm"
                         />
                       </div>
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Professional References</label>
-                      {additional.references.map((ref, i) => (
-                        <div key={i} className="mb-3 p-3 bg-gray-50 rounded-lg">
-                          <div className="text-xs font-medium text-gray-500 mb-2">Reference {i + 1}</div>
-                          <div className="grid grid-cols-2 gap-2">
-                            <input type="text" value={ref.name} onChange={(e) => updateRef(i, 'name', e.target.value)} placeholder="Name" className="px-2 py-1 border rounded text-sm" />
-                            <input type="text" value={ref.title} onChange={(e) => updateRef(i, 'title', e.target.value)} placeholder="Title" className="px-2 py-1 border rounded text-sm" />
-                            <input type="text" value={ref.phone} onChange={(e) => updateRef(i, 'phone', e.target.value)} placeholder="Phone" className="px-2 py-1 border rounded text-sm" />
-                            <input type="text" value={ref.email} onChange={(e) => updateRef(i, 'email', e.target.value)} placeholder="Email" className="px-2 py-1 border rounded text-sm" />
-                            <input type="text" value={ref.relationship} onChange={(e) => updateRef(i, 'relationship', e.target.value)} placeholder="Relationship" className="col-span-2 px-2 py-1 border rounded text-sm" />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                    <div className="text-xs font-medium text-gray-500 mb-2">References</div>
+                    {additional.references.map((ref, i) => (
+                      <div key={i} className="grid grid-cols-5 gap-2 mb-2">
+                        <input type="text" value={ref.name} onChange={(e) => updateRef(i, 'name', e.target.value)} placeholder="Name" className="px-2 py-1 border rounded text-xs" />
+                        <input type="text" value={ref.title} onChange={(e) => updateRef(i, 'title', e.target.value)} placeholder="Title" className="px-2 py-1 border rounded text-xs" />
+                        <input type="text" value={ref.phone} onChange={(e) => updateRef(i, 'phone', e.target.value)} placeholder="Phone" className="px-2 py-1 border rounded text-xs" />
+                        <input type="text" value={ref.email} onChange={(e) => updateRef(i, 'email', e.target.value)} placeholder="Email" className="px-2 py-1 border rounded text-xs" />
+                        <input type="text" value={ref.relationship} onChange={(e) => updateRef(i, 'relationship', e.target.value)} placeholder="Relation" className="px-2 py-1 border rounded text-xs" />
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -657,22 +540,11 @@
               <div>
                 {profile ? (
                   <div ref={profileRef}>
-                    <ProfileDisplay 
-                      data={profile} 
-                      companyName={companyName} 
-                      companyLogo={companyLogo}
-                      additional={additional}
-                    />
+                    <ProfileDisplay data={profile} companyName={companyName} companyLogo={companyLogo} additional={additional} />
                   </div>
                 ) : (
-                  <div className="bg-white rounded-xl border p-12 text-center">
-                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-700 mb-2">Ready to Build</h3>
-                    <p className="text-gray-500 text-sm">Upload a resume or paste text to generate a professional profile</p>
+                  <div className="bg-white rounded-xl border p-8 text-center">
+                    <div className="text-gray-400 text-sm">Upload a resume to generate profile</div>
                   </div>
                 )}
               </div>
@@ -682,148 +554,142 @@
       );
     }
 
-    // Profile Display Component
+    // COMPACT Profile Display - fits on one page
     function ProfileDisplay({ data, companyName, companyLogo, additional }) {
       const { personalInfo, licenses, certifications, education, workHistory, yearsExperience, primarySpecialty } = data;
-      const licenseStates = licenses?.map(l => l.state).join(', ') || 'N/A';
+      
+      // Get license states properly
+      const licenseStates = licenses?.map(l => l.state).filter(Boolean).join(', ') || 'N/A';
       const hasCompact = licenses?.some(l => l.compact);
 
       return (
-        <div className="bg-white rounded-xl border overflow-hidden">
+        <div className="bg-white rounded-xl border overflow-hidden text-sm">
           {/* Company Header */}
           {(companyLogo || companyName) && (
-            <div className="px-6 py-3 bg-gray-50 border-b flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                {companyLogo && <img src={companyLogo} alt="Logo" className="h-8 object-contain" />}
-                {companyName && <span className="font-semibold text-gray-700">{companyName}</span>}
+            <div className="px-4 py-2 bg-gray-50 border-b flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {companyLogo && <img src={companyLogo} alt="Logo" className="h-6 object-contain" />}
+                {companyName && <span className="font-semibold text-gray-700 text-sm">{companyName}</span>}
               </div>
               <span className="text-xs text-gray-400">Candidate Profile</span>
             </div>
           )}
 
-          {/* Blue Highlight Box */}
-          <div className="highlight-box text-white p-6">
-            <div className="flex justify-between items-start mb-4">
+          {/* Blue Highlight Box - COMPACT */}
+          <div className="highlight-box text-white p-4">
+            <div className="flex justify-between items-start mb-3">
               <div>
-                <h1 className="text-2xl font-bold">{personalInfo?.fullName || 'Candidate'}</h1>
-                <p className="text-blue-100 text-sm mt-1">
+                <h1 className="text-xl font-bold">{personalInfo?.fullName || 'Candidate'}</h1>
+                <p className="text-blue-100 text-xs mt-0.5">
                   {[personalInfo?.email, personalInfo?.phone].filter(Boolean).join(' • ')}
                 </p>
               </div>
-              <span className="bg-white/20 px-3 py-1 rounded-full text-sm">{primarySpecialty || 'RN'}</span>
+              <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs">{primarySpecialty || 'RN'}</span>
             </div>
 
-            <div className="grid grid-cols-4 gap-3 mt-4">
-              <div className="bg-white/10 rounded-lg p-3 text-center">
-                <div className="text-2xl font-bold">{yearsExperience || '—'}</div>
-                <div className="text-xs text-blue-100">Years Exp</div>
+            <div className="grid grid-cols-4 gap-2">
+              <div className="bg-white/10 rounded-lg p-2 text-center">
+                <div className="text-lg font-bold">{yearsExperience || '—'}</div>
+                <div className="text-xs text-blue-100">Years</div>
               </div>
-              <div className="bg-white/10 rounded-lg p-3 text-center">
-                <div className="text-lg font-bold">{licenseStates}</div>
+              <div className="bg-white/10 rounded-lg p-2 text-center">
+                <div className="text-sm font-bold">{licenseStates}</div>
                 <div className="text-xs text-blue-100">{hasCompact ? 'Compact' : 'Licensed'}</div>
               </div>
-              <div className="bg-white/10 rounded-lg p-3 text-center">
+              <div className="bg-white/10 rounded-lg p-2 text-center">
                 <div className="text-lg font-bold">{certifications?.length || 0}</div>
                 <div className="text-xs text-blue-100">Certs</div>
               </div>
-              <div className="bg-white/10 rounded-lg p-3 text-center">
+              <div className="bg-white/10 rounded-lg p-2 text-center">
                 <div className="text-lg font-bold">{workHistory?.length || 0}</div>
-                <div className="text-xs text-blue-100">Positions</div>
+                <div className="text-xs text-blue-100">Jobs</div>
               </div>
             </div>
 
             {certifications?.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-4">
-                {certifications.slice(0, 6).map((cert, i) => (
-                  <span key={i} className="bg-white/20 px-3 py-1 rounded-full text-sm">{cert}</span>
+              <div className="flex flex-wrap gap-1 mt-3">
+                {certifications.map((cert, i) => (
+                  <span key={i} className="bg-white/20 px-2 py-0.5 rounded-full text-xs">{cert}</span>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Credentials Section */}
-          <div className="p-6 border-b">
-            <h2 className="text-lg font-bold text-gray-800 mb-4">Credentials & Education</h2>
-            <div className="grid grid-cols-3 gap-6">
+          {/* Credentials Section - COMPACT */}
+          <div className="px-4 py-3 border-b">
+            <h2 className="text-sm font-bold text-gray-800 mb-2">Credentials & Education</h2>
+            <div className="grid grid-cols-3 gap-4 text-xs">
               <div>
-                <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">Licenses</h3>
+                <div className="font-semibold text-gray-500 uppercase mb-1" style={{fontSize: '10px'}}>Licenses</div>
                 {licenses?.map((lic, i) => (
-                  <div key={i} className="flex items-center gap-2 mb-2">
-                    <span className="w-8 h-8 bg-green-100 text-green-700 rounded flex items-center justify-center text-xs font-bold">{lic.state}</span>
-                    <span className="text-sm">{lic.type || 'RN'}{lic.compact && <span className="ml-1 text-xs text-green-600">(Compact)</span>}</span>
+                  <div key={i} className="flex items-center gap-1 mb-1">
+                    <span className="w-6 h-6 bg-green-100 text-green-700 rounded flex items-center justify-center font-bold" style={{fontSize: '10px'}}>{lic.state}</span>
+                    <span>{lic.type || 'RN'}{lic.compact && <span className="text-green-600 ml-1">(C)</span>}</span>
                   </div>
                 ))}
                 {additional?.nursysLink && (
-                  <a href={additional.nursysLink} target="_blank" className="text-xs text-blue-600 mt-2 block">Nursys Verification →</a>
+                  <a href={additional.nursysLink} target="_blank" className="text-blue-600 block mt-1" style={{fontSize: '10px'}}>Nursys →</a>
                 )}
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">Certifications</h3>
+                <div className="font-semibold text-gray-500 uppercase mb-1" style={{fontSize: '10px'}}>Certifications</div>
                 <div className="flex flex-wrap gap-1">
                   {certifications?.map((cert, i) => (
-                    <span key={i} className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">{cert}</span>
+                    <span key={i} className="bg-gray-100 text-gray-700 px-1.5 py-0.5 rounded" style={{fontSize: '10px'}}>{cert}</span>
                   ))}
                 </div>
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">Education</h3>
+                <div className="font-semibold text-gray-500 uppercase mb-1" style={{fontSize: '10px'}}>Education</div>
                 {education && (
-                  <div className="text-sm">
+                  <div>
                     <div className="font-medium">{education.degree}</div>
                     <div className="text-gray-600">{education.school}</div>
-                    <div className="text-gray-500 text-xs">{education.graduationDate}</div>
+                    <div className="text-gray-500">{education.graduationDate}</div>
                   </div>
                 )}
                 {additional?.driversLicense?.state && (
-                  <div className="mt-3 pt-3 border-t">
-                    <div className="text-xs text-gray-500">Driver's License</div>
-                    <div className="text-sm">{additional.driversLicense.state} • Exp: {additional.driversLicense.expiration || 'N/A'}</div>
+                  <div className="mt-2 pt-2 border-t">
+                    <span className="text-gray-500">DL:</span> {additional.driversLicense.state}
                   </div>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Work History Section */}
-          <div className="p-6">
-            <h2 className="text-lg font-bold text-gray-800 mb-4">Work History</h2>
-            <div className="space-y-4">
+          {/* Work History - COMPACT */}
+          <div className="px-4 py-3">
+            <h2 className="text-sm font-bold text-gray-800 mb-2">Work History</h2>
+            <div className="space-y-3">
               {workHistory?.map((job, i) => (
                 <div key={i} className="border rounded-lg overflow-hidden">
-                  <div className="bg-gray-50 px-4 py-3 border-b">
-                    <div className="flex justify-between">
-                      <div>
-                        <h3 className="font-bold text-gray-800">{job.title}</h3>
-                        <p className="text-gray-600 text-sm">{job.facility}</p>
-                        <p className="text-gray-500 text-xs">{job.city}, {job.state}</p>
-                      </div>
-                      <div className="text-right text-sm">
-                        <div className="text-gray-700">{job.startDate} - {job.endDate}</div>
-                        {job.unit && <span className="inline-block mt-1 bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">{job.unit}</span>}
-                      </div>
+                  <div className="bg-gray-50 px-3 py-2 border-b flex justify-between items-start">
+                    <div>
+                      <div className="font-bold text-gray-800">{job.title}</div>
+                      <div className="text-gray-600">{job.facility} • {job.city}, {job.state}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-gray-500" style={{fontSize: '10px'}}>{job.startDate} - {job.endDate}</div>
+                      {job.unit && <span className="inline-block mt-0.5 bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded" style={{fontSize: '10px'}}>{job.unit}</span>}
                     </div>
                   </div>
-                  <div className="p-4">
+                  <div className="px-3 py-2">
                     {job.hospitalData && (
-                      <div className="mb-3 p-2 bg-amber-50 border border-amber-200 rounded text-sm">
+                      <div className="mb-2 p-1.5 bg-amber-50 border border-amber-200 rounded text-xs">
                         <span className="font-medium text-amber-700">Facility: </span>
-                        {job.hospitalData.beds} beds | {job.hospitalData.trauma} | {job.hospitalData.teaching ? 'Teaching' : 'Non-Teaching'} | {job.hospitalData.emr}
+                        {job.hospitalData.beds} beds | {job.hospitalData.trauma} | {job.hospitalData.emr}
                       </div>
                     )}
                     {job.responsibilities?.length > 0 && (
-                      <ul className="space-y-1">
-                        {job.responsibilities.map((resp, j) => (
-                          <li key={j} className="text-sm text-gray-700 flex gap-2">
-                            <span className="text-blue-500">•</span>{resp}
-                          </li>
+                      <div className="text-xs text-gray-700">
+                        {job.responsibilities.slice(0, 3).map((resp, j) => (
+                          <span key={j}>{j > 0 && ' • '}{resp}</span>
                         ))}
-                      </ul>
+                      </div>
                     )}
                     {job.chargeExperience && (
-                      <div className="mt-2">
-                        <span className="inline-flex items-center gap-1 bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs font-medium">
-                          ★ Charge Nurse Experience
-                        </span>
+                      <div className="mt-1">
+                        <span className="bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded font-medium" style={{fontSize: '10px'}}>★ Charge Nurse</span>
                       </div>
                     )}
                   </div>
@@ -832,33 +698,29 @@
             </div>
           </div>
 
-          {/* References Section */}
+          {/* References - COMPACT */}
           {additional?.references?.some(r => r.name) && (
-            <div className="p-6 bg-gray-50 border-t">
-              <h2 className="text-lg font-bold text-gray-800 mb-4">Professional References</h2>
-              <div className="grid grid-cols-3 gap-4">
+            <div className="px-4 py-3 bg-gray-50 border-t">
+              <h2 className="text-sm font-bold text-gray-800 mb-2">References</h2>
+              <div className="grid grid-cols-3 gap-2">
                 {additional.references.filter(r => r.name).map((ref, i) => (
-                  <div key={i} className="bg-white p-3 rounded-lg border">
+                  <div key={i} className="bg-white p-2 rounded border text-xs">
                     <div className="font-medium">{ref.name}</div>
-                    {ref.title && <div className="text-sm text-gray-600">{ref.title}</div>}
-                    {ref.relationship && <div className="text-xs text-gray-500">{ref.relationship}</div>}
-                    {ref.phone && <div className="text-sm mt-1">{ref.phone}</div>}
-                    {ref.email && <div className="text-sm text-blue-600">{ref.email}</div>}
+                    {ref.title && <div className="text-gray-600">{ref.title}</div>}
+                    {ref.phone && <div>{ref.phone}</div>}
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Footer */}
-          <div className="px-6 py-3 bg-gray-50 border-t text-center">
-            <p className="text-xs text-gray-400">Generated by Profile Builder Pro • {new Date().toLocaleDateString()}</p>
+          <div className="px-4 py-2 bg-gray-50 border-t text-center">
+            <p className="text-xs text-gray-400">Profile Builder Pro • {new Date().toLocaleDateString()}</p>
           </div>
         </div>
       );
     }
 
-    // Render
     ReactDOM.createRoot(document.getElementById('root')).render(<App />);
   </script>
 </body>
