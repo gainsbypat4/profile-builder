@@ -1,720 +1,1087 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Healthcare Profile Builder - MVP Demo</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile Builder Pro</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-  <script src="https://unpkg.com/docx@8.2.2/build/index.umd.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-  <style>
-    .animate-spin { animation: spin 1s linear infinite; }
-    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-    .drop-zone { transition: all 0.2s ease; }
-    .drop-zone.drag-over { border-color: #3b82f6; background-color: #eff6ff; }
-  </style>
-</head>
-<body>
-  <div id="root"></div>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script>
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .profile-output { font-family: 'DM Sans', sans-serif; }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    
+    /* Print styles for profile output */
+    @media print {
+      .no-print { display: none !important; }
+      .profile-output { 
+        box-shadow: none !important; 
+        border: none !important;
+      }
+    }
+    
+    /* Highlight box gradient */
+    .highlight-box {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 50%, #0369a1 100%);
+    }
+    
+    /* Subtle pattern for sections */
+    .section-pattern {
+      background-image: radial-gradient(circle at 1px 1px, #e2e8f0 1px, transparent 0);
+      background-size: 20px 20px;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+  <div id="root"></div>
 
-    const UNIT_TYPES = {
-      "icu": { name: "Intensive Care Unit", acuity: "Critical", typicalRatio: "1:2", skills: ["Ventilator management", "Vasoactive drips", "Hemodynamic monitoring", "CRRT"] },
-      "micu": { name: "Medical ICU", acuity: "Critical", typicalRatio: "1:2", skills: ["Ventilator management", "Sepsis protocols", "DKA management"] },
-      "sicu": { name: "Surgical ICU", acuity: "Critical", typicalRatio: "1:2", skills: ["Post-op monitoring", "Wound care", "Drain management"] },
-      "cvicu": { name: "Cardiovascular ICU", acuity: "Critical", typicalRatio: "1:2", skills: ["CABG recovery", "Balloon pump", "Swan-Ganz monitoring"] },
-      "nicu": { name: "Neonatal ICU", acuity: "Critical", typicalRatio: "1:2-3", skills: ["Premature infant care", "Phototherapy", "Neonatal ventilation"] },
-      "picu": { name: "Pediatric ICU", acuity: "Critical", typicalRatio: "1:2", skills: ["Pediatric assessment", "Family-centered care", "Growth/development"] },
-      "er": { name: "Emergency Room", acuity: "Variable", typicalRatio: "1:4-6", skills: ["Triage", "Trauma response", "Rapid assessment"] },
-      "ed": { name: "Emergency Department", acuity: "Variable", typicalRatio: "1:4-6", skills: ["Triage", "Trauma response", "Rapid assessment"] },
-      "emergency": { name: "Emergency Department", acuity: "Variable", typicalRatio: "1:4-6", skills: ["Triage", "Trauma response", "Rapid assessment"] },
-      "med-surg": { name: "Medical-Surgical", acuity: "Moderate", typicalRatio: "1:5-6", skills: ["Post-op care", "Medication administration", "Patient education"] },
-      "medsurg": { name: "Medical-Surgical", acuity: "Moderate", typicalRatio: "1:5-6", skills: ["Post-op care", "Medication administration", "Patient education"] },
-      "telemetry": { name: "Telemetry", acuity: "Moderate-High", typicalRatio: "1:4-5", skills: ["Cardiac monitoring", "Rhythm interpretation", "Chest pain protocols"] },
-      "tele": { name: "Telemetry", acuity: "Moderate-High", typicalRatio: "1:4-5", skills: ["Cardiac monitoring", "Rhythm interpretation", "Chest pain protocols"] },
-      "l&d": { name: "Labor & Delivery", acuity: "Variable", typicalRatio: "1:2", skills: ["Fetal monitoring", "C-section assist", "Postpartum hemorrhage"] },
-      "labor and delivery": { name: "Labor & Delivery", acuity: "Variable", typicalRatio: "1:2", skills: ["Fetal monitoring", "C-section assist", "Postpartum hemorrhage"] },
-      "postpartum": { name: "Postpartum", acuity: "Low-Moderate", typicalRatio: "1:4-6", skills: ["Breastfeeding support", "Newborn assessment", "C-section recovery"] },
-      "oncology": { name: "Oncology", acuity: "Moderate-High", typicalRatio: "1:4-5", skills: ["Chemotherapy administration", "Port access", "Symptom management"] },
-      "or": { name: "Operating Room", acuity: "Critical", typicalRatio: "1:1", skills: ["Sterile technique", "Surgical instruments", "Anesthesia support"] },
-      "pacu": { name: "Post-Anesthesia Care", acuity: "High", typicalRatio: "1:2", skills: ["Airway management", "Pain control", "PONV management"] },
-      "cath lab": { name: "Cardiac Cath Lab", acuity: "High", typicalRatio: "1:1", skills: ["Sheath management", "Cardiac monitoring", "Sedation"] },
-      "dialysis": { name: "Dialysis", acuity: "Moderate", typicalRatio: "1:3-4", skills: ["Hemodialysis", "Fistula care", "Fluid management"] },
-      "rehab": { name: "Rehabilitation", acuity: "Low-Moderate", typicalRatio: "1:5-7", skills: ["PT/OT coordination", "ADL assistance", "Discharge planning"] },
-      "psych": { name: "Psychiatric", acuity: "Variable", typicalRatio: "1:5-6", skills: ["De-escalation", "Safety monitoring", "Therapeutic communication"] },
-      "stepdown": { name: "Step-Down/PCU", acuity: "High", typicalRatio: "1:3-4", skills: ["Continuous monitoring", "NIV management", "Early mobility"] },
-      "pcu": { name: "Progressive Care Unit", acuity: "High", typicalRatio: "1:3-4", skills: ["Continuous monitoring", "NIV management", "Drip titration"] },
-      "trauma": { name: "Trauma ICU", acuity: "Critical", typicalRatio: "1:2", skills: ["Trauma assessment", "ICP monitoring", "Massive transfusion"] }
+  <script type="text/babel">
+    const { useState, useRef } = React;
+
+    // ============ HOSPITAL DATABASE ============
+    const HOSPITAL_DATABASE = {
+      "tampa general hospital": {
+        officialName: "Tampa General Hospital",
+        city: "Tampa",
+        state: "FL",
+        beds: 1041,
+        traumaLevel: "Level I",
+        teaching: true,
+        emr: "Epic"
+      },
+      "cleveland clinic": {
+        officialName: "Cleveland Clinic Main Campus",
+        city: "Cleveland",
+        state: "OH",
+        beds: 1400,
+        traumaLevel: "Level I",
+        teaching: true,
+        emr: "Epic"
+      },
+      "jackson memorial hospital": {
+        officialName: "Jackson Memorial Hospital",
+        city: "Miami",
+        state: "FL",
+        beds: 1550,
+        traumaLevel: "Level I",
+        teaching: true,
+        emr: "Epic"
+      },
+      "johns hopkins hospital": {
+        officialName: "Johns Hopkins Hospital",
+        city: "Baltimore",
+        state: "MD",
+        beds: 1162,
+        traumaLevel: "Level I",
+        teaching: true,
+        emr: "Epic"
+      },
+      "mayo clinic": {
+        officialName: "Mayo Clinic - Rochester",
+        city: "Rochester",
+        state: "MN",
+        beds: 2059,
+        traumaLevel: "Level I",
+        teaching: true,
+        emr: "Epic"
+      },
+      "cedars-sinai": {
+        officialName: "Cedars-Sinai Medical Center",
+        city: "Los Angeles",
+        state: "CA",
+        beds: 886,
+        traumaLevel: "Level I",
+        teaching: true,
+        emr: "Epic"
+      },
+      "massachusetts general hospital": {
+        officialName: "Massachusetts General Hospital",
+        city: "Boston",
+        state: "MA",
+        beds: 1057,
+        traumaLevel: "Level I",
+        teaching: true,
+        emr: "Epic"
+      },
+      "ucla medical center": {
+        officialName: "UCLA Medical Center",
+        city: "Los Angeles",
+        state: "CA",
+        beds: 520,
+        traumaLevel: "Level I",
+        teaching: true,
+        emr: "Epic"
+      },
+      "stanford health care": {
+        officialName: "Stanford Health Care",
+        city: "Stanford",
+        state: "CA",
+        beds: 613,
+        traumaLevel: "Level I",
+        teaching: true,
+        emr: "Epic"
+      },
+      "northwestern memorial hospital": {
+        officialName: "Northwestern Memorial Hospital",
+        city: "Chicago",
+        state: "IL",
+        beds: 894,
+        traumaLevel: "Level I",
+        teaching: true,
+        emr: "Epic"
+      },
+      "baptist hospital of miami": {
+        officialName: "Baptist Hospital of Miami",
+        city: "Miami",
+        state: "FL",
+        beds: 728,
+        traumaLevel: "Level II",
+        teaching: true,
+        emr: "Epic"
+      },
+      "adventhealth orlando": {
+        officialName: "AdventHealth Orlando",
+        city: "Orlando",
+        state: "FL",
+        beds: 1368,
+        traumaLevel: "Level I",
+        teaching: true,
+        emr: "Cerner"
+      },
+      "houston methodist hospital": {
+        officialName: "Houston Methodist Hospital",
+        city: "Houston",
+        state: "TX",
+        beds: 1101,
+        traumaLevel: "Level I",
+        teaching: true,
+        emr: "Epic"
+      },
+      "emory university hospital": {
+        officialName: "Emory University Hospital",
+        city: "Atlanta",
+        state: "GA",
+        beds: 733,
+        traumaLevel: "Level I",
+        teaching: true,
+        emr: "Epic"
+      },
+      "mount sinai hospital": {
+        officialName: "Mount Sinai Hospital",
+        city: "New York",
+        state: "NY",
+        beds: 1139,
+        traumaLevel: "Level I",
+        teaching: true,
+        emr: "Epic"
+      },
+      "nyu langone": {
+        officialName: "NYU Langone Medical Center",
+        city: "New York",
+        state: "NY",
+        beds: 834,
+        traumaLevel: "Level I",
+        teaching: true,
+        emr: "Epic"
+      },
+      "duke university hospital": {
+        officialName: "Duke University Hospital",
+        city: "Durham",
+        state: "NC",
+        beds: 1048,
+        traumaLevel: "Level I",
+        teaching: true,
+        emr: "Epic"
+      },
+      "vanderbilt university medical center": {
+        officialName: "Vanderbilt University Medical Center",
+        city: "Nashville",
+        state: "TN",
+        beds: 1091,
+        traumaLevel: "Level I",
+        teaching: true,
+        emr: "Epic"
+      },
+      "ucsf medical center": {
+        officialName: "UCSF Medical Center",
+        city: "San Francisco",
+        state: "CA",
+        beds: 783,
+        traumaLevel: "Level I",
+        teaching: true,
+        emr: "Epic"
+      },
+      "penn medicine": {
+        officialName: "Hospital of the University of Pennsylvania",
+        city: "Philadelphia",
+        state: "PA",
+        beds: 844,
+        traumaLevel: "Level I",
+        teaching: true,
+        emr: "Epic"
+      },
+      "memorial sloan kettering": {
+        officialName: "Memorial Sloan Kettering Cancer Center",
+        city: "New York",
+        state: "NY",
+        beds: 514,
+        traumaLevel: "N/A",
+        teaching: true,
+        emr: "Epic"
+      },
+      "brigham and women's hospital": {
+        officialName: "Brigham and Women's Hospital",
+        city: "Boston",
+        state: "MA",
+        beds: 793,
+        traumaLevel: "Level I",
+        teaching: true,
+        emr: "Epic"
+      },
+      "barnes-jewish hospital": {
+        officialName: "Barnes-Jewish Hospital",
+        city: "St. Louis",
+        state: "MO",
+        beds: 1377,
+        traumaLevel: "Level I",
+        teaching: true,
+        emr: "Epic"
+      },
+      "uc san diego health": {
+        officialName: "UC San Diego Health",
+        city: "San Diego",
+        state: "CA",
+        beds: 808,
+        traumaLevel: "Level I",
+        teaching: true,
+        emr: "Epic"
+      },
+      "university of michigan hospital": {
+        officialName: "University of Michigan Hospital",
+        city: "Ann Arbor",
+        state: "MI",
+        beds: 1025,
+        traumaLevel: "Level I",
+        teaching: true,
+        emr: "Epic"
+      }
     };
 
-    function matchUnitType(unitOrTitle) {
-      if (!unitOrTitle) return null;
-      const normalized = unitOrTitle.toLowerCase();
-      for (const [key, data] of Object.entries(UNIT_TYPES)) {
-        if (normalized.includes(key)) return data;
+    // ============ UNIT TEMPLATES ============
+    const UNIT_TEMPLATES = {
+      "icu": {
+        typicalRatio: "1-2:1",
+        populations: ["Critical care", "Ventilator patients", "Post-cardiac surgery", "Sepsis"],
+        responsibilities: [
+          "Continuous hemodynamic monitoring",
+          "Ventilator management and weaning protocols",
+          "Vasopressor and sedation titration",
+          "Central line and arterial line management",
+          "Rapid response and code team participation"
+        ]
+      },
+      "med-surg": {
+        typicalRatio: "5-6:1",
+        populations: ["Post-surgical", "General medical", "Ortho", "Neuro"],
+        responsibilities: [
+          "Medication administration and IV therapy",
+          "Post-operative care and wound management",
+          "Patient assessment and care planning",
+          "Discharge planning and patient education"
+        ]
+      },
+      "emergency": {
+        typicalRatio: "4-5:1",
+        populations: ["Trauma", "Chest pain", "Stroke", "Pediatric emergencies"],
+        responsibilities: [
+          "Triage and rapid assessment",
+          "Trauma stabilization",
+          "Emergency medication administration",
+          "Procedural assistance and sedation monitoring"
+        ]
+      },
+      "labor and delivery": {
+        typicalRatio: "1-2:1",
+        populations: ["Laboring patients", "High-risk OB", "C-section", "Postpartum"],
+        responsibilities: [
+          "Fetal monitoring and interpretation",
+          "Labor support and pain management",
+          "High-risk pregnancy management",
+          "Neonatal resuscitation (NRP certified)"
+        ]
+      },
+      "operating room": {
+        typicalRatio: "1:1",
+        populations: ["Surgical patients - all specialties"],
+        responsibilities: [
+          "Circulating and/or scrub nurse duties",
+          "Sterile technique and instrument management",
+          "Patient positioning and safety",
+          "Surgical count procedures"
+        ]
+      },
+      "telemetry": {
+        typicalRatio: "4-5:1",
+        populations: ["Cardiac monitoring", "Post-MI", "Heart failure", "Arrhythmias"],
+        responsibilities: [
+          "Continuous cardiac monitoring",
+          "Rhythm interpretation and intervention",
+          "Cardiac medication administration",
+          "Patient education on heart health"
+        ]
+      },
+      "oncology": {
+        typicalRatio: "4-5:1",
+        populations: ["Chemotherapy patients", "Radiation therapy", "Palliative care"],
+        responsibilities: [
+          "Chemotherapy administration (ONS certified)",
+          "Central line management",
+          "Symptom management",
+          "Emotional support and end-of-life care"
+        ]
+      },
+      "pediatrics": {
+        typicalRatio: "3-4:1",
+        populations: ["Infants", "Children", "Adolescents"],
+        responsibilities: [
+          "Pediatric assessment and vital signs",
+          "Family-centered care",
+          "Growth and development monitoring",
+          "Pediatric medication calculations"
+        ]
+      },
+      "nicu": {
+        typicalRatio: "1-2:1",
+        populations: ["Premature infants", "Critical neonates", "Congenital conditions"],
+        responsibilities: [
+          "Neonatal assessment and monitoring",
+          "Ventilator and CPAP management",
+          "Feeding support (gavage, breastfeeding)",
+          "Family education and bonding support"
+        ]
+      },
+      "stepdown": {
+        typicalRatio: "3-4:1",
+        populations: ["Post-ICU", "Stable but requiring monitoring"],
+        responsibilities: [
+          "Transitional care from ICU",
+          "Continuous monitoring with telemetry",
+          "Early mobilization protocols",
+          "Complex medication management"
+        ]
+      }
+    };
+
+    // ============ HELPER FUNCTIONS ============
+    function findHospitalData(facilityName) {
+      if (!facilityName) return null;
+      const searchTerm = facilityName.toLowerCase().trim();
+      for (const [key, data] of Object.entries(HOSPITAL_DATABASE)) {
+        if (searchTerm.includes(key) || key.includes(searchTerm)) {
+          return data;
+        }
       }
       return null;
     }
 
-    async function extractTextFromPDF(file) {
-      const arrayBuffer = await file.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-      let fullText = '';
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const textContent = await page.getTextContent();
-        const pageText = textContent.items.map(item => item.str).join(' ');
-        fullText += pageText + '\n';
-      }
-      return fullText.trim();
+    function detectUnitType(unitName) {
+      if (!unitName) return null;
+      const unit = unitName.toLowerCase();
+      if (unit.includes('icu') || unit.includes('intensive care') || unit.includes('critical care')) return 'icu';
+      if (unit.includes('nicu') || unit.includes('neonatal intensive')) return 'nicu';
+      if (unit.includes('med-surg') || unit.includes('medical surgical') || unit.includes('medsurg')) return 'med-surg';
+      if (unit.includes('er') || unit.includes('emergency') || unit.includes('ed ')) return 'emergency';
+      if (unit.includes('l&d') || unit.includes('labor') || unit.includes('delivery') || unit.includes('ob')) return 'labor and delivery';
+      if (unit.includes('or') || unit.includes('operating') || unit.includes('surgical services') || unit.includes('periop')) return 'operating room';
+      if (unit.includes('tele') || unit.includes('cardiac') || unit.includes('ccu')) return 'telemetry';
+      if (unit.includes('onc') || unit.includes('cancer') || unit.includes('chemo')) return 'oncology';
+      if (unit.includes('peds') || unit.includes('pediatric') || unit.includes('children')) return 'pediatrics';
+      if (unit.includes('stepdown') || unit.includes('pcu') || unit.includes('intermediate')) return 'stepdown';
+      return null;
     }
 
-    async function extractTextFromDocx(file) {
-      const arrayBuffer = await file.arrayBuffer();
-      const result = await mammoth.extractRawText({ arrayBuffer });
-      return result.value.trim();
-    }
-
-    // Generate Word Document
-    async function generateWordDocument(profile) {
-      const { Document, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType, HeadingLevel } = docx;
-      
-      const children = [];
-      
-      // Title - Name
-      children.push(
-        new Paragraph({
-          children: [new TextRun({ text: profile.name || "Nurse Profile", bold: true, size: 48 })],
-          alignment: AlignmentType.CENTER,
-          spacing: { after: 200 }
-        })
-      );
-      
-      // Contact Info
-      const contactLines = [];
-      if (profile.phone) contactLines.push(profile.phone);
-      if (profile.email) contactLines.push(profile.email);
-      if (profile.location) contactLines.push(profile.location);
-      
-      if (contactLines.length > 0) {
-        children.push(
-          new Paragraph({
-            children: [new TextRun({ text: contactLines.join("  |  "), size: 22 })],
-            alignment: AlignmentType.CENTER,
-            spacing: { after: 400 }
-          })
-        );
-      }
-      
-      // Licenses Section
-      if (profile.licenses && profile.licenses.length > 0) {
-        children.push(
-          new Paragraph({
-            children: [new TextRun({ text: "LICENSES", bold: true, size: 28 })],
-            spacing: { before: 300, after: 150 },
-            border: { bottom: { style: BorderStyle.SINGLE, size: 1, color: "999999" } }
-          })
-        );
-        
-        profile.licenses.forEach(lic => {
-          children.push(
-            new Paragraph({
-              children: [new TextRun({ text: "• " + lic, size: 22 })],
-              spacing: { after: 50 }
-            })
-          );
-        });
-        
-        if (profile.compactLicense) {
-          children.push(
-            new Paragraph({
-              children: [new TextRun({ text: "✓ Compact/Multi-state License", bold: true, color: "2E7D32", size: 22 })],
-              spacing: { after: 100 }
-            })
-          );
-        }
-      }
-      
-      // Certifications Section
-      if (profile.certifications && profile.certifications.length > 0) {
-        children.push(
-          new Paragraph({
-            children: [new TextRun({ text: "CERTIFICATIONS", bold: true, size: 28 })],
-            spacing: { before: 300, after: 150 },
-            border: { bottom: { style: BorderStyle.SINGLE, size: 1, color: "999999" } }
-          })
-        );
-        
-        children.push(
-          new Paragraph({
-            children: [new TextRun({ text: profile.certifications.join("  •  "), size: 22 })],
-            spacing: { after: 100 }
-          })
-        );
-      }
-      
-      // Work History Section
-      if (profile.workHistory && profile.workHistory.length > 0) {
-        children.push(
-          new Paragraph({
-            children: [new TextRun({ text: "WORK EXPERIENCE", bold: true, size: 28 })],
-            spacing: { before: 300, after: 150 },
-            border: { bottom: { style: BorderStyle.SINGLE, size: 1, color: "999999" } }
-          })
-        );
-        
-        profile.workHistory.forEach((job, index) => {
-          // Job Title
-          children.push(
-            new Paragraph({
-              children: [new TextRun({ text: job.title || "Staff Nurse", bold: true, size: 24 })],
-              spacing: { before: 200, after: 50 }
-            })
-          );
-          
-          // Facility and Dates
-          children.push(
-            new Paragraph({
-              children: [
-                new TextRun({ text: job.facility || "Healthcare Facility", italics: true, size: 22 }),
-                new TextRun({ text: "  |  " + (job.dates || ""), size: 22 })
-              ],
-              spacing: { after: 100 }
-            })
-          );
-          
-          // Hospital Data (if enriched)
-          const hospitalData = job.hospitalData || job.enrichment;
-          if (hospitalData && (hospitalData.verified || hospitalData.matched)) {
-            const details = [];
-            if (hospitalData.beds) details.push("Beds: " + hospitalData.beds);
-            if (hospitalData.traumaLevel) details.push("Trauma: " + hospitalData.traumaLevel);
-            if (hospitalData.teachingHospital || hospitalData.teaching) details.push("Teaching: Yes");
-            if (hospitalData.emrSystem || hospitalData.emr) details.push("EMR: " + (hospitalData.emrSystem || hospitalData.emr));
-            if (hospitalData.magnetStatus) details.push("Magnet Status");
-            
-            if (details.length > 0) {
-              children.push(
-                new Paragraph({
-                  children: [new TextRun({ text: details.join("  |  "), size: 20, color: "666666" })],
-                  spacing: { after: 100 }
-                })
-              );
-            }
-          }
-          
-          // Unit Info
-          const unitInfo = job.unitInfo || matchUnitType(job.unit || job.title);
-          if (unitInfo) {
-            children.push(
-              new Paragraph({
-                children: [
-                  new TextRun({ text: "Unit: " + unitInfo.name, size: 20 }),
-                  new TextRun({ text: "  |  Typical Ratio: " + unitInfo.typicalRatio, size: 20 }),
-                  new TextRun({ text: "  |  Acuity: " + unitInfo.acuity, size: 20 })
-                ],
-                spacing: { after: 150 }
-              })
-            );
-          }
-        });
-      }
-      
-      // Education
-      if (profile.education) {
-        children.push(
-          new Paragraph({
-            children: [new TextRun({ text: "EDUCATION", bold: true, size: 28 })],
-            spacing: { before: 300, after: 150 },
-            border: { bottom: { style: BorderStyle.SINGLE, size: 1, color: "999999" } }
-          })
-        );
-        
-        children.push(
-          new Paragraph({
-            children: [new TextRun({ text: profile.education, size: 22 })],
-            spacing: { after: 100 }
-          })
-        );
-      }
-      
-      // Special Notes
-      if (profile.chargeExperience) {
-        children.push(
-          new Paragraph({
-            children: [new TextRun({ text: "⭐ CHARGE NURSE EXPERIENCE", bold: true, size: 24, color: "B8860B" })],
-            spacing: { before: 300, after: 100 }
-          })
-        );
-      }
-      
-      // Years Experience
-      if (profile.yearsExperience) {
-        children.push(
-          new Paragraph({
-            children: [new TextRun({ text: "Total Years Experience: " + profile.yearsExperience, bold: true, size: 22 })],
-            spacing: { before: 200, after: 100 }
-          })
-        );
-      }
-      
-      // Create document
-      const doc = new Document({
-        sections: [{
-          properties: {},
-          children: children
-        }]
-      });
-      
-      // Generate and save
-      const blob = await docx.Packer.toBlob(doc);
-      const fileName = ((profile.name || 'nurse_profile').replace(/[^a-z0-9]/gi, '_')) + '_profile.docx';
-      saveAs(blob, fileName);
-    }
-
+    // ============ MAIN APP ============
     function App() {
-      const [step, setStep] = React.useState(1);
-      const [resumeText, setResumeText] = React.useState('');
-      const [extractedData, setExtractedData] = React.useState(null);
-      const [enrichedProfile, setEnrichedProfile] = React.useState(null);
-      const [loading, setLoading] = React.useState(false);
-      const [error, setError] = React.useState('');
-      const [dragOver, setDragOver] = React.useState(false);
-      const [fileName, setFileName] = React.useState('');
-      const [fileProcessing, setFileProcessing] = React.useState(false);
-      const [downloading, setDownloading] = React.useState(false);
+      const [resumeText, setResumeText] = useState('');
+      const [loading, setLoading] = useState(false);
+      const [error, setError] = useState('');
+      const [profileData, setProfileData] = useState(null);
+      const [companyLogo, setCompanyLogo] = useState(null);
+      const [companyName, setCompanyName] = useState('');
+      const logoInputRef = useRef(null);
 
-      const handleFile = async (file) => {
-        if (!file) return;
-        setFileProcessing(true);
-        setError('');
-        setFileName(file.name);
-        
-        try {
-          let text = '';
-          const fileType = file.name.toLowerCase();
-          
-          if (fileType.endsWith('.pdf')) {
-            text = await extractTextFromPDF(file);
-          } else if (fileType.endsWith('.docx')) {
-            text = await extractTextFromDocx(file);
-          } else if (fileType.endsWith('.doc')) {
-            setError('Old .doc format not supported. Please save as .docx or PDF.');
-            setFileProcessing(false);
-            return;
-          } else if (fileType.endsWith('.txt')) {
-            text = await file.text();
-          } else {
-            setError('Please upload a PDF, Word (.docx), or text file.');
-            setFileProcessing(false);
-            return;
-          }
-          
-          if (text.trim().length < 50) {
-            setError('Could not extract enough text from the file. Try pasting the resume instead.');
-            setFileProcessing(false);
-            return;
-          }
-          
-          setResumeText(text);
-        } catch (err) {
-          console.error('File processing error:', err);
-          setError('Error reading file: ' + (err.message || String(err)));
-        }
-        setFileProcessing(false);
-      };
+      // Additional fields state (not from AI extraction)
+      const [additionalData, setAdditionalData] = useState({
+        references: [
+          { name: '', title: '', phone: '', email: '', relationship: '' },
+          { name: '', title: '', phone: '', email: '', relationship: '' },
+          { name: '', title: '', phone: '', email: '', relationship: '' }
+        ],
+        nursysLink: '',
+        driversLicense: { state: '', number: '', expiration: '' }
+      });
 
-      const handleDrop = (e) => {
-        e.preventDefault();
-        setDragOver(false);
-        const file = e.dataTransfer.files[0];
-        handleFile(file);
-      };
-
-      const handleDragOver = (e) => {
-        e.preventDefault();
-        setDragOver(true);
-      };
-
-      const handleDragLeave = (e) => {
-        e.preventDefault();
-        setDragOver(false);
-      };
-
-      const handleFileInput = (e) => {
+      const handleLogoUpload = (e) => {
         const file = e.target.files[0];
-        handleFile(file);
+        if (file) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setCompanyLogo(reader.result);
+          };
+          reader.readAsDataURL(file);
+        }
       };
 
-      const loadSample = () => {
-        setFileName('');
-        setResumeText(`SARAH JOHNSON, RN, BSN
-Phone: (305) 555-0147
-Email: sarah.johnson@email.com
-Miami, FL 33130
-
-PROFESSIONAL SUMMARY
-Dedicated Registered Nurse with 6+ years of experience in critical care and med-surg environments. Compact RN license. BLS, ACLS, PALS certified.
-
-LICENSES & CERTIFICATIONS
-- Registered Nurse, Florida Board of Nursing (Active)
-- Compact/Multi-state License (NLC)
-- BLS (American Heart Association) - Expires 2026
-- ACLS (American Heart Association) - Expires 2026
-- PALS (American Heart Association) - Expires 2025
-
-WORK EXPERIENCE
-
-Charge Nurse - ICU
-Memorial Regional Medical Center | Hollywood, FL
-March 2021 - Present
-- Lead 18-bed intensive care unit on night shift
-- Manage ventilator patients, CRRT, and vasoactive drips
-- Precept new graduate nurses and travel nurses
-- Coordinate with respiratory therapy and pharmacy
-
-Staff Nurse - Med/Surg Telemetry
-Jackson Memorial Hospital | Miami, FL
-June 2018 - March 2021
-- Provided care for 5-6 patients on 32-bed unit
-- Telemetry monitoring and rhythm interpretation
-- Medication administration and patient education
-
-EDUCATION
-Bachelor of Science in Nursing (BSN)
-University of Miami | 2018`);
-      };
-
-      const extractData = async () => {
+      const handleExtract = async () => {
         if (!resumeText.trim()) {
-          setError('Please paste a resume or upload a file first');
+          setError('Please paste resume text first');
           return;
         }
+
         setLoading(true);
         setError('');
-        
+        setProfileData(null);
+
         try {
           const response = await fetch('/api/extract', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ resumeText })
           });
-          
-          const responseText = await response.text();
-          console.log('API Response:', responseText);
-          
-          let parsed;
-          try {
-            parsed = JSON.parse(responseText);
-          } catch (parseErr) {
-            console.error('JSON Parse Error:', parseErr);
-            setError('Failed to parse API response. Raw response: ' + responseText.substring(0, 200));
-            setLoading(false);
-            return;
+
+          const data = await response.json();
+
+          if (data.error) {
+            setError(data.error);
+          } else {
+            // Enrich with hospital data
+            if (data.workHistory) {
+              data.workHistory = data.workHistory.map(job => {
+                const hospitalData = findHospitalData(job.facility);
+                const unitType = detectUnitType(job.unit);
+                const unitTemplate = unitType ? UNIT_TEMPLATES[unitType] : null;
+                
+                return {
+                  ...job,
+                  hospitalData,
+                  unitType,
+                  unitTemplate
+                };
+              });
+            }
+            setProfileData(data);
           }
-          
-          if (parsed.error) {
-            setError(String(parsed.error));
-            setLoading(false);
-            return;
-          }
-          
-          if (!response.ok) {
-            setError('API request failed: ' + (parsed.error || parsed.message || 'Unknown error'));
-            setLoading(false);
-            return;
-          }
-          
-          setExtractedData(parsed);
-          
-          const workHistory = Array.isArray(parsed.workHistory) ? parsed.workHistory : [];
-          
-          const enriched = {
-            ...parsed,
-            workHistory: workHistory.map(job => {
-              const unitData = matchUnitType(job.unit || job.title);
-              return {
-                ...job,
-                unitInfo: unitData
-              };
-            })
-          };
-          
-          setEnrichedProfile(enriched);
-          setStep(3);
         } catch (err) {
-          console.error('Extract Error:', err);
-          const errorMsg = err && err.message ? String(err.message) : String(err) || 'Failed to extract data. Please try again.';
-          setError(errorMsg);
+          setError('Failed to process resume. Please try again.');
+          console.error(err);
         } finally {
           setLoading(false);
         }
       };
 
-      const handleDownload = async () => {
-        if (!enrichedProfile) return;
-        setDownloading(true);
-        try {
-          await generateWordDocument(enrichedProfile);
-        } catch (err) {
-          console.error('Download error:', err);
-          setError('Failed to generate document: ' + (err.message || String(err)));
-        }
-        setDownloading(false);
+      const handlePrint = () => {
+        window.print();
       };
 
-      const CheckCircle = () => (
-        React.createElement('svg', { className: "w-5 h-5", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24" },
-          React.createElement('path', { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M5 13l4 4L19 7" })
-        )
-      );
+      const updateReference = (index, field, value) => {
+        setAdditionalData(prev => {
+          const newRefs = [...prev.references];
+          newRefs[index] = { ...newRefs[index], [field]: value };
+          return { ...prev, references: newRefs };
+        });
+      };
 
-      const Spinner = () => (
-        React.createElement('svg', { className: "animate-spin h-5 w-5 text-white", fill: "none", viewBox: "0 0 24 24" },
-          React.createElement('circle', { className: "opacity-25", cx: "12", cy: "12", r: "10", stroke: "currentColor", strokeWidth: "4" }),
-          React.createElement('path', { className: "opacity-75", fill: "currentColor", d: "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" })
-        )
-      );
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-sky-50">
+          {/* Header */}
+          <header className="bg-white border-b border-slate-200 sticky top-0 z-50 no-print">
+            <div className="max-w-7xl mx-auto px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-sky-500 to-blue-600 rounded-xl flex items-center justify-center">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h1 className="text-xl font-bold text-slate-800">Profile Builder Pro</h1>
+                    <p className="text-xs text-slate-500">Healthcare Staffing Resume Processor</p>
+                  </div>
+                </div>
+                {profileData && (
+                  <button
+                    onClick={handlePrint}
+                    className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    Print Profile
+                  </button>
+                )}
+              </div>
+            </div>
+          </header>
 
-      const UploadIcon = () => (
-        React.createElement('svg', { className: "w-12 h-12 text-gray-400", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24" },
-          React.createElement('path', { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 1.5, d: "M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" })
-        )
-      );
-
-      const FileIcon = () => (
-        React.createElement('svg', { className: "w-6 h-6 text-blue-500", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24" },
-          React.createElement('path', { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" })
-        )
-      );
-
-      const DownloadIcon = () => (
-        React.createElement('svg', { className: "w-5 h-5", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24" },
-          React.createElement('path', { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" })
-        )
-      );
-
-      return React.createElement('div', { className: "min-h-screen bg-gray-50 p-4" },
-        React.createElement('div', { className: "max-w-4xl mx-auto" },
-          
-          // Header
-          React.createElement('div', { className: "bg-white rounded-lg shadow-sm p-6 mb-6" },
-            React.createElement('div', { className: "flex justify-between items-start" },
-              React.createElement('div', null,
-                React.createElement('h1', { className: "text-2xl font-bold text-gray-900" }, "Healthcare Profile Builder"),
-                React.createElement('p', { className: "text-gray-600 mt-1" }, "AI-powered nurse profile enrichment — MVP Demo")
-              ),
-              React.createElement('span', { className: "px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium" }, "✨ Real AI Extraction")
-            ),
-            
-            // Progress Steps
-            React.createElement('div', { className: "flex items-center mt-6" },
-              [1, 2, 3].map(function(s, i) { 
-                return React.createElement(React.Fragment, { key: s },
-                  React.createElement('div', { 
-                    className: "flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium " + (step >= s ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500')
-                  }, step > s ? React.createElement(CheckCircle) : s),
-                  i < 2 ? React.createElement('div', { className: "flex-1 h-1 mx-2 " + (step > s ? 'bg-blue-600' : 'bg-gray-200') }) : null
-                );
-              })
-            ),
-            React.createElement('div', { className: "flex justify-between mt-2 text-sm text-gray-600" },
-              React.createElement('span', null, "Paste Resume"),
-              React.createElement('span', null, "Extract Data"),
-              React.createElement('span', null, "Review Profile")
-            )
-          ),
-
-          // Step 1: Input
-          step === 1 ? React.createElement('div', { className: "bg-white rounded-lg shadow-sm p-6" },
-            React.createElement('h2', { className: "text-lg font-semibold mb-4 flex items-center gap-2" }, "📄 Upload or Paste Resume"),
-            
-            // File Upload Zone
-            React.createElement('div', {
-              className: "drop-zone border-2 border-dashed rounded-lg p-8 text-center mb-4 cursor-pointer " + (dragOver ? 'drag-over border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'),
-              onDrop: handleDrop,
-              onDragOver: handleDragOver,
-              onDragLeave: handleDragLeave,
-              onClick: function() { document.getElementById('fileInput').click(); }
-            },
-              React.createElement('input', {
-                type: 'file',
-                id: 'fileInput',
-                className: 'hidden',
-                accept: '.pdf,.docx,.doc,.txt',
-                onChange: handleFileInput
-              }),
-              fileProcessing ? 
-                React.createElement('div', { className: "flex flex-col items-center" },
-                  React.createElement('div', { className: "animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mb-2" }),
-                  React.createElement('p', { className: "text-gray-600" }, "Processing file...")
-                ) :
-              fileName ?
-                React.createElement('div', { className: "flex flex-col items-center" },
-                  React.createElement(FileIcon),
-                  React.createElement('p', { className: "text-gray-900 font-medium mt-2" }, fileName),
-                  React.createElement('p', { className: "text-green-600 text-sm" }, "✓ File loaded successfully")
-                ) :
-                React.createElement('div', { className: "flex flex-col items-center" },
-                  React.createElement(UploadIcon),
-                  React.createElement('p', { className: "text-gray-600 mt-2" }, "Drag & drop a file here, or click to browse"),
-                  React.createElement('p', { className: "text-gray-400 text-sm mt-1" }, "Supports PDF, Word (.docx), and text files")
-                )
-            ),
-            
-            React.createElement('div', { className: "flex items-center gap-4 mb-4" },
-              React.createElement('div', { className: "flex-1 h-px bg-gray-200" }),
-              React.createElement('span', { className: "text-gray-400 text-sm" }, "or paste text below"),
-              React.createElement('div', { className: "flex-1 h-px bg-gray-200" })
-            ),
-            
-            React.createElement('textarea', {
-              className: "w-full h-64 p-4 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
-              placeholder: "Paste resume text here...",
-              value: resumeText,
-              onChange: function(e) { setResumeText(e.target.value); setFileName(''); }
-            }),
-            
-            error ? React.createElement('div', { className: "bg-red-50 border border-red-200 rounded-lg p-4 mt-4 text-red-700" }, "⚠ " + error) : null,
-            
-            React.createElement('div', { className: "flex gap-3 mt-4" },
-              React.createElement('button', {
-                onClick: loadSample,
-                className: "px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-              }, "Load Sample Resume"),
-              React.createElement('button', {
-                onClick: function() { setStep(2); },
-                disabled: !resumeText.trim(),
-                className: "px-6 py-2 rounded-lg font-medium " + (resumeText.trim() ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-200 text-gray-500 cursor-not-allowed')
-              }, "Continue →")
-            )
-          ) : null,
-
-          // Step 2: Extract
-          step === 2 ? React.createElement('div', { className: "bg-white rounded-lg shadow-sm p-6" },
-            React.createElement('h2', { className: "text-lg font-semibold mb-4 flex items-center gap-2" }, "🔍 Extract & Enrich Profile"),
-            React.createElement('div', { className: "bg-gray-50 rounded-lg p-4 mb-4 max-h-64 overflow-y-auto" },
-              React.createElement('pre', { className: "whitespace-pre-wrap font-mono text-sm text-gray-700" }, resumeText)
-            ),
-            React.createElement('div', { className: "bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4" },
-              React.createElement('h3', { className: "font-medium text-blue-900 mb-2" }, "What happens next:"),
-              React.createElement('ul', { className: "text-blue-800 text-sm space-y-1" },
-                React.createElement('li', null, "• Claude AI extracts: Name, contact, work history, licenses, certifications"),
-                React.createElement('li', null, "• System enriches: Hospital beds, trauma level, EMR, teaching status"),
-                React.createElement('li', null, "• Auto-fills: Typical responsibilities by unit type")
-              )
-            ),
-            error ? React.createElement('div', { className: "bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-red-700" }, "⚠ " + error) : null,
-            React.createElement('div', { className: "flex gap-3" },
-              React.createElement('button', {
-                onClick: function() { setStep(1); setError(''); },
-                className: "px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-              }, "← Back"),
-              React.createElement('button', {
-                onClick: extractData,
-                disabled: loading,
-                className: "px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 disabled:bg-green-400 flex items-center gap-2"
-              }, loading ? React.createElement(Spinner) : null, loading ? "Extracting..." : "✓ Extract & Enrich")
-            )
-          ) : null,
-
-          // Step 3: Review
-          step === 3 && enrichedProfile ? React.createElement('div', { className: "space-y-6" },
-            // Contact Card
-            React.createElement('div', { className: "bg-white rounded-lg shadow-sm p-6" },
-              React.createElement('h2', { className: "text-xl font-bold text-gray-900" }, enrichedProfile.name || "Unknown"),
-              React.createElement('div', { className: "mt-2 text-gray-600 space-y-1" },
-                enrichedProfile.phone ? React.createElement('p', null, "📞 " + enrichedProfile.phone) : null,
-                enrichedProfile.email ? React.createElement('p', null, "✉️ " + enrichedProfile.email) : null,
-                enrichedProfile.location ? React.createElement('p', null, "📍 " + enrichedProfile.location) : null
-              )
-            ),
-            
-            // Licenses
-            enrichedProfile.licenses && enrichedProfile.licenses.length > 0 ? React.createElement('div', { className: "bg-white rounded-lg shadow-sm p-6" },
-              React.createElement('h3', { className: "font-semibold text-gray-900 mb-3" }, "🪪 Licenses"),
-              React.createElement('div', { className: "flex flex-wrap gap-2" },
-                enrichedProfile.licenses.map(function(lic, i) {
-                  return React.createElement('span', { key: i, className: "px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm" }, String(lic));
-                })
-              ),
-              enrichedProfile.compactLicense ? React.createElement('p', { className: "mt-2 text-green-600 font-medium" }, "✓ Compact/Multi-state License") : null
-            ) : null,
-            
-            // Certifications
-            enrichedProfile.certifications && enrichedProfile.certifications.length > 0 ? React.createElement('div', { className: "bg-white rounded-lg shadow-sm p-6" },
-              React.createElement('h3', { className: "font-semibold text-gray-900 mb-3" }, "📜 Certifications"),
-              React.createElement('div', { className: "flex flex-wrap gap-2" },
-                enrichedProfile.certifications.map(function(cert, i) {
-                  return React.createElement('span', { key: i, className: "px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm" }, String(cert));
-                })
-              )
-            ) : null,
-            
-            // Work History
-            React.createElement('div', { className: "bg-white rounded-lg shadow-sm p-6" },
-              React.createElement('h3', { className: "font-semibold text-gray-900 mb-4" }, "💼 Work History"),
-              React.createElement('div', { className: "space-y-6" },
-                (enrichedProfile.workHistory || []).map(function(job, i) {
-                  const hospitalData = job.hospitalData || job.enrichment;
-                  const isVerified = hospitalData && (hospitalData.verified || hospitalData.matched);
+          <main className="max-w-7xl mx-auto px-6 py-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              
+              {/* LEFT COLUMN - Input Section */}
+              <div className="space-y-6 no-print">
+                
+                {/* Company Branding Section */}
+                <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                  <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    Company Branding
+                  </h2>
                   
-                  return React.createElement('div', { key: i, className: "border-l-4 border-blue-500 pl-4" },
-                    React.createElement('h4', { className: "font-medium text-gray-900" }, job.title || "Unknown Position"),
-                    React.createElement('p', { className: "text-gray-600" }, (job.facility || "Unknown Facility") + " | " + (job.dates || "Dates not specified")),
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">Company Name</label>
+                      <input
+                        type="text"
+                        value={companyName}
+                        onChange={(e) => setCompanyName(e.target.value)}
+                        placeholder="Your Staffing Agency Name"
+                        className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
+                      />
+                    </div>
                     
-                    // Enrichment Badge
-                    isVerified ? React.createElement('div', { className: "mt-2 bg-green-50 border border-green-200 rounded-lg p-3" },
-                      React.createElement('p', { className: "text-green-800 font-medium text-sm" }, "✓ Hospital Verified"),
-                      React.createElement('div', { className: "grid grid-cols-2 gap-2 mt-2 text-sm" },
-                        React.createElement('span', { className: "text-gray-600" }, "Beds: ", React.createElement('span', { className: "font-medium" }, hospitalData.beds || hospitalData.beds || "N/A")),
-                        React.createElement('span', { className: "text-gray-600" }, "Trauma: ", React.createElement('span', { className: "font-medium" }, hospitalData.traumaLevel || hospitalData.traumaLevel || "N/A")),
-                        React.createElement('span', { className: "text-gray-600" }, "Teaching: ", React.createElement('span', { className: "font-medium" }, (hospitalData.teachingHospital || hospitalData.teaching) ? "Yes" : "No")),
-                        React.createElement('span', { className: "text-gray-600" }, "EMR: ", React.createElement('span', { className: "font-medium" }, hospitalData.emrSystem || hospitalData.emr || "Unknown"))
-                      )
-                    ) : null,
-                    
-                    // Unit Info
-                    job.unitInfo ? React.createElement('div', { className: "mt-2 bg-blue-50 border border-blue-200 rounded-lg p-3" },
-                      React.createElement('p', { className: "text-blue-800 font-medium text-sm" }, "Unit: " + job.unitInfo.name),
-                      React.createElement('p', { className: "text-blue-700 text-sm" }, "Typical Ratio: " + job.unitInfo.typicalRatio + " | Acuity: " + job.unitInfo.acuity)
-                    ) : null
-                  );
-                })
-              )
-            ),
-            
-            // Charge Nurse Experience
-            enrichedProfile.chargeExperience ? React.createElement('div', { className: "bg-yellow-50 border border-yellow-200 rounded-lg p-4" },
-              React.createElement('p', { className: "text-yellow-800 font-medium" }, "⭐ Charge Nurse Experience Detected")
-            ) : null,
-            
-            // Actions
-            React.createElement('div', { className: "flex gap-3" },
-              React.createElement('button', {
-                onClick: function() { setStep(1); setResumeText(''); setEnrichedProfile(null); setFileName(''); setError(''); },
-                className: "px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-              }, "← Start Over"),
-              React.createElement('button', {
-                onClick: handleDownload,
-                disabled: downloading,
-                className: "px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:bg-blue-400 flex items-center gap-2"
-              }, 
-                downloading ? React.createElement(Spinner) : React.createElement(DownloadIcon),
-                downloading ? "Generating..." : "Download Profile"
-              )
-            )
-          ) : null
-        )
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">Company Logo</label>
+                      <div className="flex items-center gap-4">
+                        <input
+                          type="file"
+                          ref={logoInputRef}
+                          onChange={handleLogoUpload}
+                          accept="image/*"
+                          className="hidden"
+                        />
+                        <button
+                          onClick={() => logoInputRef.current?.click()}
+                          className="px-4 py-3 border-2 border-dashed border-slate-300 rounded-xl hover:border-sky-400 hover:bg-sky-50 transition-all text-slate-600 flex items-center gap-2"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          Upload Logo
+                        </button>
+                        {companyLogo && (
+                          <div className="flex items-center gap-3">
+                            <img src={companyLogo} alt="Company Logo" className="h-12 w-auto object-contain" />
+                            <button
+                              onClick={() => setCompanyLogo(null)}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Resume Input Section */}
+                <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                  <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Paste Resume
+                  </h2>
+                  
+                  <textarea
+                    value={resumeText}
+                    onChange={(e) => setResumeText(e.target.value)}
+                    placeholder="Paste the nurse's resume text here..."
+                    className="w-full h-64 px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-transparent resize-none transition-all text-slate-700"
+                  />
+                  
+                  {error && (
+                    <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+                      {error}
+                    </div>
+                  )}
+                  
+                  <button
+                    onClick={handleExtract}
+                    disabled={loading}
+                    className="mt-4 w-full py-4 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {loading ? (
+                      <>
+                        <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        Extract & Build Profile
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {/* Additional Data Section (only show after extraction) */}
+                {profileData && (
+                  <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                    <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                      <svg className="w-5 h-5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                      Additional Information
+                    </h2>
+
+                    {/* Nursys Verification */}
+                    <div className="mb-6">
+                      <label className="block text-sm font-medium text-slate-700 mb-2">Nursys Verification Link</label>
+                      <input
+                        type="url"
+                        value={additionalData.nursysLink}
+                        onChange={(e) => setAdditionalData(prev => ({ ...prev, nursysLink: e.target.value }))}
+                        placeholder="https://www.nursys.com/..."
+                        className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                      />
+                    </div>
+
+                    {/* Driver's License */}
+                    <div className="mb-6">
+                      <label className="block text-sm font-medium text-slate-700 mb-2">Driver's License</label>
+                      <div className="grid grid-cols-3 gap-3">
+                        <input
+                          type="text"
+                          value={additionalData.driversLicense.state}
+                          onChange={(e) => setAdditionalData(prev => ({ 
+                            ...prev, 
+                            driversLicense: { ...prev.driversLicense, state: e.target.value }
+                          }))}
+                          placeholder="State"
+                          className="px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                        />
+                        <input
+                          type="text"
+                          value={additionalData.driversLicense.number}
+                          onChange={(e) => setAdditionalData(prev => ({ 
+                            ...prev, 
+                            driversLicense: { ...prev.driversLicense, number: e.target.value }
+                          }))}
+                          placeholder="License #"
+                          className="px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                        />
+                        <input
+                          type="text"
+                          value={additionalData.driversLicense.expiration}
+                          onChange={(e) => setAdditionalData(prev => ({ 
+                            ...prev, 
+                            driversLicense: { ...prev.driversLicense, expiration: e.target.value }
+                          }))}
+                          placeholder="Exp Date"
+                          className="px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                        />
+                      </div>
+                    </div>
+
+                    {/* References */}
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-3">Professional References</label>
+                      {additionalData.references.map((ref, idx) => (
+                        <div key={idx} className="mb-4 p-4 bg-slate-50 rounded-xl">
+                          <p className="text-xs font-semibold text-slate-500 mb-2">Reference {idx + 1}</p>
+                          <div className="grid grid-cols-2 gap-3">
+                            <input
+                              type="text"
+                              value={ref.name}
+                              onChange={(e) => updateReference(idx, 'name', e.target.value)}
+                              placeholder="Name"
+                              className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                            />
+                            <input
+                              type="text"
+                              value={ref.title}
+                              onChange={(e) => updateReference(idx, 'title', e.target.value)}
+                              placeholder="Title"
+                              className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                            />
+                            <input
+                              type="tel"
+                              value={ref.phone}
+                              onChange={(e) => updateReference(idx, 'phone', e.target.value)}
+                              placeholder="Phone"
+                              className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                            />
+                            <input
+                              type="email"
+                              value={ref.email}
+                              onChange={(e) => updateReference(idx, 'email', e.target.value)}
+                              placeholder="Email"
+                              className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                            />
+                            <input
+                              type="text"
+                              value={ref.relationship}
+                              onChange={(e) => updateReference(idx, 'relationship', e.target.value)}
+                              placeholder="Relationship (e.g., Supervisor)"
+                              className="col-span-2 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* RIGHT COLUMN - Profile Output */}
+              <div>
+                {profileData ? (
+                  <ProfileOutput 
+                    data={profileData} 
+                    companyLogo={companyLogo} 
+                    companyName={companyName}
+                    additionalData={additionalData}
+                  />
+                ) : (
+                  <div className="bg-white rounded-2xl border border-slate-200 p-12 shadow-sm flex flex-col items-center justify-center min-h-[600px] no-print">
+                    <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-6">
+                      <svg className="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-xl font-semibold text-slate-700 mb-2">Ready to Build</h3>
+                    <p className="text-slate-500 text-center max-w-sm">
+                      Paste a resume on the left and click "Extract & Build Profile" to generate a professional candidate profile.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </main>
+        </div>
       );
     }
 
-    ReactDOM.render(React.createElement(App), document.getElementById('root'));
+    // ============ PROFILE OUTPUT COMPONENT ============
+    function ProfileOutput({ data, companyLogo, companyName, additionalData }) {
+      const { personalInfo, licenses, certifications, education, workHistory, yearsExperience, primarySpecialty } = data;
+
+      // Build highlight stats
+      const licenseStates = licenses?.map(l => l.state).join(', ') || 'N/A';
+      const hasCompact = licenses?.some(l => l.compact);
+      const topCerts = certifications?.slice(0, 5).join(', ') || 'N/A';
+
+      return (
+        <div className="profile-output bg-white rounded-2xl border border-slate-200 shadow-lg overflow-hidden">
+          
+          {/* Company Header */}
+          {(companyLogo || companyName) && (
+            <div className="px-8 py-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                {companyLogo && (
+                  <img src={companyLogo} alt="Company Logo" className="h-10 w-auto object-contain" />
+                )}
+                {companyName && (
+                  <span className="text-lg font-semibold text-slate-700">{companyName}</span>
+                )}
+              </div>
+              <span className="text-xs text-slate-400">Candidate Profile</span>
+            </div>
+          )}
+
+          {/* === BLUE BOX HIGHLIGHT SECTION === */}
+          <div className="highlight-box text-white p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h1 className="text-2xl font-bold">{personalInfo?.fullName || 'Candidate Name'}</h1>
+                <p className="text-sky-100 text-sm mt-1">{personalInfo?.email} • {personalInfo?.phone}</p>
+              </div>
+              <div className="text-right">
+                <span className="inline-block bg-white/20 backdrop-blur px-3 py-1 rounded-full text-sm font-medium">
+                  {primarySpecialty || 'RN'}
+                </span>
+              </div>
+            </div>
+            
+            {/* Quick Stats Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+              <div className="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
+                <p className="text-2xl font-bold">{yearsExperience || '—'}</p>
+                <p className="text-xs text-sky-100 uppercase tracking-wide">Years Exp</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
+                <p className="text-lg font-bold">{licenseStates}</p>
+                <p className="text-xs text-sky-100 uppercase tracking-wide">
+                  {hasCompact ? 'Compact License' : 'Licensed States'}
+                </p>
+              </div>
+              <div className="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
+                <p className="text-lg font-bold">{certifications?.length || 0}</p>
+                <p className="text-xs text-sky-100 uppercase tracking-wide">Certifications</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
+                <p className="text-lg font-bold">{workHistory?.length || 0}</p>
+                <p className="text-xs text-sky-100 uppercase tracking-wide">Positions Held</p>
+              </div>
+            </div>
+
+            {/* Top Certifications Banner */}
+            {certifications && certifications.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {certifications.slice(0, 6).map((cert, idx) => (
+                  <span key={idx} className="bg-white/20 px-3 py-1 rounded-full text-sm">
+                    {cert}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* === CREDENTIALS SECTION (Licenses, Certs, Education) === */}
+          <div className="p-6 border-b border-slate-200">
+            <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <svg className="w-5 h-5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+              </svg>
+              Credentials & Education
+            </h2>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* Licenses */}
+              <div>
+                <h3 className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-3">Licenses</h3>
+                <div className="space-y-2">
+                  {licenses?.map((lic, idx) => (
+                    <div key={idx} className="flex items-center gap-2 text-sm">
+                      <span className="w-8 h-8 bg-emerald-100 text-emerald-700 rounded-lg flex items-center justify-center font-semibold text-xs">
+                        {lic.state}
+                      </span>
+                      <div>
+                        <span className="font-medium text-slate-700">{lic.type || 'RN'}</span>
+                        {lic.compact && (
+                          <span className="ml-2 text-xs bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full">
+                            Compact
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Nursys Verification */}
+                {additionalData?.nursysLink && (
+                  <div className="mt-3 pt-3 border-t border-slate-100">
+                    <a 
+                      href={additionalData.nursysLink} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-xs text-sky-600 hover:text-sky-700 flex items-center gap-1"
+                    >
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                      Nursys Verification
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              {/* Certifications */}
+              <div>
+                <h3 className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-3">Certifications</h3>
+                <div className="flex flex-wrap gap-2">
+                  {certifications?.map((cert, idx) => (
+                    <span key={idx} className="bg-slate-100 text-slate-700 px-3 py-1 rounded-lg text-sm">
+                      {cert}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Education */}
+              <div>
+                <h3 className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-3">Education</h3>
+                {education && (
+                  <div className="text-sm">
+                    <p className="font-semibold text-slate-800">{education.degree}</p>
+                    <p className="text-slate-600">{education.school}</p>
+                    <p className="text-slate-500">{education.graduationDate}</p>
+                  </div>
+                )}
+                
+                {/* Driver's License */}
+                {additionalData?.driversLicense?.state && (
+                  <div className="mt-4 pt-3 border-t border-slate-100">
+                    <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Driver's License</p>
+                    <p className="text-sm text-slate-700">
+                      {additionalData.driversLicense.state} • Exp: {additionalData.driversLicense.expiration || 'N/A'}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* === WORK HISTORY SECTION === */}
+          <div className="p-6">
+            <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <svg className="w-5 h-5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              Work History
+            </h2>
+
+            <div className="space-y-6">
+              {workHistory?.map((job, idx) => (
+                <div key={idx} className="border border-slate-200 rounded-xl overflow-hidden">
+                  {/* Job Header */}
+                  <div className="bg-slate-50 px-5 py-4 border-b border-slate-200">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-bold text-slate-800">{job.title}</h3>
+                        <p className="text-slate-600">{job.facility}</p>
+                        <p className="text-sm text-slate-500">{job.city}, {job.state}</p>
+                      </div>
+                      <div className="text-right text-sm">
+                        <p className="font-medium text-slate-700">{job.startDate} - {job.endDate}</p>
+                        {job.unit && (
+                          <span className="inline-block mt-1 bg-sky-100 text-sky-700 px-2 py-0.5 rounded text-xs">
+                            {job.unit}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Job Details */}
+                  <div className="p-5">
+                    {/* Hospital Enrichment Data */}
+                    {job.hospitalData && (
+                      <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                        <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-2">Facility Details</p>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                          <div>
+                            <span className="text-amber-600">Beds:</span>{' '}
+                            <span className="font-medium text-slate-700">{job.hospitalData.beds}</span>
+                          </div>
+                          <div>
+                            <span className="text-amber-600">Trauma:</span>{' '}
+                            <span className="font-medium text-slate-700">{job.hospitalData.traumaLevel}</span>
+                          </div>
+                          <div>
+                            <span className="text-amber-600">Teaching:</span>{' '}
+                            <span className="font-medium text-slate-700">{job.hospitalData.teaching ? 'Yes' : 'No'}</span>
+                          </div>
+                          <div>
+                            <span className="text-amber-600">EMR:</span>{' '}
+                            <span className="font-medium text-slate-700">{job.hospitalData.emr}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Responsibilities */}
+                    {job.responsibilities && job.responsibilities.length > 0 && (
+                      <div className="mb-4">
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Key Responsibilities</p>
+                        <ul className="space-y-1">
+                          {job.responsibilities.map((resp, rIdx) => (
+                            <li key={rIdx} className="text-sm text-slate-700 flex items-start gap-2">
+                              <span className="text-sky-500 mt-1">•</span>
+                              {resp}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Unit Template Suggestions */}
+                    {job.unitTemplate && (
+                      <div className="p-3 bg-slate-50 rounded-lg">
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
+                          Typical {job.unit || job.unitType?.toUpperCase()} Experience
+                        </p>
+                        <p className="text-sm text-slate-600 mb-2">
+                          <span className="font-medium">Patient Ratio:</span> {job.unitTemplate.typicalRatio}
+                        </p>
+                        <p className="text-sm text-slate-600">
+                          <span className="font-medium">Populations:</span> {job.unitTemplate.populations.join(', ')}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Charge Experience Badge */}
+                    {job.chargeExperience && (
+                      <div className="mt-3">
+                        <span className="inline-flex items-center gap-1 bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                          </svg>
+                          Charge Nurse Experience
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* === REFERENCES SECTION === */}
+          {additionalData?.references?.some(r => r.name) && (
+            <div className="p-6 border-t border-slate-200 bg-slate-50">
+              <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <svg className="w-5 h-5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                Professional References
+              </h2>
+
+              <div className="grid md:grid-cols-3 gap-4">
+                {additionalData.references.filter(r => r.name).map((ref, idx) => (
+                  <div key={idx} className="bg-white p-4 rounded-xl border border-slate-200">
+                    <p className="font-semibold text-slate-800">{ref.name}</p>
+                    {ref.title && <p className="text-sm text-slate-600">{ref.title}</p>}
+                    {ref.relationship && <p className="text-xs text-slate-500 mb-2">{ref.relationship}</p>}
+                    {ref.phone && <p className="text-sm text-slate-700">{ref.phone}</p>}
+                    {ref.email && <p className="text-sm text-sky-600">{ref.email}</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Footer */}
+          <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 text-center">
+            <p className="text-xs text-slate-400">
+              Generated by Profile Builder Pro • {new Date().toLocaleDateString()}
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    // ============ RENDER ============
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
   </script>
 </body>
 </html>
