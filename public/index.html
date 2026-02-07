@@ -498,37 +498,6 @@
         }
       });
 
-      // ===== PAGE BREAK - REFERENCES =====
-      const page2 = [];
-      page2.push(new Paragraph({ children: [new PageBreak()] }));
-
-      if (companyName) {
-        page2.push(new Paragraph({
-          children: [new TextRun({ text: companyName.toUpperCase() + ' — REFERENCES', bold: true, size: 24, color: BLUE })],
-          spacing: { after: 200 }
-        }));
-      }
-      page2.push(new Paragraph({
-        children: [new TextRun({ text: `References for ${name}`, size: 22, bold: true })],
-        spacing: { after: 200 }
-      }));
-
-      const refs = additionalData?.references || [];
-      if (refs.some(r => r.name)) {
-        refs.filter(r => r.name).forEach((ref, i) => {
-          page2.push(new Paragraph({
-            children: [new TextRun({ text: ref.name, bold: true, size: 22 })],
-            spacing: { before: i > 0 ? 150 : 0, after: 30 }
-          }));
-          if (ref.title) page2.push(new Paragraph({ children: [new TextRun({ text: ref.title, size: 20, color: GRAY })], spacing: { after: 20 } }));
-          if (ref.relationship) page2.push(new Paragraph({ children: [new TextRun({ text: ref.relationship, size: 18, italics: true, color: GRAY })], spacing: { after: 20 } }));
-          if (ref.phone) page2.push(new Paragraph({ children: [new TextRun({ text: 'Phone: ' + ref.phone, size: 20 })], spacing: { after: 10 } }));
-          if (ref.email) page2.push(new Paragraph({ children: [new TextRun({ text: 'Email: ' + ref.email, size: 20, color: "2563eb" })], spacing: { after: 10 } }));
-        });
-      } else {
-        page2.push(new Paragraph({ children: [new TextRun({ text: 'References available upon request', size: 20, italics: true, color: GRAY })], spacing: { after: 100 } }));
-      }
-
       // ===== PAGE BREAK - SKILLS CHECKLIST =====
       const page3 = [];
       page3.push(new Paragraph({ children: [new PageBreak()] }));
@@ -654,16 +623,21 @@
       }
 
       // ===== ASSEMBLE DOCUMENT =====
-      const doc = new Document({
-        sections: [{
-          properties: { page: { margin: { top: 720, right: 720, bottom: 720, left: 720 } } },
-          children: [...page1, ...page2, ...page3, ...page4, ...page5]
-        }]
-      });
+      try {
+        const doc = new Document({
+          sections: [{
+            properties: { page: { margin: { top: 720, right: 720, bottom: 720, left: 720 } } },
+            children: [...page1, ...page3, ...page4, ...page5]
+          }]
+        });
 
-      const blob = await Packer.toBlob(doc);
-      const fileName = `${(name || 'candidate').replace(/[^a-zA-Z0-9]/g, '_')}_Profile_${new Date().toISOString().slice(0,10)}.docx`;
-      saveAs(blob, fileName);
+        const blob = await Packer.toBlob(doc);
+        const fileName = `${(name || 'candidate').replace(/[^a-zA-Z0-9]/g, '_')}_Profile_${new Date().toISOString().slice(0,10)}.docx`;
+        saveAs(blob, fileName);
+      } catch (err) {
+        console.error('DOCX Export Error:', err);
+        alert('Error saving DOCX: ' + (err.message || 'Unknown error. Check console for details.'));
+      }
     }
 
     // ==================== MAIN APP ====================
@@ -857,7 +831,7 @@
         { id: 'certifications', label: 'Certifications' },
         { id: 'workhistory', label: 'Work History' },
         { id: 'skills', label: 'Skills' },
-        { id: 'references', label: 'References' },
+        { id: 'references', label: '🔒 References' },
         { id: 'preview', label: '👁 Preview' },
       ];
 
@@ -909,7 +883,7 @@
               <button onClick={() => setStep('input')} className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg">
                 ← New Resume
               </button>
-              <button onClick={() => exportFullDOCX(extractedData, additionalData, companyName, companyLogo, scoreResult, overlaps, overlapResolutions, overlapPrnShifts)}
+              <button onClick={async () => { try { await exportFullDOCX(extractedData, additionalData, companyName, companyLogo, scoreResult, overlaps, overlapResolutions, overlapPrnShifts); } catch(e) { console.error(e); alert('DOCX save error: ' + e.message); } }}
                 className="px-4 py-1.5 text-sm bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition">
                 Download DOCX
               </button>
@@ -1018,9 +992,35 @@
                           placeholder={`Summary point ${i + 1}...`} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
                       ))}
                       <div className="border-t pt-3 mt-3">
-                        <label className="block text-sm font-medium text-gray-600 mb-1">Nursys Verification Link</label>
-                        <input type="text" value={additionalData.nursysLink} onChange={e => updateAdditional('nursysLink', e.target.value)}
-                          placeholder="https://www.nursys.com/..." className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                        <label className="block text-sm font-medium text-gray-600 mb-1">Nursys License Verification</label>
+                        <p className="text-xs text-gray-400 mb-2">Auto-generates a Nursys lookup link from the nurse's name and license state</p>
+                        {extractedData?.personalInfo?.fullName && (() => {
+                          const nameParts = (extractedData.personalInfo.fullName || '').split(' ');
+                          const firstName = nameParts[0] || '';
+                          const lastName = nameParts[nameParts.length - 1] || '';
+                          const primaryState = (additionalData?.licenses?.[0]?.state || extractedData?.licenses?.[0]?.state || '').toUpperCase();
+                          const nursysUrl = `https://www.nursys.com/LLV/LLVSearch.aspx`;
+                          return (
+                            <div className="space-y-2">
+                              <div className="bg-blue-50 rounded-lg p-3 flex items-center justify-between">
+                                <div>
+                                  <p className="text-xs text-blue-700 font-medium">Quick Lookup: {firstName} {lastName}{primaryState ? ` — ${primaryState}` : ''}</p>
+                                  <p className="text-xs text-blue-500">Click to verify on Nursys.com</p>
+                                </div>
+                                <a href={nursysUrl} target="_blank" rel="noopener noreferrer"
+                                  className="px-3 py-1.5 bg-blue-600 text-white rounded text-xs font-medium hover:bg-blue-700">
+                                  Open Nursys ↗
+                                </a>
+                              </div>
+                              <input type="text" value={additionalData.nursysLink} onChange={e => updateAdditional('nursysLink', e.target.value)}
+                                placeholder="Paste Nursys verification URL after lookup..." className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                            </div>
+                          );
+                        })()}
+                        {!extractedData?.personalInfo?.fullName && (
+                          <input type="text" value={additionalData.nursysLink} onChange={e => updateAdditional('nursysLink', e.target.value)}
+                            placeholder="https://www.nursys.com/..." className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                        )}
                       </div>
                       <div className="border-t pt-3 mt-3">
                         <h4 className="text-sm font-medium text-gray-600 mb-2">Driver's License</h4>
@@ -1165,36 +1165,49 @@
                     </div>
                   )}
 
-                  {/* REFERENCES TAB */}
+                  {/* REFERENCES TAB - INTERNAL ONLY */}
                   {activeTab === 'references' && (
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <h3 className="font-semibold text-sm text-gray-800">Professional References</h3>
+                        <h3 className="font-semibold text-sm text-gray-800">References</h3>
                         <button onClick={addReference} className="text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded font-medium hover:bg-blue-100">+ Add Reference</button>
+                      </div>
+                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-2">
+                        <p className="text-xs text-amber-700 font-medium">🔒 Internal Only — references are NOT included in the exported profile</p>
                       </div>
                       {additionalData.references.map((ref, i) => (
                         <div key={i} className="border border-gray-200 rounded-lg p-3 space-y-2">
                           <div className="flex items-center gap-2">
                             <span className="text-xs font-semibold text-gray-500">Reference {i + 1}</span>
+                            {ref.status === 'sent' && <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">📱 Text Sent</span>}
+                            {ref.status === 'completed' && <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">✓ Completed</span>}
                             {i >= 3 && <button onClick={() => setAdditionalData(prev => ({ ...prev, references: prev.references.filter((_, j) => j !== i) }))}
                               className="ml-auto text-xs text-red-500 hover:text-red-700">Remove</button>}
                           </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            <input type="text" value={ref.name} onChange={e => updateAdditional(`references.${i}.name`, e.target.value)}
-                              placeholder="Full Name" className="px-2 py-1.5 border border-gray-300 rounded text-sm" />
-                            <input type="text" value={ref.title} onChange={e => updateAdditional(`references.${i}.title`, e.target.value)}
-                              placeholder="Title (e.g. Charge Nurse)" className="px-2 py-1.5 border border-gray-300 rounded text-sm" />
-                          </div>
                           <div className="grid grid-cols-3 gap-2">
-                            <input type="text" value={ref.relationship} onChange={e => updateAdditional(`references.${i}.relationship`, e.target.value)}
-                              placeholder="Relationship" className="px-2 py-1.5 border border-gray-300 rounded text-sm" />
+                            <input type="text" value={ref.name} onChange={e => updateAdditional(`references.${i}.name`, e.target.value)}
+                              placeholder="Reference Name" className="px-2 py-1.5 border border-gray-300 rounded text-sm" />
+                            <input type="text" value={ref.title} onChange={e => updateAdditional(`references.${i}.title`, e.target.value)}
+                              placeholder="Title" className="px-2 py-1.5 border border-gray-300 rounded text-sm" />
                             <input type="text" value={ref.phone} onChange={e => updateAdditional(`references.${i}.phone`, e.target.value)}
-                              placeholder="Phone" className="px-2 py-1.5 border border-gray-300 rounded text-sm" />
-                            <input type="text" value={ref.email} onChange={e => updateAdditional(`references.${i}.email`, e.target.value)}
-                              placeholder="Email" className="px-2 py-1.5 border border-gray-300 rounded text-sm" />
+                              placeholder="Phone Number" className="px-2 py-1.5 border border-gray-300 rounded text-sm" />
                           </div>
+                          <input type="text" value={ref.relationship} onChange={e => updateAdditional(`references.${i}.relationship`, e.target.value)}
+                            placeholder="Relationship (e.g. Charge Nurse, Supervisor)" className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm" />
+                          {ref.name && ref.phone && (
+                            <button onClick={() => { updateAdditional(`references.${i}.status`, 'sent'); }}
+                              className="w-full py-1.5 bg-green-600 text-white rounded text-xs font-medium hover:bg-green-700 transition">
+                              📱 Send Reference Request via Text
+                            </button>
+                          )}
+                          {ref.status === 'sent' && (
+                            <p className="text-xs text-gray-400 italic">Reference request sent — waiting for response</p>
+                          )}
                         </div>
                       ))}
+                      <div className="bg-gray-50 rounded-lg p-3 mt-2">
+                        <p className="text-xs text-gray-500">💡 <strong>Coming soon:</strong> References will receive an automated text with a link to complete their reference. Responses are stored here automatically.</p>
+                      </div>
                     </div>
                   )}
 
@@ -1204,14 +1217,18 @@
                       <h3 className="font-semibold text-sm text-gray-800">DOCX Export Preview</h3>
                       <p className="text-xs text-gray-500">Your downloaded DOCX will include these pages:</p>
                       <div className="space-y-2 mt-2">
-                        {['Page 1: Resume Profile (with blue highlight box)', 'Page 2: Professional References', 'Page 3: Skills Checklist', 'Page 4: Certifications (formatted)', 'Page 5: License Verification / Nursys'].map((page, i) => (
+                        {['Page 1: Resume Profile (with blue highlight box)', 'Page 2: Skills Checklist', 'Page 3: Certifications (formatted)', 'Page 4: License Verification / Nursys'].map((page, i) => (
                           <div key={i} className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
                             <span className="text-xs font-mono text-blue-600">{i + 1}</span>
                             <span className="text-sm text-gray-700">{page.split(': ')[1]}</span>
                           </div>
                         ))}
+                        <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 rounded-lg border border-amber-200">
+                          <span className="text-xs font-mono text-amber-600">🔒</span>
+                          <span className="text-sm text-amber-700">References stored internally — not in export</span>
+                        </div>
                       </div>
-                      <button onClick={() => exportFullDOCX(extractedData, additionalData, companyName, companyLogo, scoreResult, overlaps, overlapResolutions, overlapPrnShifts)}
+                      <button onClick={async () => { try { await exportFullDOCX(extractedData, additionalData, companyName, companyLogo, scoreResult, overlaps, overlapResolutions, overlapPrnShifts); } catch(e) { console.error(e); alert('DOCX save error: ' + e.message); } }}
                         className="w-full mt-4 py-2 bg-blue-600 text-white rounded-lg font-medium text-sm hover:bg-blue-700 transition">
                         Download Complete Profile Packet (DOCX)
                       </button>
@@ -1338,19 +1355,10 @@
                   ))}
                 </div>
 
-                {/* References preview */}
+                {/* References - Internal Only indicator */}
                 {additionalData.references.some(r => r.name) && (
-                  <div className="px-6 py-3 border-t border-gray-100">
-                    <h2 className="text-sm font-bold text-blue-800 uppercase tracking-wide border-b-2 border-blue-800 pb-1 mb-3">References</h2>
-                    <div className="grid grid-cols-3 gap-2">
-                      {additionalData.references.filter(r => r.name).map((ref, i) => (
-                        <div key={i} className="bg-gray-50 p-2 rounded text-xs">
-                          <p className="font-medium text-gray-800">{ref.name}</p>
-                          {ref.title && <p className="text-gray-500">{ref.title}</p>}
-                          {ref.phone && <p className="text-gray-600 mt-1">{ref.phone}</p>}
-                        </div>
-                      ))}
-                    </div>
+                  <div className="px-6 py-2 border-t border-gray-100">
+                    <p className="text-xs text-gray-400 italic">🔒 {additionalData.references.filter(r => r.name).length} reference(s) on file — stored internally</p>
                   </div>
                 )}
 
