@@ -1,8 +1,9 @@
-const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
-        AlignmentType, LevelFormat, BorderStyle, WidthType, ShadingType,
-        PageBreak, PageNumber, Header, Footer } = require('docx');
-
 export default async function handler(req, res) {
+  const docx = await import('docx');
+  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
+          AlignmentType, LevelFormat, BorderStyle, WidthType, ShadingType,
+          PageBreak, PageNumber, Header, Footer } = docx;
+
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
