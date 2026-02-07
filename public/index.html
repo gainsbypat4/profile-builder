@@ -5,19 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Profile Builder Pro</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
   <script src="https://unpkg.com/docx@8.2.0/build/index.umd.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { font-family: 'Inter', sans-serif; }
+    .highlight-box { background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 50%, #2563eb 100%); }
     @media print { .no-print { display: none !important; } }
-    .section-header { background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); }
-    .diagonal-bg { background: repeating-linear-gradient(135deg, transparent, transparent 10px, rgba(0,0,0,0.015) 10px, rgba(0,0,0,0.015) 20px); }
+    .tab-active { border-bottom: 3px solid #2563eb; color: #1e40af; font-weight: 600; }
+    .score-ring { transition: stroke-dashoffset 0.8s ease-in-out; }
+    .overlap-warning { animation: pulse-warn 2s infinite; }
+    @keyframes pulse-warn { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+    input:focus, select:focus, textarea:focus { outline: none; box-shadow: 0 0 0 2px #2563eb40; border-color: #2563eb; }
   </style>
   <script>
     if (typeof pdfjsLib !== 'undefined') {
@@ -25,24 +29,200 @@
     }
   </script>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gray-50 min-h-screen">
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useRef } = React;
+    const { useState, useRef, useEffect, useCallback } = React;
 
-    const SKILLS_BY_SPECIALTY = {
-      "OR": ["Circulating", "Scrubbing", "First Assist", "General Surgery", "Orthopedics", "CVOR", "Neurosurgery", "Robotics (Da Vinci)", "Trauma", "GYN", "Urology", "ENT", "Spine"],
-      "ICU": ["Ventilator Management", "Arterial Lines", "Central Lines", "Vasopressors/Drips", "CRRT", "IABP", "Impella", "ECMO", "Code Team"],
-      "ED": ["Triage", "Trauma", "Pediatric Emergency", "Stroke/STEMI", "Conscious Sedation", "Chest Tubes", "RSI Assist"],
-      "Med-Surg": ["Telemetry", "Wound Care", "IV Therapy", "Blood Transfusions", "PCA Pumps", "NG Tubes", "Discharge Planning"],
-      "L&D": ["Fetal Monitoring", "High-Risk OB", "C-Section", "Epidural Management", "Pitocin", "Neonatal Resuscitation"],
-      "Telemetry": ["Rhythm Interpretation", "12-Lead EKG", "Cardiac Drips", "Post-Cath Care", "Pacemaker/ICD"]
+    // ==================== HOSPITAL DATABASE ====================
+    const HOSPITAL_DATABASE = {
+      "tampa general hospital": { officialName: "Tampa General Hospital", city: "Tampa", state: "FL", beds: 1041, traumaLevel: "Level I", teaching: true, emr: "Epic" },
+      "cleveland clinic": { officialName: "Cleveland Clinic Main Campus", city: "Cleveland", state: "OH", beds: 1400, traumaLevel: "Level I", teaching: true, emr: "Epic" },
+      "jackson memorial hospital": { officialName: "Jackson Memorial Hospital", city: "Miami", state: "FL", beds: 1547, traumaLevel: "Level I", teaching: true, emr: "Epic" },
+      "johns hopkins hospital": { officialName: "Johns Hopkins Hospital", city: "Baltimore", state: "MD", beds: 1162, traumaLevel: "Level I", teaching: true, emr: "Epic" },
+      "mayo clinic": { officialName: "Mayo Clinic - Rochester", city: "Rochester", state: "MN", beds: 2059, traumaLevel: "Level I", teaching: true, emr: "Epic" },
+      "cedars-sinai": { officialName: "Cedars-Sinai Medical Center", city: "Los Angeles", state: "CA", beds: 886, traumaLevel: "Level I", teaching: true, emr: "Epic" },
+      "mass general": { officialName: "Massachusetts General Hospital", city: "Boston", state: "MA", beds: 999, traumaLevel: "Level I", teaching: true, emr: "Epic" },
+      "massachusetts general hospital": { officialName: "Massachusetts General Hospital", city: "Boston", state: "MA", beds: 999, traumaLevel: "Level I", teaching: true, emr: "Epic" },
+      "ucla medical center": { officialName: "UCLA Medical Center", city: "Los Angeles", state: "CA", beds: 520, traumaLevel: "Level I", teaching: true, emr: "Epic" },
+      "stanford hospital": { officialName: "Stanford Health Care", city: "Stanford", state: "CA", beds: 613, traumaLevel: "Level I", teaching: true, emr: "Epic" },
+      "northwestern memorial hospital": { officialName: "Northwestern Memorial Hospital", city: "Chicago", state: "IL", beds: 894, traumaLevel: "Level I", teaching: true, emr: "Epic" },
+      "baptist hospital of miami": { officialName: "Baptist Hospital of Miami", city: "Miami", state: "FL", beds: 728, traumaLevel: "Level II", teaching: false, emr: "Cerner" },
+      "adventhealth orlando": { officialName: "AdventHealth Orlando", city: "Orlando", state: "FL", beds: 1368, traumaLevel: "Level I", teaching: true, emr: "Cerner" },
+      "houston methodist": { officialName: "Houston Methodist Hospital", city: "Houston", state: "TX", beds: 907, traumaLevel: "Level I", teaching: true, emr: "Epic" },
+      "emory university hospital": { officialName: "Emory University Hospital", city: "Atlanta", state: "GA", beds: 733, traumaLevel: "Level I", teaching: true, emr: "Epic" },
+      "mount sinai hospital": { officialName: "Mount Sinai Hospital", city: "New York", state: "NY", beds: 1139, traumaLevel: "Level I", teaching: true, emr: "Epic" },
+      "nyu langone": { officialName: "NYU Langone Medical Center", city: "New York", state: "NY", beds: 834, traumaLevel: "Level I", teaching: true, emr: "Epic" },
+      "university of michigan hospital": { officialName: "University of Michigan Hospital", city: "Ann Arbor", state: "MI", beds: 1000, traumaLevel: "Level I", teaching: true, emr: "Epic" },
+      "duke university hospital": { officialName: "Duke University Hospital", city: "Durham", state: "NC", beds: 957, traumaLevel: "Level I", teaching: true, emr: "Epic" },
+      "ucsf medical center": { officialName: "UCSF Medical Center", city: "San Francisco", state: "CA", beds: 600, traumaLevel: "Level I", teaching: true, emr: "Epic" },
+      "vanderbilt university medical center": { officialName: "Vanderbilt University Medical Center", city: "Nashville", state: "TN", beds: 1000, traumaLevel: "Level I", teaching: true, emr: "Epic" },
+      "ohio state wexner medical center": { officialName: "Ohio State Wexner Medical Center", city: "Columbus", state: "OH", beds: 1300, traumaLevel: "Level I", teaching: true, emr: "Epic" },
+      "university of pittsburgh medical center": { officialName: "UPMC Presbyterian", city: "Pittsburgh", state: "PA", beds: 757, traumaLevel: "Level I", teaching: true, emr: "Epic" },
+      "upmc": { officialName: "UPMC Presbyterian", city: "Pittsburgh", state: "PA", beds: 757, traumaLevel: "Level I", teaching: true, emr: "Epic" },
+      "nebraska medicine": { officialName: "Nebraska Medicine", city: "Omaha", state: "NE", beds: 809, traumaLevel: "Level I", teaching: true, emr: "Epic" },
+      "methodist hospital omaha": { officialName: "Methodist Hospital", city: "Omaha", state: "NE", beds: 460, traumaLevel: "Level II", teaching: false, emr: "Cerner" },
+      "chi health": { officialName: "CHI Health", city: "Omaha", state: "NE", beds: 695, traumaLevel: "Level II", teaching: false, emr: "Epic" },
+      "boys town national research hospital": { officialName: "Boys Town National Research Hospital", city: "Omaha", state: "NE", beds: 54, traumaLevel: null, teaching: true, emr: "Epic" },
     };
 
-    const CHARTING_SYSTEMS = ["Epic", "Cerner", "Meditech", "CPSI", "Allscripts", "Other"];
-    const TRAUMA_LEVELS = ["Trauma Level 1", "Trauma Level 2", "Trauma Level 3", "Non-Trauma", "N/A"];
+    // ==================== UNIT TYPE TEMPLATES ====================
+    const UNIT_TEMPLATES = {
+      "icu": { typicalRatio: "1-2:1", populations: ["Critical care", "Ventilator patients", "Post-cardiac surgery", "Sepsis"], responsibilities: ["Continuous hemodynamic monitoring", "Ventilator management and weaning protocols", "Vasopressor and sedation titration", "Central line and arterial line management", "Rapid response and code team participation"] },
+      "med-surg": { typicalRatio: "5-6:1", populations: ["Post-surgical", "General medical", "Ortho", "Neuro"], responsibilities: ["Medication administration and IV therapy", "Post-operative care and wound management", "Patient assessment and care planning", "Discharge planning and patient education", "Telemetry monitoring"] },
+      "emergency": { typicalRatio: "4-5:1", populations: ["Trauma", "Chest pain", "Stroke", "Pediatric emergencies"], responsibilities: ["Triage and rapid assessment", "Trauma stabilization and resuscitation", "Emergency medication administration", "Procedural assistance and sedation", "Multi-system patient management"] },
+      "labor and delivery": { typicalRatio: "2-3:1", populations: ["High-risk OB", "Postpartum", "Neonatal"], responsibilities: ["Fetal monitoring and interpretation", "Labor support and pain management", "C-section circulating and recovery", "Postpartum hemorrhage management", "Neonatal resuscitation"] },
+      "operating room": { typicalRatio: "1:1", populations: ["Surgical patients all specialties"], responsibilities: ["Surgical scrub and circulating", "Sterile field management", "Surgical instrument and equipment knowledge", "Patient positioning and safety", "Specimen handling and documentation"] },
+      "telemetry": { typicalRatio: "4-5:1", populations: ["Cardiac", "Post-procedure", "Step-down"], responsibilities: ["Continuous cardiac monitoring", "Rhythm interpretation and intervention", "Post-cardiac catheterization care", "Medication titration", "Patient education on cardiac health"] },
+      "oncology": { typicalRatio: "4-5:1", populations: ["Chemo patients", "Radiation", "Palliative"], responsibilities: ["Chemotherapy administration", "Central line management and blood draws", "Symptom management and pain control", "Oncologic emergency recognition", "Patient and family education"] },
+      "pediatrics": { typicalRatio: "3-4:1", populations: ["General pediatric", "Respiratory", "Post-surgical"], responsibilities: ["Pediatric assessment and vital signs", "Weight-based medication calculations", "Family-centered care coordination", "Developmental milestone monitoring", "Pediatric emergency response"] },
+      "nicu": { typicalRatio: "1-2:1", populations: ["Premature infants", "Congenital anomalies", "Respiratory distress"], responsibilities: ["Neonatal ventilator management", "Thermoregulation and isolette care", "Feeding support and gavage", "Developmental care practices", "Parent education and bonding support"] },
+      "picu": { typicalRatio: "1-2:1", populations: ["Critically ill pediatric", "Post-surgical pediatric", "Respiratory failure"], responsibilities: ["Pediatric hemodynamic monitoring", "Pediatric ventilator management", "Weight-based drip calculations", "Family-centered critical care", "Pediatric code team participation"] },
+      "cvor": { typicalRatio: "1:1", populations: ["Open heart surgery", "Valve replacement", "CABG"], responsibilities: ["Cardiac surgical scrub and circulating", "Cardiopulmonary bypass support", "Intra-aortic balloon pump management", "Sternotomy instrument proficiency", "Post-op cardiac recovery"] },
+    };
 
+    // ==================== SCORECARD RUBRICS ====================
+    const SCORECARD_RUBRICS = {
+      "icu": { minYears: 2, idealYears: 4, requiredCerts: ["BLS", "ACLS"], preferredCerts: ["CCRN", "PALS"], idealLicense: "compact", idealFacility: { traumaLevel: "Level I", teaching: true, minBeds: 400 }, weight: { years: 25, certs: 20, license: 20, facility: 20, chargeExp: 15 } },
+      "med-surg": { minYears: 1, idealYears: 2, requiredCerts: ["BLS"], preferredCerts: ["ACLS", "MEDSURG-BC"], idealLicense: "compact", idealFacility: { traumaLevel: "Level I", teaching: true, minBeds: 300 }, weight: { years: 20, certs: 15, license: 25, facility: 20, chargeExp: 20 } },
+      "emergency": { minYears: 2, idealYears: 3, requiredCerts: ["BLS", "ACLS"], preferredCerts: ["TNCC", "PALS", "CEN"], idealLicense: "compact", idealFacility: { traumaLevel: "Level I", teaching: true, minBeds: 400 }, weight: { years: 25, certs: 25, license: 20, facility: 20, chargeExp: 10 } },
+      "labor and delivery": { minYears: 2, idealYears: 3, requiredCerts: ["BLS"], preferredCerts: ["ACLS", "NRP", "RNC-OB", "AWHONN"], idealLicense: "compact", idealFacility: { traumaLevel: "Level I", teaching: true, minBeds: 300 }, weight: { years: 25, certs: 20, license: 20, facility: 20, chargeExp: 15 } },
+      "operating room": { minYears: 2, idealYears: 3, requiredCerts: ["BLS"], preferredCerts: ["ACLS", "CNOR"], idealLicense: "compact", idealFacility: { traumaLevel: "Level I", teaching: true, minBeds: 300 }, weight: { years: 30, certs: 15, license: 20, facility: 20, chargeExp: 15 } },
+      "telemetry": { minYears: 1, idealYears: 2, requiredCerts: ["BLS", "ACLS"], preferredCerts: ["PCCN"], idealLicense: "compact", idealFacility: { traumaLevel: "Level II", teaching: false, minBeds: 200 }, weight: { years: 20, certs: 20, license: 25, facility: 15, chargeExp: 20 } },
+      "pediatrics": { minYears: 2, idealYears: 3, requiredCerts: ["BLS", "PALS"], preferredCerts: ["CPN"], idealLicense: "compact", idealFacility: { traumaLevel: "Level I", teaching: true, minBeds: 200 }, weight: { years: 25, certs: 25, license: 20, facility: 15, chargeExp: 15 } },
+      "default": { minYears: 1, idealYears: 3, requiredCerts: ["BLS"], preferredCerts: ["ACLS"], idealLicense: "compact", idealFacility: { traumaLevel: "Level I", teaching: true, minBeds: 300 }, weight: { years: 25, certs: 20, license: 20, facility: 20, chargeExp: 15 } },
+    };
+
+    // ==================== SCORING FUNCTION ====================
+    function calculateScore(data, additionalData) {
+      const specialty = (data.primarySpecialty || '').toLowerCase().replace(/[^a-z ]/g, '').trim();
+      const rubric = SCORECARD_RUBRICS[specialty] || SCORECARD_RUBRICS["default"];
+      const w = rubric.weight;
+      let scores = {};
+
+      // Years score
+      const yrs = parseInt(data.yearsExperience) || 0;
+      if (yrs >= rubric.idealYears) scores.years = 100;
+      else if (yrs >= rubric.minYears) scores.years = 50 + ((yrs - rubric.minYears) / (rubric.idealYears - rubric.minYears)) * 50;
+      else if (yrs > 0) scores.years = (yrs / rubric.minYears) * 50;
+      else scores.years = 0;
+
+      // Cert score
+      const certs = (data.certifications || []).map(c => typeof c === 'string' ? c.toUpperCase() : (c.name || '').toUpperCase());
+      const allLicCerts = [...certs];
+      if (additionalData?.certifications) {
+        additionalData.certifications.forEach(c => { if (c.name) allLicCerts.push(c.name.toUpperCase()); });
+      }
+      const hasRequired = rubric.requiredCerts.every(rc => allLicCerts.some(c => c.includes(rc)));
+      const prefCount = rubric.preferredCerts.filter(pc => allLicCerts.some(c => c.includes(pc))).length;
+      scores.certs = hasRequired ? 60 + (prefCount / Math.max(rubric.preferredCerts.length, 1)) * 40 : (prefCount > 0 ? 30 : 0);
+
+      // License score
+      const licenses = [...(data.licenses || []), ...(additionalData?.licenses || [])];
+      const hasCompact = licenses.some(l => l.compact);
+      const licCount = licenses.length;
+      if (hasCompact && licCount >= 2) scores.license = 100;
+      else if (hasCompact) scores.license = 85;
+      else if (licCount >= 2) scores.license = 70;
+      else if (licCount === 1) scores.license = 50;
+      else scores.license = 0;
+
+      // Facility experience score
+      const jobs = data.workHistory || [];
+      let bestFacility = 0;
+      jobs.forEach(job => {
+        let fs = 0;
+        const hd = job.hospitalData;
+        if (hd) {
+          if (hd.traumaLevel === "Level I") fs += 40;
+          else if (hd.traumaLevel === "Level II") fs += 25;
+          if (hd.teaching) fs += 30;
+          if (hd.beds >= rubric.idealFacility.minBeds) fs += 30;
+          else if (hd.beds >= 200) fs += 15;
+        } else {
+          fs = 30; // Unknown facility gets base score
+        }
+        bestFacility = Math.max(bestFacility, fs);
+      });
+      scores.facility = bestFacility;
+
+      // Charge experience
+      const hasCharge = jobs.some(j => j.chargeExperience);
+      scores.chargeExp = hasCharge ? 100 : 0;
+
+      // Weighted total
+      const total = Math.round(
+        (scores.years * w.years + scores.certs * w.certs + scores.license * w.license + scores.facility * w.facility + scores.chargeExp * w.chargeExp) / 100
+      );
+
+      return { total: Math.min(total, 100), scores, rubric, specialty: specialty || 'default' };
+    }
+
+    // ==================== OVERLAP DETECTION ====================
+    function detectOverlaps(workHistory) {
+      if (!workHistory || workHistory.length < 2) return [];
+      const overlaps = [];
+      const parseDate = (d) => {
+        if (!d) return null;
+        if (d.toLowerCase().includes('present')) return new Date();
+        const parsed = new Date(d);
+        return isNaN(parsed) ? null : parsed;
+      };
+      for (let i = 0; i < workHistory.length; i++) {
+        for (let j = i + 1; j < workHistory.length; j++) {
+          const a = { start: parseDate(workHistory[i].startDate), end: parseDate(workHistory[i].endDate) };
+          const b = { start: parseDate(workHistory[j].startDate), end: parseDate(workHistory[j].endDate) };
+          if (a.start && a.end && b.start && b.end) {
+            if (a.start <= b.end && b.start <= a.end) {
+              overlaps.push({
+                job1: workHistory[i],
+                job2: workHistory[j],
+                job1Index: i,
+                job2Index: j
+              });
+            }
+          }
+        }
+      }
+      return overlaps;
+    }
+
+    // ==================== HOSPITAL MATCHING ====================
+    function matchHospital(facilityName) {
+      if (!facilityName) return null;
+      const normalized = facilityName.toLowerCase().trim();
+      if (HOSPITAL_DATABASE[normalized]) return HOSPITAL_DATABASE[normalized];
+      for (const [key, data] of Object.entries(HOSPITAL_DATABASE)) {
+        if (normalized.includes(key) || key.includes(normalized)) return data;
+      }
+      const words = normalized.split(/\s+/);
+      for (const [key, data] of Object.entries(HOSPITAL_DATABASE)) {
+        const keyWords = key.split(/\s+/);
+        const matchCount = words.filter(w => keyWords.includes(w)).length;
+        if (matchCount >= 2) return data;
+      }
+      return null;
+    }
+
+    // ==================== DETECT UNIT TYPE ====================
+    function detectUnitType(title, unit) {
+      const text = ((title || '') + ' ' + (unit || '')).toLowerCase();
+      if (text.includes('icu') || text.includes('intensive care') || text.includes('critical care')) return 'icu';
+      if (text.includes('emergency') || text.includes(' er ') || text.includes('trauma')) return 'emergency';
+      if (text.includes('med-surg') || text.includes('med surg') || text.includes('medical surgical') || text.includes('medsurg')) return 'med-surg';
+      if (text.includes('labor') || text.includes('delivery') || text.includes('l&d') || text.includes('ob ') || text.includes('obstetric')) return 'labor and delivery';
+      if (text.includes('operating room') || text.includes(' or ') || text.includes('surgical services') || text.includes('perioperative')) return 'operating room';
+      if (text.includes('telemetry') || text.includes('tele') || text.includes('cardiac') || text.includes('step-down')) return 'telemetry';
+      if (text.includes('oncology') || text.includes('cancer')) return 'oncology';
+      if (text.includes('nicu') || text.includes('neonatal intensive')) return 'nicu';
+      if (text.includes('picu') || text.includes('pediatric intensive') || text.includes('pediatric icu')) return 'picu';
+      if (text.includes('pediatric') || text.includes('peds')) return 'pediatrics';
+      if (text.includes('cvor') || text.includes('cardiovascular or')) return 'cvor';
+      return null;
+    }
+
+    // ==================== PDF & DOCX EXTRACTION ====================
     async function extractPDF(file) {
       const arrayBuffer = await file.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -55,781 +235,1044 @@
       return text;
     }
 
-    async function extractDOCX(file) {
+    async function extractDOCXFile(file) {
       const arrayBuffer = await file.arrayBuffer();
       const result = await mammoth.extractRawText({ arrayBuffer });
       return result.value;
     }
 
-    // COMPACT DOCX Export - All on 1-2 pages in correct order
-    async function exportDOCX(data, companyName, additional) {
-      const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, BorderStyle, WidthType, AlignmentType, ShadingType, convertInchesToTwip, PageBreak } = window.docx;
-      
-      const candidateName = data.personalInfo?.fullName || 'Candidate';
-      const children = [];
-      
-      // Helper for blue section headers
-      const sectionHeader = (text) => new Paragraph({
-        shading: { fill: "0891B2", type: ShadingType.CLEAR },
-        children: [new TextRun({ text: `  ${text}`, bold: true, size: 20, color: "FFFFFF" })],
-        spacing: { before: 150, after: 80 }
-      });
-      
-      // ===== HEADER =====
-      children.push(new Paragraph({
-        children: [
-          new TextRun({ text: companyName || 'STAFFING AGENCY', bold: true, size: 28, color: "0891B2" }),
-          new TextRun({ text: '\t\t\t', size: 20 }),
-          new TextRun({ text: candidateName, bold: true, size: 28 }),
-        ],
-        spacing: { after: 40 }
+    // ==================== SCORE RING COMPONENT ====================
+    function ScoreRing({ score, size = 90, strokeWidth = 8 }) {
+      const radius = (size - strokeWidth) / 2;
+      const circumference = radius * 2 * Math.PI;
+      const offset = circumference - (score / 100) * circumference;
+      const color = score >= 80 ? '#16a34a' : score >= 60 ? '#2563eb' : score >= 40 ? '#d97706' : '#dc2626';
+      return (
+        <svg width={size} height={size} className="transform -rotate-90">
+          <circle cx={size/2} cy={size/2} r={radius} fill="none" stroke="#e5e7eb" strokeWidth={strokeWidth} />
+          <circle cx={size/2} cy={size/2} r={radius} fill="none" stroke={color} strokeWidth={strokeWidth}
+            strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" className="score-ring" />
+          <text x={size/2} y={size/2} textAnchor="middle" dy="6" className="transform rotate-90" style={{transformOrigin:'center', fontSize: size > 70 ? '22px' : '16px', fontWeight: 700, fill: color}}>
+            {score}
+          </text>
+        </svg>
+      );
+    }
+
+    // ==================== DOCX EXPORT ====================
+    async function exportFullDOCX(data, additionalData, companyName, companyLogo, scoreResult) {
+      const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, BorderStyle, ShadingType, AlignmentType, WidthType, PageBreak, HeadingLevel, ImageRun } = window.docx;
+
+      const BLUE = "1e40af";
+      const LIGHT_BLUE = "dbeafe";
+      const GRAY = "6b7280";
+
+      const sections = [];
+      const page1 = [];
+
+      // ===== COMPANY HEADER =====
+      if (companyName) {
+        page1.push(new Paragraph({
+          children: [new TextRun({ text: companyName.toUpperCase(), bold: true, size: 28, color: BLUE, font: "Arial" })],
+          spacing: { after: 50 }
+        }));
+        page1.push(new Paragraph({
+          children: [new TextRun({ text: "CANDIDATE PROFILE", size: 18, color: GRAY, font: "Arial", characterSpacing: 200 })],
+          spacing: { after: 200 }
+        }));
+      }
+
+      // ===== CANDIDATE NAME =====
+      const name = data.personalInfo?.fullName || 'Candidate';
+      page1.push(new Paragraph({
+        children: [new TextRun({ text: name, bold: true, size: 40, font: "Arial" })],
+        spacing: { after: 60 }
       }));
-      
-      // Contact line
-      const contact = [data.personalInfo?.phone, data.personalInfo?.email, data.personalInfo?.location].filter(Boolean).join(' | ');
-      children.push(new Paragraph({
-        children: [new TextRun({ text: contact, size: 18, color: "666666" })],
-        alignment: AlignmentType.RIGHT,
-        spacing: { after: 100 }
+
+      const contactParts = [data.personalInfo?.phone, data.personalInfo?.email, data.personalInfo?.location].filter(Boolean);
+      if (contactParts.length) {
+        page1.push(new Paragraph({
+          children: [new TextRun({ text: contactParts.join('  |  '), size: 20, color: GRAY })],
+          spacing: { after: 200 }
+        }));
+      }
+
+      // ===== BLUE HIGHLIGHT BOX =====
+      const licenseStates = [...(data.licenses || []), ...(additionalData?.licenses || [])].map(l => l.state).filter(Boolean);
+      const hasCompact = [...(data.licenses || []), ...(additionalData?.licenses || [])].some(l => l.compact);
+      const allCerts = [...(data.certifications || []).map(c => typeof c === 'string' ? c : c.name), ...(additionalData?.certifications || []).map(c => c.name)].filter(Boolean);
+      const scoreLabel = scoreResult ? `${scoreResult.total}/100` : '';
+
+      const highlightItems = [
+        `${data.yearsExperience || '—'} Years Experience`,
+        `Specialty: ${data.primarySpecialty || '—'}`,
+        `Licensed: ${licenseStates.join(', ') || '—'}${hasCompact ? ' (Compact)' : ''}`,
+        `Certs: ${allCerts.slice(0, 6).join(', ') || '—'}`,
+      ];
+      if (scoreLabel) highlightItems.push(`Profile Score: ${scoreLabel}`);
+
+      page1.push(new Paragraph({
+        shading: { fill: "1e40af", type: ShadingType.CLEAR },
+        children: highlightItems.map((item, i) => new TextRun({
+          text: (i > 0 ? '   |   ' : '  ') + item + '  ',
+          bold: true, size: 18, color: "ffffff", font: "Arial"
+        })),
+        spacing: { before: 100, after: 200 },
       }));
-      
-      // Summary bullets
-      if (additional?.summaryBullets?.some(b => b)) {
-        additional.summaryBullets.filter(b => b).forEach(bullet => {
-          children.push(new Paragraph({
-            children: [new TextRun({ text: `• ${bullet}`, size: 18 })],
-            spacing: { after: 20 }
+
+      // ===== SUMMARY BULLETS =====
+      if (additionalData?.summaryBullets?.some(b => b)) {
+        page1.push(new Paragraph({ children: [new TextRun({ text: "PROFESSIONAL SUMMARY", bold: true, size: 22, color: BLUE })], spacing: { before: 200, after: 100 } }));
+        additionalData.summaryBullets.filter(b => b).forEach(bullet => {
+          page1.push(new Paragraph({
+            children: [new TextRun({ text: '•  ' + bullet, size: 20 })],
+            spacing: { after: 40 }, indent: { left: 200 }
           }));
         });
-        children.push(new Paragraph({ spacing: { after: 80 } }));
       }
-      
-      // ===== TWO COLUMN LAYOUT using Table =====
-      const leftCells = [];
-      const rightCells = [];
-      
-      // LEFT COLUMN CONTENT
-      
-      // Experience
-      leftCells.push(new Paragraph({
-        shading: { fill: "0891B2", type: ShadingType.CLEAR },
-        children: [new TextRun({ text: " Experience", bold: true, size: 18, color: "FFFFFF" })],
-        spacing: { after: 60 }
+
+      // ===== CREDENTIALS SECTION =====
+      page1.push(new Paragraph({ children: [new TextRun({ text: "CREDENTIALS & EDUCATION", bold: true, size: 22, color: BLUE })], spacing: { before: 300, after: 100 },
+        border: { bottom: { color: BLUE, space: 4, size: 6, style: BorderStyle.SINGLE } }
       }));
-      leftCells.push(new Paragraph({
-        children: [new TextRun({ text: `Specialties: `, bold: true, size: 17 }), new TextRun({ text: data.primarySpecialty || 'RN', size: 17 })],
-        spacing: { after: 30 }
-      }));
-      leftCells.push(new Paragraph({
-        children: [new TextRun({ text: `Years of Experience: `, bold: true, size: 17 }), new TextRun({ text: `${data.yearsExperience || '—'}+ years`, size: 17 })],
-        spacing: { after: 30 }
-      }));
-      leftCells.push(new Paragraph({
-        children: [new TextRun({ text: `Charting: `, bold: true, size: 17 }), new TextRun({ text: additional?.primaryCharting || 'Various', size: 17 })],
-        spacing: { after: 100 }
-      }));
-      
-      // Licenses & Certs
-      leftCells.push(new Paragraph({
-        shading: { fill: "0891B2", type: ShadingType.CLEAR },
-        children: [new TextRun({ text: " Licenses and Certifications", bold: true, size: 18, color: "FFFFFF" })],
-        spacing: { after: 60 }
-      }));
-      
-      additional?.licenseDetails?.filter(l => l.state).forEach(lic => {
-        leftCells.push(new Paragraph({
-          children: [new TextRun({ text: `${lic.type || 'RN'}, ${lic.state} – Exp. ${lic.expDate || 'N/A'}`, size: 17 })],
-          spacing: { after: 20 }
-        }));
-        if (lic.number) {
-          leftCells.push(new Paragraph({
-            children: [new TextRun({ text: lic.number, size: 15, color: "666666" })],
-            spacing: { after: 30 }
+
+      // Licenses
+      const allLicenses = [...(data.licenses || []), ...(additionalData?.licenses || [])];
+      if (allLicenses.length) {
+        page1.push(new Paragraph({ children: [new TextRun({ text: "Licenses", bold: true, size: 20 })], spacing: { before: 100, after: 60 } }));
+        allLicenses.forEach(lic => {
+          const parts = [lic.state, lic.type || 'RN', lic.compact ? '(Compact)' : ''].filter(Boolean).join(' - ');
+          const details = [lic.licenseNumber ? `#${lic.licenseNumber}` : '', lic.expirationDate ? `Exp: ${lic.expirationDate}` : ''].filter(Boolean).join(' | ');
+          page1.push(new Paragraph({
+            children: [
+              new TextRun({ text: '•  ' + parts, size: 20, bold: true }),
+              details ? new TextRun({ text: '  ' + details, size: 18, color: GRAY }) : new TextRun({ text: '' }),
+            ],
+            spacing: { after: 30 }, indent: { left: 200 }
           }));
-        }
-      });
-      
-      additional?.certDetails?.filter(c => c.name).forEach(cert => {
-        leftCells.push(new Paragraph({
-          children: [new TextRun({ text: `${cert.name} (Exp: ${cert.expDate || 'N/A'})`, size: 17 })],
-          spacing: { after: 20 }
-        }));
-      });
-      leftCells.push(new Paragraph({ spacing: { after: 80 } }));
-      
+        });
+      }
+
+      // Certifications
+      if (allCerts.length) {
+        page1.push(new Paragraph({ children: [new TextRun({ text: "Certifications", bold: true, size: 20 })], spacing: { before: 100, after: 60 } }));
+        const certDetails = [...(data.certifications || []).map(c => typeof c === 'string' ? { name: c } : c), ...(additionalData?.certifications || [])];
+        certDetails.filter(c => c.name).forEach(cert => {
+          const expText = cert.expirationDate ? ` (Exp: ${cert.expirationDate})` : '';
+          page1.push(new Paragraph({
+            children: [
+              new TextRun({ text: '•  ' + cert.name, size: 20, bold: true }),
+              new TextRun({ text: expText, size: 18, color: GRAY }),
+            ],
+            spacing: { after: 30 }, indent: { left: 200 }
+          }));
+        });
+      }
+
       // Education
-      leftCells.push(new Paragraph({
-        shading: { fill: "0891B2", type: ShadingType.CLEAR },
-        children: [new TextRun({ text: " Education", bold: true, size: 18, color: "FFFFFF" })],
-        spacing: { after: 60 }
-      }));
-      
       if (data.education) {
-        leftCells.push(new Paragraph({
-          children: [new TextRun({ text: `Graduation Date: ${data.education.graduationDate || 'N/A'}`, size: 17 })],
+        page1.push(new Paragraph({ children: [new TextRun({ text: "Education", bold: true, size: 20 })], spacing: { before: 100, after: 60 } }));
+        page1.push(new Paragraph({
+          children: [
+            new TextRun({ text: '•  ' + (data.education.degree || ''), size: 20, bold: true }),
+            new TextRun({ text: ` — ${data.education.school || ''}`, size: 20 }),
+            new TextRun({ text: data.education.graduationDate ? ` (${data.education.graduationDate})` : '', size: 18, color: GRAY }),
+          ],
+          spacing: { after: 30 }, indent: { left: 200 }
+        }));
+      }
+
+      // Nursys
+      if (additionalData?.nursysLink) {
+        page1.push(new Paragraph({ children: [new TextRun({ text: "Nursys Verification: ", bold: true, size: 18 }), new TextRun({ text: additionalData.nursysLink, size: 18, color: "2563eb" })], spacing: { before: 100, after: 100 }, indent: { left: 200 } }));
+      }
+
+      // ===== WORK HISTORY SECTION =====
+      page1.push(new Paragraph({ children: [new TextRun({ text: "WORK HISTORY", bold: true, size: 22, color: BLUE })], spacing: { before: 300, after: 100 },
+        border: { bottom: { color: BLUE, space: 4, size: 6, style: BorderStyle.SINGLE } }
+      }));
+
+      (data.workHistory || []).forEach((job, i) => {
+        page1.push(new Paragraph({
+          children: [new TextRun({ text: job.title || 'Nurse', bold: true, size: 22 })],
+          spacing: { before: i > 0 ? 200 : 100, after: 30 }
+        }));
+        page1.push(new Paragraph({
+          children: [
+            new TextRun({ text: job.facility || '', size: 20, bold: true, color: BLUE }),
+            new TextRun({ text: ` — ${[job.city, job.state].filter(Boolean).join(', ')}`, size: 20, color: GRAY }),
+          ],
           spacing: { after: 20 }
         }));
-        leftCells.push(new Paragraph({
-          children: [new TextRun({ text: data.education.school || '', size: 17 })],
-          spacing: { after: 20 }
-        }));
-        leftCells.push(new Paragraph({
-          children: [new TextRun({ text: data.education.degree || '', size: 17 })],
+        page1.push(new Paragraph({
+          children: [new TextRun({ text: `${job.startDate || ''} – ${job.endDate || 'Present'}`, size: 18, color: GRAY, italics: true })],
           spacing: { after: 40 }
         }));
-      }
-      
-      // RIGHT COLUMN - Work History
-      rightCells.push(new Paragraph({
-        shading: { fill: "0891B2", type: ShadingType.CLEAR },
-        children: [new TextRun({ text: " Work History", bold: true, size: 18, color: "FFFFFF" })],
-        spacing: { after: 80 }
-      }));
-      
-      additional?.workDetails?.forEach((job, idx) => {
-        // Facility header
-        rightCells.push(new Paragraph({
-          children: [
-            new TextRun({ text: `${job.facility || 'Facility'} – ${job.city || ''}, ${job.state || ''}`, bold: true, size: 19 }),
-            new TextRun({ text: `\t${job.startDate || ''} – ${job.endDate || 'Present'}`, size: 17, color: "666666" })
-          ],
-          spacing: { before: idx > 0 ? 120 : 0, after: 30 }
-        }));
-        
-        rightCells.push(new Paragraph({
-          children: [new TextRun({ text: job.title || 'Travel RN', size: 17 })],
-          spacing: { after: 20 }
-        }));
-        
-        if (job.roleDescription) {
-          rightCells.push(new Paragraph({
-            children: [new TextRun({ text: job.roleDescription, size: 17 })],
-            spacing: { after: 30 }
+
+        // Hospital metadata
+        const hd = job.hospitalData;
+        if (hd) {
+          const meta = [`${hd.beds || '—'} beds`, hd.traumaLevel, hd.teaching ? 'Teaching' : 'Non-Teaching', hd.emr].filter(Boolean).join(' | ');
+          page1.push(new Paragraph({
+            shading: { fill: "f3f4f6", type: ShadingType.CLEAR },
+            children: [new TextRun({ text: '  ' + meta + '  ', size: 16, color: GRAY, italics: true })],
+            spacing: { after: 60 }
           }));
         }
-        
-        // Facility details - compact
-        const details = [];
-        if (job.totalBeds) details.push(`Total Staffed Beds: ${job.totalBeds}`);
-        if (job.traumaLevel || job.facilityType) details.push(`Facility Type: ${[job.traumaLevel, job.facilityType].filter(Boolean).join(' and ')}`);
-        if (job.orSuites) details.push(`Number of OR suites: ${job.orSuites}`);
-        if (job.robotics) details.push(`Robotics: Yes (${job.roboticsSystem || 'Da Vinci SI'})`);
-        if (job.charting) details.push(`Charting System: ${job.charting}`);
-        
-        details.forEach(d => {
-          rightCells.push(new Paragraph({
-            children: [new TextRun({ text: d, size: 16 })],
-            spacing: { after: 15 }
-          }));
-        });
-        
-        if (job.duties) {
-          rightCells.push(new Paragraph({
-            children: [new TextRun({ text: `Duties: ${job.duties}`, size: 16 })],
+
+        // Overlap warning for this job
+        if (job.overlapNote) {
+          page1.push(new Paragraph({
+            children: [new TextRun({ text: '⚠ ' + job.overlapNote, size: 18, color: "b45309", italics: true })],
             spacing: { after: 40 }
           }));
         }
-      });
-      
-      // Create two-column table
-      const table = new Table({
-        width: { size: 100, type: WidthType.PERCENTAGE },
-        rows: [
-          new TableRow({
-            children: [
-              new TableCell({
-                width: { size: 35, type: WidthType.PERCENTAGE },
-                borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } },
-                children: leftCells
-              }),
-              new TableCell({
-                width: { size: 65, type: WidthType.PERCENTAGE },
-                borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } },
-                children: rightCells
-              })
-            ]
-          })
-        ]
-      });
-      
-      children.push(table);
-      
-      // Footer
-      children.push(new Paragraph({
-        children: [new TextRun({ text: `${additional?.companyAddress || ''} | ${additional?.companyPhone || ''}`, size: 16, color: "999999" })],
-        alignment: AlignmentType.CENTER,
-        spacing: { before: 200 }
-      }));
-      
-      // ===== PAGE 2: References, Skills, Certs, Nursys (if needed) =====
-      const hasPage2Content = additional?.references?.some(r => r.name) || additional?.skills?.length || additional?.nursysLink;
-      
-      if (hasPage2Content) {
-        children.push(new Paragraph({ children: [new PageBreak()] }));
-        
-        // Header for page 2
-        children.push(new Paragraph({
-          children: [
-            new TextRun({ text: companyName || 'STAFFING AGENCY', bold: true, size: 28, color: "0891B2" }),
-            new TextRun({ text: `\t\t\t${candidateName}`, bold: true, size: 24 }),
-          ],
-          spacing: { after: 150 }
-        }));
-        
-        // REFERENCES
-        const refs = additional?.references?.filter(r => r.name) || [];
-        if (refs.length) {
-          children.push(sectionHeader('References'));
-          refs.forEach(ref => {
-            children.push(new Paragraph({
-              children: [
-                new TextRun({ text: ref.name, bold: true, size: 19 }),
-                ref.title ? new TextRun({ text: ` – ${ref.title}`, size: 18, color: "666666" }) : new TextRun({ text: '' }),
-                ref.facility ? new TextRun({ text: ` at ${ref.facility}`, size: 18, color: "666666" }) : new TextRun({ text: '' }),
-              ],
-              spacing: { after: 20 }
-            }));
-            children.push(new Paragraph({
-              children: [
-                new TextRun({ text: [ref.relationship, ref.phone, ref.email].filter(Boolean).join(' | '), size: 17 })
-              ],
-              spacing: { after: 60 }
-            }));
-          });
-        }
-        
-        // SKILLS CHECKLIST
-        if (additional?.skills?.length) {
-          children.push(sectionHeader('Skills Checklist'));
-          // Display in columns
-          const skillsText = additional.skills.map(s => `✓ ${s}`).join('   |   ');
-          children.push(new Paragraph({
-            children: [new TextRun({ text: skillsText, size: 17 })],
-            spacing: { after: 100 }
+
+        // Responsibilities
+        (job.responsibilities || []).forEach(resp => {
+          page1.push(new Paragraph({
+            children: [new TextRun({ text: '•  ' + resp, size: 18 })],
+            spacing: { after: 20 }, indent: { left: 300 }
+          }));
+        });
+
+        if (job.chargeExperience) {
+          page1.push(new Paragraph({
+            children: [new TextRun({ text: '★ Charge Nurse Experience', bold: true, size: 18, color: "7c3aed" })],
+            spacing: { after: 20 }, indent: { left: 300 }
           }));
         }
-        
-        // CERTS (detailed)
-        if (additional?.certDetails?.some(c => c.name)) {
-          children.push(sectionHeader('Certifications'));
-          additional.certDetails.filter(c => c.name).forEach(cert => {
-            children.push(new Paragraph({
-              children: [
-                new TextRun({ text: cert.name, bold: true, size: 18 }),
-                new TextRun({ text: ` – Expires: ${cert.expDate || 'N/A'}`, size: 17, color: "666666" }),
-                cert.certNumber ? new TextRun({ text: ` (Cert #: ${cert.certNumber})`, size: 16, color: "888888" }) : new TextRun({ text: '' })
-              ],
-              spacing: { after: 40 }
+      });
+
+      // ===== PAGE BREAK - REFERENCES =====
+      const page2 = [];
+      page2.push(new Paragraph({ children: [new PageBreak()] }));
+
+      if (companyName) {
+        page2.push(new Paragraph({
+          children: [new TextRun({ text: companyName.toUpperCase() + ' — REFERENCES', bold: true, size: 24, color: BLUE })],
+          spacing: { after: 200 }
+        }));
+      }
+      page2.push(new Paragraph({
+        children: [new TextRun({ text: `References for ${name}`, size: 22, bold: true })],
+        spacing: { after: 200 }
+      }));
+
+      const refs = additionalData?.references || [];
+      if (refs.some(r => r.name)) {
+        refs.filter(r => r.name).forEach((ref, i) => {
+          page2.push(new Paragraph({
+            children: [new TextRun({ text: ref.name, bold: true, size: 22 })],
+            spacing: { before: i > 0 ? 150 : 0, after: 30 }
+          }));
+          if (ref.title) page2.push(new Paragraph({ children: [new TextRun({ text: ref.title, size: 20, color: GRAY })], spacing: { after: 20 } }));
+          if (ref.relationship) page2.push(new Paragraph({ children: [new TextRun({ text: ref.relationship, size: 18, italics: true, color: GRAY })], spacing: { after: 20 } }));
+          if (ref.phone) page2.push(new Paragraph({ children: [new TextRun({ text: 'Phone: ' + ref.phone, size: 20 })], spacing: { after: 10 } }));
+          if (ref.email) page2.push(new Paragraph({ children: [new TextRun({ text: 'Email: ' + ref.email, size: 20, color: "2563eb" })], spacing: { after: 10 } }));
+        });
+      } else {
+        page2.push(new Paragraph({ children: [new TextRun({ text: 'References available upon request', size: 20, italics: true, color: GRAY })], spacing: { after: 100 } }));
+      }
+
+      // ===== PAGE BREAK - SKILLS CHECKLIST =====
+      const page3 = [];
+      page3.push(new Paragraph({ children: [new PageBreak()] }));
+      if (companyName) {
+        page3.push(new Paragraph({
+          children: [new TextRun({ text: companyName.toUpperCase() + ' — SKILLS CHECKLIST', bold: true, size: 24, color: BLUE })],
+          spacing: { after: 200 }
+        }));
+      }
+      page3.push(new Paragraph({
+        children: [new TextRun({ text: `Skills Checklist for ${name}`, size: 22, bold: true })],
+        spacing: { after: 100 }
+      }));
+      page3.push(new Paragraph({
+        children: [new TextRun({ text: `Primary Specialty: ${data.primarySpecialty || '—'}`, size: 20 })],
+        spacing: { after: 200 }
+      }));
+
+      const skills = additionalData?.skills || {};
+      const skillCategories = {
+        'Patient Care': skills.patientCare || [],
+        'Technical Skills': skills.technical || [],
+        'Equipment': skills.equipment || [],
+        'Documentation': skills.documentation || [],
+      };
+
+      Object.entries(skillCategories).forEach(([category, items]) => {
+        if (items.length > 0) {
+          page3.push(new Paragraph({
+            children: [new TextRun({ text: category, bold: true, size: 20, color: BLUE })],
+            spacing: { before: 150, after: 80 }
+          }));
+          items.forEach(skill => {
+            page3.push(new Paragraph({
+              children: [new TextRun({ text: `✓  ${skill}`, size: 18 })],
+              spacing: { after: 20 }, indent: { left: 200 }
             }));
           });
         }
-        
-        // NURSYS
-        if (additional?.nursysLink || additional?.licenseDetails?.some(l => l.number)) {
-          children.push(sectionHeader('Nursys / License Verification'));
-          if (additional?.nursysLink) {
-            children.push(new Paragraph({
-              children: [new TextRun({ text: `Verification Link: ${additional.nursysLink}`, size: 17, color: "0891B2" })],
-              spacing: { after: 60 }
-            }));
-          }
-          additional?.licenseDetails?.filter(l => l.state && l.number).forEach(lic => {
-            children.push(new Paragraph({
-              children: [
-                new TextRun({ text: `${lic.state} ${lic.type || 'RN'}: `, bold: true, size: 18 }),
-                new TextRun({ text: `#${lic.number} | Issued: ${lic.issueDate || 'N/A'} | Expires: ${lic.expDate || 'N/A'}`, size: 17 })
-              ],
-              spacing: { after: 40 }
-            }));
+      });
+
+      // If no skills manually entered, auto-generate from unit templates
+      if (!Object.values(skillCategories).some(arr => arr.length > 0)) {
+        const specialty = (data.primarySpecialty || '').toLowerCase();
+        const unitKey = Object.keys(UNIT_TEMPLATES).find(k => specialty.includes(k));
+        if (unitKey) {
+          const template = UNIT_TEMPLATES[unitKey];
+          page3.push(new Paragraph({ children: [new TextRun({ text: 'Core Competencies', bold: true, size: 20, color: BLUE })], spacing: { before: 100, after: 80 } }));
+          template.responsibilities.forEach(r => {
+            page3.push(new Paragraph({ children: [new TextRun({ text: `✓  ${r}`, size: 18 })], spacing: { after: 20 }, indent: { left: 200 } }));
           });
+          page3.push(new Paragraph({ children: [new TextRun({ text: 'Patient Populations', bold: true, size: 20, color: BLUE })], spacing: { before: 150, after: 80 } }));
+          template.populations.forEach(p => {
+            page3.push(new Paragraph({ children: [new TextRun({ text: `✓  ${p}`, size: 18 })], spacing: { after: 20 }, indent: { left: 200 } }));
+          });
+          page3.push(new Paragraph({ children: [new TextRun({ text: `Typical Patient Ratio: ${template.typicalRatio}`, size: 18, italics: true, color: GRAY })], spacing: { before: 100 } }));
         }
       }
-      
+
+      // ===== PAGE BREAK - CERTIFICATIONS (formatted nicely) =====
+      const page4 = [];
+      page4.push(new Paragraph({ children: [new PageBreak()] }));
+      if (companyName) {
+        page4.push(new Paragraph({
+          children: [new TextRun({ text: companyName.toUpperCase() + ' — CERTIFICATIONS', bold: true, size: 24, color: BLUE })],
+          spacing: { after: 200 }
+        }));
+      }
+      page4.push(new Paragraph({
+        children: [new TextRun({ text: `Certifications for ${name}`, size: 22, bold: true })],
+        spacing: { after: 200 }
+      }));
+
+      const allCertDetails = [...(data.certifications || []).map(c => typeof c === 'string' ? { name: c } : c), ...(additionalData?.certifications || [])];
+      allCertDetails.filter(c => c.name).forEach((cert, i) => {
+        page4.push(new Paragraph({
+          shading: { fill: i % 2 === 0 ? "f9fafb" : "ffffff", type: ShadingType.CLEAR },
+          children: [
+            new TextRun({ text: cert.name, bold: true, size: 22 }),
+            cert.issuingBody ? new TextRun({ text: `  —  ${cert.issuingBody}`, size: 18, color: GRAY }) : new TextRun({ text: '' }),
+          ],
+          spacing: { before: 80, after: 20 }
+        }));
+        const certMeta = [cert.certNumber ? `#${cert.certNumber}` : '', cert.issueDate ? `Issued: ${cert.issueDate}` : '', cert.expirationDate ? `Expires: ${cert.expirationDate}` : ''].filter(Boolean).join('  |  ');
+        if (certMeta) {
+          page4.push(new Paragraph({
+            shading: { fill: i % 2 === 0 ? "f9fafb" : "ffffff", type: ShadingType.CLEAR },
+            children: [new TextRun({ text: certMeta, size: 18, color: GRAY })],
+            spacing: { after: 60 }, indent: { left: 200 }
+          }));
+        }
+      });
+
+      // ===== PAGE BREAK - NURSYS / LICENSE VERIFICATION =====
+      const page5 = [];
+      page5.push(new Paragraph({ children: [new PageBreak()] }));
+      if (companyName) {
+        page5.push(new Paragraph({
+          children: [new TextRun({ text: companyName.toUpperCase() + ' — LICENSE VERIFICATION', bold: true, size: 24, color: BLUE })],
+          spacing: { after: 200 }
+        }));
+      }
+      page5.push(new Paragraph({ children: [new TextRun({ text: `License Verification for ${name}`, size: 22, bold: true })], spacing: { after: 200 } }));
+
+      allLicenses.forEach((lic, i) => {
+        page5.push(new Paragraph({
+          children: [
+            new TextRun({ text: `${lic.state || ''} — ${lic.type || 'RN'}`, bold: true, size: 22 }),
+            lic.compact ? new TextRun({ text: '  (COMPACT)', size: 18, color: "16a34a", bold: true }) : new TextRun({ text: '' }),
+          ],
+          spacing: { before: i > 0 ? 150 : 0, after: 40 }
+        }));
+        if (lic.licenseNumber) page5.push(new Paragraph({ children: [new TextRun({ text: `License #: ${lic.licenseNumber}`, size: 20 })], spacing: { after: 20 }, indent: { left: 200 } }));
+        if (lic.issueDate) page5.push(new Paragraph({ children: [new TextRun({ text: `Issue Date: ${lic.issueDate}`, size: 20, color: GRAY })], spacing: { after: 20 }, indent: { left: 200 } }));
+        if (lic.expirationDate) page5.push(new Paragraph({ children: [new TextRun({ text: `Expiration: ${lic.expirationDate}`, size: 20, color: GRAY })], spacing: { after: 20 }, indent: { left: 200 } }));
+      });
+
+      if (additionalData?.nursysLink) {
+        page5.push(new Paragraph({
+          children: [new TextRun({ text: "Nursys Verification Link: ", bold: true, size: 20 }), new TextRun({ text: additionalData.nursysLink, size: 20, color: "2563eb" })],
+          spacing: { before: 200 }
+        }));
+      }
+
+      // ===== ASSEMBLE DOCUMENT =====
       const doc = new Document({
         sections: [{
-          properties: { page: { margin: { top: 500, right: 500, bottom: 500, left: 500 } } },
-          children
+          properties: { page: { margin: { top: 720, right: 720, bottom: 720, left: 720 } } },
+          children: [...page1, ...page2, ...page3, ...page4, ...page5]
         }]
       });
-      
+
       const blob = await Packer.toBlob(doc);
-      saveAs(blob, `${candidateName.replace(/\s+/g, '_')}_Profile.docx`);
+      const fileName = `${(name || 'candidate').replace(/[^a-zA-Z0-9]/g, '_')}_Profile_${new Date().toISOString().slice(0,10)}.docx`;
+      saveAs(blob, fileName);
     }
 
+    // ==================== MAIN APP ====================
     function App() {
+      const [step, setStep] = useState('input');
       const [resumeText, setResumeText] = useState('');
+      const [extractedData, setExtractedData] = useState(null);
       const [loading, setLoading] = useState(false);
-      const [fileLoading, setFileLoading] = useState(false);
       const [error, setError] = useState('');
-      const [profile, setProfile] = useState(null);
       const [companyName, setCompanyName] = useState('');
       const [companyLogo, setCompanyLogo] = useState(null);
-      const [fileName, setFileName] = useState('');
-      const [exporting, setExporting] = useState(false);
       const [activeTab, setActiveTab] = useState('summary');
-      
-      const fileRef = useRef(null);
-      const logoRef = useRef(null);
-      const profileRef = useRef(null);
-      
-      const [additional, setAdditional] = useState({
-        companyAddress: '',
-        companyPhone: '',
-        primaryCharting: '',
-        summaryBullets: ['', '', '', '', ''],
-        licenseDetails: [
-          { state: '', type: 'RN', number: '', issueDate: '', expDate: '', compact: false },
-          { state: '', type: 'RN', number: '', issueDate: '', expDate: '', compact: false }
-        ],
-        certDetails: [
-          { name: 'BLS', expDate: '', certNumber: '' },
-          { name: 'ACLS', expDate: '', certNumber: '' },
-          { name: 'PALS', expDate: '', certNumber: '' },
-          { name: 'NIHSS', expDate: '', certNumber: '' },
-          { name: '', expDate: '', certNumber: '' },
-          { name: '', expDate: '', certNumber: '' }
-        ],
-        workDetails: [],
-        skills: [],
+      const [scoreResult, setScoreResult] = useState(null);
+      const [overlaps, setOverlaps] = useState([]);
+      const [overlapResolutions, setOverlapResolutions] = useState({});
+      const fileInputRef = useRef(null);
+      const logoInputRef = useRef(null);
+
+      const [additionalData, setAdditionalData] = useState({
+        summaryBullets: ['', '', '', ''],
+        licenses: [],
+        certifications: [],
         nursysLink: '',
+        driversLicense: { state: '', number: '', expiration: '' },
         references: [
-          { name: '', title: '', facility: '', phone: '', email: '', relationship: '' },
-          { name: '', title: '', facility: '', phone: '', email: '', relationship: '' },
-          { name: '', title: '', facility: '', phone: '', email: '', relationship: '' }
-        ]
+          { name: '', title: '', relationship: '', phone: '', email: '' },
+          { name: '', title: '', relationship: '', phone: '', email: '' },
+          { name: '', title: '', relationship: '', phone: '', email: '' },
+        ],
+        skills: { patientCare: [], technical: [], equipment: [], documentation: [] },
       });
 
-      const handleFile = async (file) => {
+      // File upload handler
+      const handleFileUpload = async (e) => {
+        const file = e.target.files[0];
         if (!file) return;
-        setFileLoading(true);
         setError('');
-        setFileName(file.name);
         try {
           let text = '';
-          const name = file.name.toLowerCase();
-          if (name.endsWith('.pdf')) text = await extractPDF(file);
-          else if (name.endsWith('.docx') || name.endsWith('.doc')) text = await extractDOCX(file);
-          else if (name.endsWith('.txt')) text = await file.text();
-          else throw new Error('Upload PDF, DOCX, or TXT');
+          if (file.type === 'application/pdf') text = await extractPDF(file);
+          else if (file.name.endsWith('.docx')) text = await extractDOCXFile(file);
+          else text = await file.text();
           setResumeText(text);
         } catch (err) {
-          setError(err.message);
-          setFileName('');
-        } finally {
-          setFileLoading(false);
+          setError('Could not read file: ' + err.message);
         }
       };
 
+      // Logo upload
+      const handleLogoUpload = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => setCompanyLogo(ev.target.result);
+        reader.readAsDataURL(file);
+      };
+
+      // Extract resume via API
       const handleExtract = async () => {
-        if (!resumeText.trim()) { setError('Please upload or paste resume'); return; }
+        if (!resumeText.trim()) { setError('Please paste or upload a resume first'); return; }
         setLoading(true);
         setError('');
         try {
-          const res = await fetch('/api/extract', {
+          const response = await fetch('/api/extract', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ resumeText })
           });
-          const data = await res.json();
-          if (data.error) { setError(data.error); }
-          else {
-            setProfile(data);
-            if (data.workHistory?.length) {
-              const workDetails = data.workHistory.map(job => ({
-                facility: job.facility || '', city: job.city || '', state: job.state || '',
-                startDate: job.startDate || '', endDate: job.endDate || '', title: job.title || '',
-                roleDescription: '', totalBeds: '', traumaLevel: '', facilityType: '',
-                orSuites: '', robotics: false, roboticsSystem: '', charting: '',
-                duties: job.responsibilities?.join('. ') || ''
-              }));
-              setAdditional(prev => ({ ...prev, workDetails }));
-            }
-            if (data.licenses?.length) {
-              const licenseDetails = data.licenses.map(l => ({
-                state: l.state || '', type: l.type || 'RN', number: '', issueDate: '', expDate: '', compact: l.compact || false
-              }));
-              while (licenseDetails.length < 2) licenseDetails.push({ state: '', type: 'RN', number: '', issueDate: '', expDate: '', compact: false });
-              setAdditional(prev => ({ ...prev, licenseDetails }));
-            }
-            if (data.certifications?.length) {
-              const certDetails = data.certifications.map(c => ({ name: c, expDate: '', certNumber: '' }));
-              while (certDetails.length < 6) certDetails.push({ name: '', expDate: '', certNumber: '' });
-              setAdditional(prev => ({ ...prev, certDetails }));
-            }
+          const result = await response.json();
+          if (result.error) throw new Error(result.error);
+
+          // Enrich with hospital data and unit templates
+          if (result.workHistory) {
+            result.workHistory = result.workHistory.map(job => {
+              const hd = matchHospital(job.facility);
+              const unitType = detectUnitType(job.title, job.unit);
+              const template = unitType ? UNIT_TEMPLATES[unitType] : null;
+              return {
+                ...job,
+                hospitalData: hd,
+                detectedUnit: unitType,
+                responsibilities: job.responsibilities?.length > 0 ? job.responsibilities : (template ? template.responsibilities : [])
+              };
+            });
           }
-        } catch (err) { setError('Failed to process resume'); }
-        finally { setLoading(false); }
-      };
 
-      const handleLogoUpload = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onloadend = () => setCompanyLogo(reader.result);
-          reader.readAsDataURL(file);
+          // Pre-populate additional data from extraction
+          const newAdditional = { ...additionalData };
+          if (result.licenses) {
+            newAdditional.licenses = result.licenses.map(l => ({
+              state: l.state || '', type: l.type || 'RN', compact: l.compact || false,
+              licenseNumber: l.licenseNumber || '', issueDate: l.issueDate || '', expirationDate: l.expirationDate || ''
+            }));
+          }
+          if (result.certifications) {
+            newAdditional.certifications = result.certifications.map(c => ({
+              name: typeof c === 'string' ? c : (c.name || ''),
+              issuingBody: c.issuingBody || '', certNumber: c.certNumber || '',
+              issueDate: c.issueDate || '', expirationDate: c.expirationDate || ''
+            }));
+          }
+          setAdditionalData(newAdditional);
+
+          // Detect overlaps
+          const detected = detectOverlaps(result.workHistory || []);
+          setOverlaps(detected);
+
+          // Calculate score
+          const score = calculateScore(result, newAdditional);
+          setScoreResult(score);
+
+          setExtractedData(result);
+          setStep('edit');
+        } catch (err) {
+          setError(err.message || 'Extraction failed. Check API key and try again.');
         }
+        setLoading(false);
       };
 
-      const handleExportDOCX = async () => {
-        setExporting(true);
-        try { await exportDOCX(profile, companyName, additional); }
-        catch (err) { console.error(err); alert('Export failed: ' + err.message); }
-        finally { setExporting(false); }
-      };
+      // Update score when additional data changes
+      useEffect(() => {
+        if (extractedData) {
+          const score = calculateScore(extractedData, additionalData);
+          setScoreResult(score);
+        }
+      }, [additionalData, extractedData]);
 
-      const updateLicense = (idx, field, value) => {
-        setAdditional(prev => {
-          const newLics = [...prev.licenseDetails];
-          newLics[idx] = { ...newLics[idx], [field]: value };
-          return { ...prev, licenseDetails: newLics };
-        });
-      };
+      // ===== INPUT STEP =====
+      if (step === 'input') {
+        return (
+          <div className="max-w-3xl mx-auto p-6">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold text-gray-900">Profile Builder <span className="text-blue-600">Pro</span></h1>
+              <p className="text-gray-500 mt-1">AI-powered nursing candidate profiles</p>
+            </div>
 
-      const updateCert = (idx, field, value) => {
-        setAdditional(prev => {
-          const newCerts = [...prev.certDetails];
-          newCerts[idx] = { ...newCerts[idx], [field]: value };
-          return { ...prev, certDetails: newCerts };
-        });
-      };
+            {/* Company Branding */}
+            <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+              <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">Company Branding</h2>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Company Name</label>
+                  <input type="text" value={companyName} onChange={e => setCompanyName(e.target.value)}
+                    placeholder="e.g. Triage Staffing" className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Company Logo</label>
+                  <div className="flex items-center gap-3">
+                    <button onClick={() => logoInputRef.current?.click()}
+                      className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-gray-700 transition">
+                      {companyLogo ? '✓ Logo Uploaded' : 'Upload Logo'}
+                    </button>
+                    {companyLogo && <img src={companyLogo} alt="Logo" className="h-8 object-contain" />}
+                    <input ref={logoInputRef} type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
+                  </div>
+                </div>
+              </div>
+            </div>
 
-      const updateWork = (idx, field, value) => {
-        setAdditional(prev => {
-          const newWork = [...prev.workDetails];
-          newWork[idx] = { ...newWork[idx], [field]: value };
-          return { ...prev, workDetails: newWork };
-        });
-      };
+            {/* Resume Input */}
+            <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+              <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">Resume Input</h2>
+              <div className="flex gap-3 mb-4">
+                <button onClick={() => fileInputRef.current?.click()}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition">
+                  Upload PDF / DOCX
+                </button>
+                <input ref={fileInputRef} type="file" accept=".pdf,.docx,.doc,.txt" onChange={handleFileUpload} className="hidden" />
+                <span className="text-gray-400 self-center text-sm">or paste below</span>
+              </div>
+              <textarea value={resumeText} onChange={e => setResumeText(e.target.value)}
+                placeholder="Paste the full nurse resume text here..."
+                className="w-full h-64 px-4 py-3 border border-gray-300 rounded-lg text-sm resize-none" />
+            </div>
 
-      const updateRef = (idx, field, value) => {
-        setAdditional(prev => {
-          const refs = [...prev.references];
-          refs[idx] = { ...refs[idx], [field]: value };
-          return { ...prev, references: refs };
-        });
-      };
+            {error && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">{error}</div>}
 
-      const updateSummary = (idx, value) => {
-        setAdditional(prev => {
-          const bullets = [...prev.summaryBullets];
-          bullets[idx] = value;
-          return { ...prev, summaryBullets: bullets };
-        });
-      };
+            <button onClick={handleExtract} disabled={loading}
+              className="w-full py-3 bg-blue-600 text-white rounded-xl font-semibold text-lg hover:bg-blue-700 disabled:opacity-50 transition">
+              {loading ? 'Extracting...' : 'Extract & Build Profile'}
+            </button>
+          </div>
+        );
+      }
 
-      const toggleSkill = (skill) => {
-        setAdditional(prev => ({
-          ...prev,
-          skills: prev.skills.includes(skill) ? prev.skills.filter(s => s !== skill) : [...prev.skills, skill]
-        }));
-      };
-
-      const suggestedSkills = profile?.primarySpecialty ? SKILLS_BY_SPECIALTY[profile.primarySpecialty] || SKILLS_BY_SPECIALTY['Med-Surg'] : [];
-
+      // ===== EDIT STEP =====
       const tabs = [
         { id: 'summary', label: 'Summary' },
         { id: 'licenses', label: 'Licenses' },
-        { id: 'certs', label: 'Certs' },
-        { id: 'work', label: 'Work' },
+        { id: 'certifications', label: 'Certifications' },
+        { id: 'workhistory', label: 'Work History' },
         { id: 'skills', label: 'Skills' },
-        { id: 'refs', label: 'Refs' }
+        { id: 'references', label: 'References' },
+        { id: 'preview', label: '👁 Preview' },
       ];
 
-      return (
-        <div className="min-h-screen bg-gray-100">
-          <header className="bg-white border-b sticky top-0 z-50 no-print">
-            <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-cyan-600 rounded-lg flex items-center justify-center">
-                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-                <h1 className="text-base font-bold text-gray-800">Profile Builder Pro</h1>
-              </div>
-              {profile && (
-                <button onClick={handleExportDOCX} disabled={exporting} className="px-4 py-1.5 bg-cyan-600 text-white text-sm font-medium rounded-lg hover:bg-cyan-700 disabled:opacity-50">
-                  {exporting ? 'Exporting...' : 'Download DOCX'}
-                </button>
-              )}
-            </div>
-          </header>
+      const updateAdditional = (path, value) => {
+        setAdditionalData(prev => {
+          const next = JSON.parse(JSON.stringify(prev));
+          const keys = path.split('.');
+          let obj = next;
+          for (let i = 0; i < keys.length - 1; i++) {
+            if (keys[i].match(/^\d+$/)) keys[i] = parseInt(keys[i]);
+            obj = obj[keys[i]];
+          }
+          const lastKey = keys[keys.length - 1].match(/^\d+$/) ? parseInt(keys[keys.length - 1]) : keys[keys.length - 1];
+          obj[lastKey] = value;
+          return next;
+        });
+      };
 
-          <main className="max-w-7xl mx-auto px-4 py-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {/* LEFT */}
-              <div className="space-y-3 no-print">
-                {/* Company */}
-                <div className="bg-white rounded-lg border p-3">
-                  <h2 className="text-xs font-semibold mb-2 text-gray-500 uppercase">Company</h2>
-                  <input type="text" value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Staffing Agency Name" className="w-full px-2 py-1.5 border rounded text-sm mb-2" />
-                  <div className="grid grid-cols-2 gap-2">
-                    <input type="text" value={additional.companyAddress} onChange={(e) => setAdditional(prev => ({ ...prev, companyAddress: e.target.value }))} placeholder="Address" className="px-2 py-1.5 border rounded text-xs" />
-                    <input type="text" value={additional.companyPhone} onChange={(e) => setAdditional(prev => ({ ...prev, companyPhone: e.target.value }))} placeholder="Phone" className="px-2 py-1.5 border rounded text-xs" />
-                  </div>
-                  <div className="flex items-center gap-2 mt-2">
-                    <input type="file" ref={logoRef} onChange={handleLogoUpload} accept="image/*" className="hidden" />
-                    <button onClick={() => logoRef.current?.click()} className="px-3 py-1 border rounded text-xs hover:bg-gray-50">
-                      {companyLogo ? 'Change Logo' : 'Upload Logo'}
-                    </button>
-                    {companyLogo && <img src={companyLogo} alt="Logo" className="h-8 object-contain" />}
-                  </div>
-                </div>
+      const addLicense = () => {
+        setAdditionalData(prev => ({
+          ...prev,
+          licenses: [...prev.licenses, { state: '', type: 'RN', compact: false, licenseNumber: '', issueDate: '', expirationDate: '' }]
+        }));
+      };
 
-                {/* Upload */}
-                <div className="bg-white rounded-lg border p-3">
-                  <h2 className="text-xs font-semibold mb-2 text-gray-500 uppercase">Resume</h2>
-                  <div onClick={() => fileRef.current?.click()} className="border-2 border-dashed rounded p-3 text-center cursor-pointer hover:border-cyan-400 hover:bg-cyan-50 transition mb-2">
-                    <input type="file" ref={fileRef} onChange={(e) => handleFile(e.target.files[0])} accept=".pdf,.docx,.doc,.txt" className="hidden" />
-                    {fileLoading ? <span className="text-cyan-600 text-xs">Extracting...</span> : fileName ? (
-                      <div><span className="text-green-600 text-xs font-medium">{fileName}</span></div>
-                    ) : <span className="text-gray-400 text-xs">Drop PDF, DOCX, or TXT</span>}
-                  </div>
-                  <textarea value={resumeText} onChange={(e) => { setResumeText(e.target.value); setFileName(''); }} placeholder="Or paste resume..." className="w-full h-16 px-2 py-1.5 border rounded text-xs resize-none" />
-                  {error && <div className="mt-1 p-1.5 bg-red-50 border border-red-200 rounded text-red-700 text-xs">{error}</div>}
-                  <button onClick={handleExtract} disabled={loading || fileLoading} className="mt-2 w-full py-1.5 bg-cyan-600 text-white text-sm font-medium rounded hover:bg-cyan-700 disabled:opacity-50">
-                    {loading ? 'Processing...' : 'Extract & Build'}
-                  </button>
-                </div>
+      const addCert = () => {
+        setAdditionalData(prev => ({
+          ...prev,
+          certifications: [...prev.certifications, { name: '', issuingBody: '', certNumber: '', issueDate: '', expirationDate: '' }]
+        }));
+      };
 
-                {/* Tabs */}
-                {profile && (
-                  <div className="bg-white rounded-lg border overflow-hidden">
-                    <div className="flex border-b bg-gray-50">
-                      {tabs.map(tab => (
-                        <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex-1 py-1.5 text-xs font-medium ${activeTab === tab.id ? 'bg-white border-b-2 border-cyan-600 text-cyan-600' : 'text-gray-500'}`}>
-                          {tab.label}
-                        </button>
-                      ))}
-                    </div>
-                    
-                    <div className="p-3 max-h-80 overflow-y-auto">
-                      {activeTab === 'summary' && (
-                        <div className="space-y-2">
-                          <select value={additional.primaryCharting} onChange={(e) => setAdditional(prev => ({ ...prev, primaryCharting: e.target.value }))} className="w-full px-2 py-1.5 border rounded text-xs">
-                            <option value="">Primary Charting System</option>
-                            {CHARTING_SYSTEMS.map(c => <option key={c} value={c}>{c}</option>)}
-                          </select>
-                          <div className="text-xs text-gray-500">Summary Bullets:</div>
-                          {additional.summaryBullets.map((b, i) => (
-                            <input key={i} type="text" value={b} onChange={(e) => updateSummary(i, e.target.value)} placeholder={`Bullet ${i + 1}`} className="w-full px-2 py-1 border rounded text-xs" />
-                          ))}
-                          <input type="url" value={additional.nursysLink} onChange={(e) => setAdditional(prev => ({ ...prev, nursysLink: e.target.value }))} placeholder="Nursys Link" className="w-full px-2 py-1.5 border rounded text-xs" />
-                        </div>
-                      )}
-
-                      {activeTab === 'licenses' && (
-                        <div className="space-y-3">
-                          {additional.licenseDetails.map((lic, i) => (
-                            <div key={i} className="p-2 bg-gray-50 rounded text-xs space-y-1">
-                              <div className="grid grid-cols-4 gap-1">
-                                <input type="text" value={lic.state} onChange={(e) => updateLicense(i, 'state', e.target.value)} placeholder="State" className="px-1.5 py-1 border rounded" />
-                                <select value={lic.type} onChange={(e) => updateLicense(i, 'type', e.target.value)} className="px-1.5 py-1 border rounded">
-                                  <option value="RN">RN</option><option value="LPN">LPN</option>
-                                </select>
-                                <input type="text" value={lic.number} onChange={(e) => updateLicense(i, 'number', e.target.value)} placeholder="License #" className="px-1.5 py-1 border rounded" />
-                                <label className="flex items-center gap-1"><input type="checkbox" checked={lic.compact} onChange={(e) => updateLicense(i, 'compact', e.target.checked)} />Compact</label>
-                              </div>
-                              <div className="grid grid-cols-2 gap-1">
-                                <input type="text" value={lic.issueDate} onChange={(e) => updateLicense(i, 'issueDate', e.target.value)} placeholder="Issue Date" className="px-1.5 py-1 border rounded" />
-                                <input type="text" value={lic.expDate} onChange={(e) => updateLicense(i, 'expDate', e.target.value)} placeholder="Exp Date" className="px-1.5 py-1 border rounded" />
-                              </div>
-                            </div>
-                          ))}
-                          <button onClick={() => setAdditional(prev => ({ ...prev, licenseDetails: [...prev.licenseDetails, { state: '', type: 'RN', number: '', issueDate: '', expDate: '', compact: false }] }))} className="text-xs text-cyan-600">+ Add</button>
-                        </div>
-                      )}
-
-                      {activeTab === 'certs' && (
-                        <div className="space-y-1">
-                          {additional.certDetails.map((c, i) => (
-                            <div key={i} className="grid grid-cols-3 gap-1">
-                              <input type="text" value={c.name} onChange={(e) => updateCert(i, 'name', e.target.value)} placeholder="Name" className="px-1.5 py-1 border rounded text-xs" />
-                              <input type="text" value={c.expDate} onChange={(e) => updateCert(i, 'expDate', e.target.value)} placeholder="Exp Date" className="px-1.5 py-1 border rounded text-xs" />
-                              <input type="text" value={c.certNumber} onChange={(e) => updateCert(i, 'certNumber', e.target.value)} placeholder="Cert #" className="px-1.5 py-1 border rounded text-xs" />
-                            </div>
-                          ))}
-                          <button onClick={() => setAdditional(prev => ({ ...prev, certDetails: [...prev.certDetails, { name: '', expDate: '', certNumber: '' }] }))} className="text-xs text-cyan-600">+ Add</button>
-                        </div>
-                      )}
-
-                      {activeTab === 'work' && (
-                        <div className="space-y-3">
-                          {additional.workDetails.map((job, i) => (
-                            <div key={i} className="p-2 bg-gray-50 rounded text-xs">
-                              <div className="font-medium mb-1">{job.facility || `Job ${i + 1}`}</div>
-                              <div className="grid grid-cols-2 gap-1 mb-1">
-                                <input type="text" value={job.totalBeds} onChange={(e) => updateWork(i, 'totalBeds', e.target.value)} placeholder="Beds" className="px-1.5 py-1 border rounded" />
-                                <select value={job.traumaLevel} onChange={(e) => updateWork(i, 'traumaLevel', e.target.value)} className="px-1.5 py-1 border rounded">
-                                  <option value="">Trauma</option>
-                                  {TRAUMA_LEVELS.map(t => <option key={t} value={t}>{t}</option>)}
-                                </select>
-                              </div>
-                              <div className="grid grid-cols-2 gap-1 mb-1">
-                                <select value={job.charting} onChange={(e) => updateWork(i, 'charting', e.target.value)} className="px-1.5 py-1 border rounded">
-                                  <option value="">Charting</option>
-                                  {CHARTING_SYSTEMS.map(c => <option key={c} value={c}>{c}</option>)}
-                                </select>
-                                <input type="text" value={job.orSuites} onChange={(e) => updateWork(i, 'orSuites', e.target.value)} placeholder="OR Suites" className="px-1.5 py-1 border rounded" />
-                              </div>
-                              <div className="flex items-center gap-2 mb-1">
-                                <label className="flex items-center gap-1"><input type="checkbox" checked={job.robotics} onChange={(e) => updateWork(i, 'robotics', e.target.checked)} />Robotics</label>
-                                {job.robotics && <input type="text" value={job.roboticsSystem} onChange={(e) => updateWork(i, 'roboticsSystem', e.target.value)} placeholder="System" className="px-1.5 py-1 border rounded flex-1" />}
-                              </div>
-                              <input type="text" value={job.roleDescription} onChange={(e) => updateWork(i, 'roleDescription', e.target.value)} placeholder="Role Description" className="w-full px-1.5 py-1 border rounded mb-1" />
-                              <textarea value={job.duties} onChange={(e) => updateWork(i, 'duties', e.target.value)} placeholder="Duties" className="w-full px-1.5 py-1 border rounded h-12 resize-none" />
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      {activeTab === 'skills' && (
-                        <div>
-                          <div className="flex flex-wrap gap-1">
-                            {suggestedSkills.map(skill => (
-                              <button key={skill} onClick={() => toggleSkill(skill)} className={`px-2 py-0.5 rounded text-xs ${additional.skills.includes(skill) ? 'bg-cyan-600 text-white' : 'bg-gray-100 text-gray-700'}`}>
-                                {additional.skills.includes(skill) ? '✓ ' : ''}{skill}
-                              </button>
-                            ))}
-                          </div>
-                          <div className="mt-2 text-xs text-gray-500">{additional.skills.length} selected</div>
-                        </div>
-                      )}
-
-                      {activeTab === 'refs' && (
-                        <div className="space-y-2">
-                          {additional.references.map((ref, i) => (
-                            <div key={i} className="p-2 bg-gray-50 rounded text-xs grid grid-cols-2 gap-1">
-                              <input type="text" value={ref.name} onChange={(e) => updateRef(i, 'name', e.target.value)} placeholder="Name" className="px-1.5 py-1 border rounded" />
-                              <input type="text" value={ref.title} onChange={(e) => updateRef(i, 'title', e.target.value)} placeholder="Title" className="px-1.5 py-1 border rounded" />
-                              <input type="text" value={ref.facility} onChange={(e) => updateRef(i, 'facility', e.target.value)} placeholder="Facility" className="px-1.5 py-1 border rounded" />
-                              <input type="text" value={ref.relationship} onChange={(e) => updateRef(i, 'relationship', e.target.value)} placeholder="Relationship" className="px-1.5 py-1 border rounded" />
-                              <input type="text" value={ref.phone} onChange={(e) => updateRef(i, 'phone', e.target.value)} placeholder="Phone" className="px-1.5 py-1 border rounded" />
-                              <input type="text" value={ref.email} onChange={(e) => updateRef(i, 'email', e.target.value)} placeholder="Email" className="px-1.5 py-1 border rounded" />
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* RIGHT - Preview */}
-              <div>
-                {profile ? (
-                  <div ref={profileRef}>
-                    <ProfilePreview data={profile} companyName={companyName} companyLogo={companyLogo} additional={additional} />
-                  </div>
-                ) : (
-                  <div className="bg-white rounded-lg border p-8 text-center text-gray-400 text-sm">
-                    Upload a resume to generate profile
-                  </div>
-                )}
-              </div>
-            </div>
-          </main>
-        </div>
-      );
-    }
-
-    function ProfilePreview({ data, companyName, companyLogo, additional }) {
-      const { personalInfo, education, yearsExperience, primarySpecialty } = data;
-      const activeLicenses = additional?.licenseDetails?.filter(l => l.state) || [];
-      const activeCerts = additional?.certDetails?.filter(c => c.name) || [];
+      const addReference = () => {
+        setAdditionalData(prev => ({
+          ...prev,
+          references: [...prev.references, { name: '', title: '', relationship: '', phone: '', email: '' }]
+        }));
+      };
 
       return (
-        <div className="bg-white rounded-lg border overflow-hidden text-sm diagonal-bg">
-          {/* Header */}
-          <div className="p-4 border-b bg-white">
-            <div className="flex justify-between items-start">
-              <div className="flex items-center gap-2">
-                {companyLogo && <img src={companyLogo} alt="" className="h-10 object-contain" />}
-                <span className="font-bold text-cyan-600 text-lg">{companyName || 'STAFFING AGENCY'}</span>
-              </div>
-              <div className="text-right">
-                <div className="font-bold">{personalInfo?.fullName || 'Candidate'}</div>
-                <div className="text-xs text-gray-600">{personalInfo?.phone}</div>
-                <div className="text-xs text-gray-600">{personalInfo?.email}</div>
-                <div className="text-xs text-gray-600">{personalInfo?.location}</div>
-              </div>
+        <div className="max-w-6xl mx-auto p-4">
+          {/* Header Bar */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              {companyLogo && <img src={companyLogo} alt="Logo" className="h-8 object-contain" />}
+              <h1 className="text-xl font-bold text-gray-900">Profile Builder <span className="text-blue-600">Pro</span></h1>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setStep('input')} className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg">
+                ← New Resume
+              </button>
+              <button onClick={() => exportFullDOCX(extractedData, additionalData, companyName, companyLogo, scoreResult)}
+                className="px-4 py-1.5 text-sm bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition">
+                Download DOCX
+              </button>
             </div>
           </div>
 
-          {/* Summary */}
-          {additional?.summaryBullets?.some(b => b) && (
-            <div className="px-4 py-2 bg-cyan-50 border-b text-xs">
-              {additional.summaryBullets.filter(b => b).map((b, i) => <div key={i}>• {b}</div>)}
+          {/* Overlap Warnings */}
+          {overlaps.length > 0 && (
+            <div className="bg-amber-50 border border-amber-300 rounded-xl p-4 mb-4 overlap-warning">
+              <h3 className="font-semibold text-amber-800 mb-2">⚠ Overlapping Employment Dates Detected</h3>
+              {overlaps.map((o, i) => (
+                <div key={i} className="mb-3 last:mb-0">
+                  <p className="text-sm text-amber-700">
+                    <strong>{o.job1.title}</strong> at {o.job1.facility} ({o.job1.startDate} – {o.job1.endDate}) overlaps with{' '}
+                    <strong>{o.job2.title}</strong> at {o.job2.facility} ({o.job2.startDate} – {o.job2.endDate})
+                  </p>
+                  <div className="mt-2 flex gap-2 items-center">
+                    <span className="text-xs text-amber-600 font-medium">Clarification:</span>
+                    <select value={overlapResolutions[i] || ''} onChange={e => setOverlapResolutions(prev => ({ ...prev, [i]: e.target.value }))}
+                      className="text-xs border border-amber-300 rounded px-2 py-1 bg-white">
+                      <option value="">Select reason...</option>
+                      <option value="prn">PRN / Per Diem alongside travel</option>
+                      <option value="staff_and_travel">Staff position + travel assignment</option>
+                      <option value="transition">Transition period between jobs</option>
+                      <option value="error">Date error on resume (needs correction)</option>
+                    </select>
+                    {overlapResolutions[i] === 'prn' && (
+                      <input type="text" placeholder="Avg shifts/week at PRN?" className="text-xs border border-amber-300 rounded px-2 py-1 w-40" />
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
-          {/* Two columns */}
-          <div className="flex">
-            {/* Left */}
-            <div className="w-1/3 border-r p-3 space-y-3">
-              <div>
-                <div className="section-header text-white text-xs font-bold px-2 py-1 rounded-t">Experience</div>
-                <div className="border border-t-0 rounded-b p-2 text-xs space-y-0.5 bg-white">
-                  <div><b>Specialties:</b> {primarySpecialty || 'RN'}</div>
-                  <div><b>Years:</b> {yearsExperience || '—'}+</div>
-                  <div><b>Charting:</b> {additional?.primaryCharting || 'Various'}</div>
+          <div className="grid grid-cols-12 gap-4">
+            {/* Left Panel: Score + Tabs */}
+            <div className="col-span-5">
+              {/* Score Card */}
+              {scoreResult && (
+                <div className="bg-white rounded-xl border border-gray-200 p-4 mb-4">
+                  <div className="flex items-center gap-4">
+                    <ScoreRing score={scoreResult.total} size={80} />
+                    <div>
+                      <h3 className="font-semibold text-gray-800">Placement Score</h3>
+                      <p className="text-xs text-gray-500 capitalize">{scoreResult.specialty || 'General'} Specialty</p>
+                      <p className="text-xs mt-1">
+                        {scoreResult.total >= 80 ? <span className="text-green-600 font-medium">Strong candidate — submit with confidence</span> :
+                         scoreResult.total >= 60 ? <span className="text-blue-600 font-medium">Solid candidate — review pay/location fit</span> :
+                         scoreResult.total >= 40 ? <span className="text-amber-600 font-medium">Needs work — check certs & license gaps</span> :
+                         <span className="text-red-600 font-medium">Weak profile — may need additional experience</span>}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-5 gap-1 mt-3">
+                    {[
+                      { label: 'Exp', val: scoreResult.scores.years },
+                      { label: 'Certs', val: scoreResult.scores.certs },
+                      { label: 'License', val: scoreResult.scores.license },
+                      { label: 'Facility', val: scoreResult.scores.facility },
+                      { label: 'Charge', val: scoreResult.scores.chargeExp },
+                    ].map(s => (
+                      <div key={s.label} className="text-center">
+                        <div className="text-xs text-gray-500">{s.label}</div>
+                        <div className={`text-sm font-bold ${s.val >= 70 ? 'text-green-600' : s.val >= 40 ? 'text-amber-600' : 'text-red-500'}`}>{Math.round(s.val)}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Tabs */}
+              <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <div className="flex border-b overflow-x-auto">
+                  {tabs.map(tab => (
+                    <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                      className={`px-3 py-2 text-xs font-medium whitespace-nowrap transition ${activeTab === tab.id ? 'tab-active bg-blue-50' : 'text-gray-500 hover:text-gray-700'}`}>
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="p-4 max-h-[600px] overflow-y-auto">
+                  {/* SUMMARY TAB */}
+                  {activeTab === 'summary' && (
+                    <div className="space-y-3">
+                      <h3 className="font-semibold text-sm text-gray-800">Quick Summary Bullets</h3>
+                      <p className="text-xs text-gray-500">These appear in the blue highlight box at the top of the profile</p>
+                      {additionalData.summaryBullets.map((bullet, i) => (
+                        <input key={i} type="text" value={bullet} onChange={e => updateAdditional(`summaryBullets.${i}`, e.target.value)}
+                          placeholder={`Summary point ${i + 1}...`} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                      ))}
+                      <div className="border-t pt-3 mt-3">
+                        <label className="block text-sm font-medium text-gray-600 mb-1">Nursys Verification Link</label>
+                        <input type="text" value={additionalData.nursysLink} onChange={e => updateAdditional('nursysLink', e.target.value)}
+                          placeholder="https://www.nursys.com/..." className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                      </div>
+                      <div className="border-t pt-3 mt-3">
+                        <h4 className="text-sm font-medium text-gray-600 mb-2">Driver's License</h4>
+                        <div className="grid grid-cols-3 gap-2">
+                          <input type="text" value={additionalData.driversLicense.state} onChange={e => updateAdditional('driversLicense.state', e.target.value)}
+                            placeholder="State" className="px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                          <input type="text" value={additionalData.driversLicense.number} onChange={e => updateAdditional('driversLicense.number', e.target.value)}
+                            placeholder="DL Number" className="px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                          <input type="text" value={additionalData.driversLicense.expiration} onChange={e => updateAdditional('driversLicense.expiration', e.target.value)}
+                            placeholder="Exp Date" className="px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* LICENSES TAB */}
+                  {activeTab === 'licenses' && (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-sm text-gray-800">Nursing Licenses</h3>
+                        <button onClick={addLicense} className="text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded font-medium hover:bg-blue-100">+ Add License</button>
+                      </div>
+                      {additionalData.licenses.map((lic, i) => (
+                        <div key={i} className="border border-gray-200 rounded-lg p-3 space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold text-gray-500">License {i + 1}</span>
+                            <button onClick={() => setAdditionalData(prev => ({ ...prev, licenses: prev.licenses.filter((_, j) => j !== i) }))}
+                              className="ml-auto text-xs text-red-500 hover:text-red-700">Remove</button>
+                          </div>
+                          <div className="grid grid-cols-3 gap-2">
+                            <input type="text" value={lic.state} onChange={e => updateAdditional(`licenses.${i}.state`, e.target.value)}
+                              placeholder="State (e.g. FL)" className="px-2 py-1.5 border border-gray-300 rounded text-sm" />
+                            <select value={lic.type} onChange={e => updateAdditional(`licenses.${i}.type`, e.target.value)}
+                              className="px-2 py-1.5 border border-gray-300 rounded text-sm">
+                              <option value="RN">RN</option><option value="LPN">LPN</option><option value="APRN">APRN</option>
+                            </select>
+                            <label className="flex items-center gap-2 text-sm">
+                              <input type="checkbox" checked={lic.compact} onChange={e => updateAdditional(`licenses.${i}.compact`, e.target.checked)} />
+                              Compact
+                            </label>
+                          </div>
+                          <div className="grid grid-cols-3 gap-2">
+                            <input type="text" value={lic.licenseNumber} onChange={e => updateAdditional(`licenses.${i}.licenseNumber`, e.target.value)}
+                              placeholder="License #" className="px-2 py-1.5 border border-gray-300 rounded text-sm" />
+                            <input type="text" value={lic.issueDate} onChange={e => updateAdditional(`licenses.${i}.issueDate`, e.target.value)}
+                              placeholder="Issue Date" className="px-2 py-1.5 border border-gray-300 rounded text-sm" />
+                            <input type="text" value={lic.expirationDate} onChange={e => updateAdditional(`licenses.${i}.expirationDate`, e.target.value)}
+                              placeholder="Exp Date" className="px-2 py-1.5 border border-gray-300 rounded text-sm" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* CERTIFICATIONS TAB */}
+                  {activeTab === 'certifications' && (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-sm text-gray-800">Certifications</h3>
+                        <button onClick={addCert} className="text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded font-medium hover:bg-blue-100">+ Add Cert</button>
+                      </div>
+                      {additionalData.certifications.map((cert, i) => (
+                        <div key={i} className="border border-gray-200 rounded-lg p-3 space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold text-gray-500">Cert {i + 1}</span>
+                            <button onClick={() => setAdditionalData(prev => ({ ...prev, certifications: prev.certifications.filter((_, j) => j !== i) }))}
+                              className="ml-auto text-xs text-red-500 hover:text-red-700">Remove</button>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <input type="text" value={cert.name} onChange={e => updateAdditional(`certifications.${i}.name`, e.target.value)}
+                              placeholder="Cert Name (e.g. BLS)" className="px-2 py-1.5 border border-gray-300 rounded text-sm" />
+                            <input type="text" value={cert.issuingBody} onChange={e => updateAdditional(`certifications.${i}.issuingBody`, e.target.value)}
+                              placeholder="Issuing Body (e.g. AHA)" className="px-2 py-1.5 border border-gray-300 rounded text-sm" />
+                          </div>
+                          <div className="grid grid-cols-3 gap-2">
+                            <input type="text" value={cert.certNumber} onChange={e => updateAdditional(`certifications.${i}.certNumber`, e.target.value)}
+                              placeholder="Cert #" className="px-2 py-1.5 border border-gray-300 rounded text-sm" />
+                            <input type="text" value={cert.issueDate} onChange={e => updateAdditional(`certifications.${i}.issueDate`, e.target.value)}
+                              placeholder="Issue Date" className="px-2 py-1.5 border border-gray-300 rounded text-sm" />
+                            <input type="text" value={cert.expirationDate} onChange={e => updateAdditional(`certifications.${i}.expirationDate`, e.target.value)}
+                              placeholder="Exp Date" className="px-2 py-1.5 border border-gray-300 rounded text-sm" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* WORK HISTORY TAB */}
+                  {activeTab === 'workhistory' && (
+                    <div className="space-y-3">
+                      <h3 className="font-semibold text-sm text-gray-800">Work History</h3>
+                      {(extractedData?.workHistory || []).map((job, i) => (
+                        <div key={i} className="border border-gray-200 rounded-lg p-3">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="font-medium text-sm">{job.title} — {job.facility}</span>
+                            {job.hospitalData && <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">✓ Enriched</span>}
+                          </div>
+                          <p className="text-xs text-gray-500">{job.startDate} – {job.endDate} | {job.city}, {job.state}</p>
+                          {job.hospitalData && (
+                            <p className="text-xs text-gray-400 mt-1">{job.hospitalData.beds} beds | {job.hospitalData.traumaLevel} | {job.hospitalData.teaching ? 'Teaching' : 'Non-Teaching'} | {job.hospitalData.emr}</p>
+                          )}
+                          {job.chargeExperience && <p className="text-xs text-purple-600 mt-1">★ Charge Nurse Experience</p>}
+                          <div className="mt-2">
+                            <p className="text-xs text-gray-500 mb-1">Responsibilities:</p>
+                            {(job.responsibilities || []).map((r, j) => (
+                              <p key={j} className="text-xs text-gray-600 ml-2">• {r}</p>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* SKILLS TAB */}
+                  {activeTab === 'skills' && (
+                    <div className="space-y-3">
+                      <h3 className="font-semibold text-sm text-gray-800">Skills Checklist</h3>
+                      <p className="text-xs text-gray-500">Auto-generated from specialty. Add custom skills below.</p>
+                      {extractedData?.primarySpecialty && (() => {
+                        const spec = extractedData.primarySpecialty.toLowerCase();
+                        const unitKey = Object.keys(UNIT_TEMPLATES).find(k => spec.includes(k));
+                        const template = unitKey ? UNIT_TEMPLATES[unitKey] : null;
+                        if (!template) return null;
+                        return (
+                          <div className="bg-blue-50 rounded-lg p-3">
+                            <p className="text-xs font-semibold text-blue-700 mb-2">Auto-generated for {extractedData.primarySpecialty}:</p>
+                            {template.responsibilities.map((r, i) => (
+                              <p key={i} className="text-xs text-blue-600 ml-2">✓ {r}</p>
+                            ))}
+                            <p className="text-xs text-blue-500 mt-2">Typical Ratio: {template.typicalRatio}</p>
+                          </div>
+                        );
+                      })()}
+                      {['patientCare', 'technical', 'equipment', 'documentation'].map(cat => (
+                        <div key={cat} className="border border-gray-200 rounded-lg p-3">
+                          <label className="text-xs font-medium text-gray-600 capitalize mb-1 block">{cat.replace(/([A-Z])/g, ' $1')}</label>
+                          <textarea value={(additionalData.skills[cat] || []).join('\n')}
+                            onChange={e => updateAdditional(`skills.${cat}`, e.target.value.split('\n').filter(s => s.trim()))}
+                            placeholder="One skill per line..." className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm h-16 resize-none" />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* REFERENCES TAB */}
+                  {activeTab === 'references' && (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-sm text-gray-800">Professional References</h3>
+                        <button onClick={addReference} className="text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded font-medium hover:bg-blue-100">+ Add Reference</button>
+                      </div>
+                      {additionalData.references.map((ref, i) => (
+                        <div key={i} className="border border-gray-200 rounded-lg p-3 space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold text-gray-500">Reference {i + 1}</span>
+                            {i >= 3 && <button onClick={() => setAdditionalData(prev => ({ ...prev, references: prev.references.filter((_, j) => j !== i) }))}
+                              className="ml-auto text-xs text-red-500 hover:text-red-700">Remove</button>}
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <input type="text" value={ref.name} onChange={e => updateAdditional(`references.${i}.name`, e.target.value)}
+                              placeholder="Full Name" className="px-2 py-1.5 border border-gray-300 rounded text-sm" />
+                            <input type="text" value={ref.title} onChange={e => updateAdditional(`references.${i}.title`, e.target.value)}
+                              placeholder="Title (e.g. Charge Nurse)" className="px-2 py-1.5 border border-gray-300 rounded text-sm" />
+                          </div>
+                          <div className="grid grid-cols-3 gap-2">
+                            <input type="text" value={ref.relationship} onChange={e => updateAdditional(`references.${i}.relationship`, e.target.value)}
+                              placeholder="Relationship" className="px-2 py-1.5 border border-gray-300 rounded text-sm" />
+                            <input type="text" value={ref.phone} onChange={e => updateAdditional(`references.${i}.phone`, e.target.value)}
+                              placeholder="Phone" className="px-2 py-1.5 border border-gray-300 rounded text-sm" />
+                            <input type="text" value={ref.email} onChange={e => updateAdditional(`references.${i}.email`, e.target.value)}
+                              placeholder="Email" className="px-2 py-1.5 border border-gray-300 rounded text-sm" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* PREVIEW TAB */}
+                  {activeTab === 'preview' && (
+                    <div className="space-y-2">
+                      <h3 className="font-semibold text-sm text-gray-800">DOCX Export Preview</h3>
+                      <p className="text-xs text-gray-500">Your downloaded DOCX will include these pages:</p>
+                      <div className="space-y-2 mt-2">
+                        {['Page 1: Resume Profile (with blue highlight box)', 'Page 2: Professional References', 'Page 3: Skills Checklist', 'Page 4: Certifications (formatted)', 'Page 5: License Verification / Nursys'].map((page, i) => (
+                          <div key={i} className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
+                            <span className="text-xs font-mono text-blue-600">{i + 1}</span>
+                            <span className="text-sm text-gray-700">{page.split(': ')[1]}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <button onClick={() => exportFullDOCX(extractedData, additionalData, companyName, companyLogo, scoreResult)}
+                        className="w-full mt-4 py-2 bg-blue-600 text-white rounded-lg font-medium text-sm hover:bg-blue-700 transition">
+                        Download Complete Profile Packet (DOCX)
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
-              <div>
-                <div className="section-header text-white text-xs font-bold px-2 py-1 rounded-t">Licenses & Certs</div>
-                <div className="border border-t-0 rounded-b p-2 text-xs space-y-1 bg-white">
-                  {activeLicenses.map((l, i) => (
-                    <div key={i}>
-                      <div className="font-medium">{l.type}, {l.state} – Exp. {l.expDate || 'N/A'}</div>
-                      {l.number && <div className="text-gray-500 text-xs">{l.number}</div>}
+            </div>
+
+            {/* Right Panel: Live Profile Preview */}
+            <div className="col-span-7">
+              <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+                {/* Company Header */}
+                <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
+                  {companyLogo && <img src={companyLogo} alt="Logo" className="h-10 object-contain" />}
+                  {companyName && <span className="text-lg font-bold text-blue-800 uppercase tracking-wider">{companyName}</span>}
+                  {!companyName && !companyLogo && <span className="text-sm text-gray-400 italic">No company branding set</span>}
+                </div>
+
+                {/* Candidate Name */}
+                <div className="px-6 pt-4 pb-2">
+                  <h1 className="text-2xl font-bold text-gray-900">{extractedData?.personalInfo?.fullName || 'Candidate'}</h1>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {[extractedData?.personalInfo?.phone, extractedData?.personalInfo?.email, extractedData?.personalInfo?.location].filter(Boolean).join(' | ')}
+                  </p>
+                </div>
+
+                {/* BLUE HIGHLIGHT BOX */}
+                <div className="mx-6 mb-4 highlight-box rounded-lg px-5 py-3">
+                  <div className="flex flex-wrap gap-x-6 gap-y-1 text-white text-sm">
+                    <span><strong>{extractedData?.yearsExperience || '—'}</strong> Years Exp</span>
+                    <span><strong>{extractedData?.primarySpecialty || '—'}</strong></span>
+                    <span>Licensed: <strong>
+                      {[...(extractedData?.licenses || []), ...(additionalData?.licenses || [])].map(l => l.state).filter(Boolean).join(', ') || '—'}
+                      {[...(extractedData?.licenses || []), ...(additionalData?.licenses || [])].some(l => l.compact) ? ' (Compact)' : ''}
+                    </strong></span>
+                    <span>Certs: <strong>
+                      {[...(extractedData?.certifications || []).map(c => typeof c === 'string' ? c : c.name), ...(additionalData?.certifications || []).map(c => c.name)].filter(Boolean).slice(0, 5).join(', ') || '—'}
+                    </strong></span>
+                    {scoreResult && <span>Score: <strong>{scoreResult.total}/100</strong></span>}
+                  </div>
+                </div>
+
+                {/* Summary Bullets */}
+                {additionalData.summaryBullets.some(b => b) && (
+                  <div className="px-6 pb-3">
+                    {additionalData.summaryBullets.filter(b => b).map((b, i) => (
+                      <p key={i} className="text-sm text-gray-700 mb-1">• {b}</p>
+                    ))}
+                  </div>
+                )}
+
+                {/* CREDENTIALS & EDUCATION */}
+                <div className="px-6 py-3 border-t border-gray-100">
+                  <h2 className="text-sm font-bold text-blue-800 uppercase tracking-wide border-b-2 border-blue-800 pb-1 mb-3">Credentials & Education</h2>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <h3 className="text-xs font-semibold text-gray-500 mb-1">Licenses</h3>
+                      {[...(extractedData?.licenses || []), ...(additionalData?.licenses || [])].map((lic, i) => (
+                        <div key={i} className="flex items-center gap-2 mb-1">
+                          <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs font-bold rounded">{lic.state}</span>
+                          <span className="text-xs text-gray-700">{lic.type || 'RN'}</span>
+                          {lic.compact && <span className="text-xs text-green-600 font-medium">Compact</span>}
+                          {lic.expirationDate && <span className="text-xs text-gray-400">Exp: {lic.expirationDate}</span>}
+                        </div>
+                      ))}
+                    </div>
+                    <div>
+                      <h3 className="text-xs font-semibold text-gray-500 mb-1">Certifications</h3>
+                      <div className="flex flex-wrap gap-1">
+                        {[...(extractedData?.certifications || []).map(c => typeof c === 'string' ? c : c.name), ...(additionalData?.certifications || []).map(c => c.name)].filter(Boolean).map((cert, i) => (
+                          <span key={i} className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded font-medium">{cert}</span>
+                        ))}
+                      </div>
+                      {extractedData?.education && (
+                        <div className="mt-2">
+                          <h3 className="text-xs font-semibold text-gray-500 mb-1">Education</h3>
+                          <p className="text-xs text-gray-700">{extractedData.education.degree} — {extractedData.education.school}</p>
+                          {extractedData.education.graduationDate && <p className="text-xs text-gray-400">{extractedData.education.graduationDate}</p>}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* WORK HISTORY */}
+                <div className="px-6 py-3 border-t border-gray-100">
+                  <h2 className="text-sm font-bold text-blue-800 uppercase tracking-wide border-b-2 border-blue-800 pb-1 mb-3">Work History</h2>
+                  {(extractedData?.workHistory || []).map((job, i) => (
+                    <div key={i} className="mb-4 last:mb-0">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="font-semibold text-gray-900 text-sm">{job.title}</p>
+                          <p className="text-sm text-blue-700">{job.facility} <span className="text-gray-400">— {job.city}, {job.state}</span></p>
+                        </div>
+                        <span className="text-xs text-gray-400 whitespace-nowrap">{job.startDate} – {job.endDate}</span>
+                      </div>
+                      {job.hospitalData && (
+                        <p className="text-xs text-gray-400 mt-0.5 italic">{job.hospitalData.beds} beds | {job.hospitalData.traumaLevel} | {job.hospitalData.teaching ? 'Teaching' : 'Non-Teaching'} | {job.hospitalData.emr}</p>
+                      )}
+                      <div className="mt-1">
+                        {(job.responsibilities || []).slice(0, 4).map((r, j) => (
+                          <p key={j} className="text-xs text-gray-600 ml-3">• {r}</p>
+                        ))}
+                      </div>
+                      {job.chargeExperience && <p className="text-xs text-purple-600 ml-3 mt-1">★ Charge Nurse Experience</p>}
                     </div>
                   ))}
-                  {activeCerts.map((c, i) => <div key={i} className="text-gray-700">{c.name} (Exp: {c.expDate || 'N/A'})</div>)}
                 </div>
-              </div>
-              <div>
-                <div className="section-header text-white text-xs font-bold px-2 py-1 rounded-t">Education</div>
-                <div className="border border-t-0 rounded-b p-2 text-xs bg-white">
-                  {education ? (
-                    <>
-                      <div><b>Grad:</b> {education.graduationDate || 'N/A'}</div>
-                      <div>{education.school}</div>
-                      <div>{education.degree}</div>
-                    </>
-                  ) : <div className="text-gray-400">N/A</div>}
-                </div>
-              </div>
-            </div>
 
-            {/* Right - Work History */}
-            <div className="w-2/3 p-3">
-              <div className="section-header text-white text-xs font-bold px-2 py-1 rounded mb-2">Work History</div>
-              <div className="space-y-3">
-                {additional?.workDetails?.length > 0 ? additional.workDetails.map((job, i) => (
-                  <div key={i} className="border-b pb-2 last:border-b-0 text-xs">
-                    <div className="flex justify-between">
-                      <span className="font-bold">{job.facility} – {job.city}, {job.state}</span>
-                      <span className="text-gray-500 text-xs">{job.startDate} – {job.endDate}</span>
+                {/* References preview */}
+                {additionalData.references.some(r => r.name) && (
+                  <div className="px-6 py-3 border-t border-gray-100">
+                    <h2 className="text-sm font-bold text-blue-800 uppercase tracking-wide border-b-2 border-blue-800 pb-1 mb-3">References</h2>
+                    <div className="grid grid-cols-3 gap-2">
+                      {additionalData.references.filter(r => r.name).map((ref, i) => (
+                        <div key={i} className="bg-gray-50 p-2 rounded text-xs">
+                          <p className="font-medium text-gray-800">{ref.name}</p>
+                          {ref.title && <p className="text-gray-500">{ref.title}</p>}
+                          {ref.phone && <p className="text-gray-600 mt-1">{ref.phone}</p>}
+                        </div>
+                      ))}
                     </div>
-                    <div className="text-gray-700">{job.title}</div>
-                    {job.roleDescription && <div className="text-gray-600">{job.roleDescription}</div>}
-                    <div className="mt-1 text-xs text-gray-600 space-y-0.5">
-                      {job.totalBeds && <div>Total Staffed Beds: {job.totalBeds}</div>}
-                      {(job.traumaLevel || job.facilityType) && <div>Facility Type: {[job.traumaLevel, job.facilityType].filter(Boolean).join(' and ')}</div>}
-                      {job.orSuites && <div>Number of OR suites: {job.orSuites}</div>}
-                      {job.robotics && <div>Robotics: Yes ({job.roboticsSystem || 'Da Vinci'})</div>}
-                      {job.charting && <div>Charting System: {job.charting}</div>}
-                    </div>
-                    {job.duties && <div className="mt-1"><b>Duties:</b> {job.duties}</div>}
                   </div>
-                )) : <div className="text-gray-400">Add details in Work tab</div>}
+                )}
+
+                <div className="px-6 py-2 bg-gray-50 text-center border-t">
+                  <p className="text-xs text-gray-400">Profile Builder Pro • {new Date().toLocaleDateString()}</p>
+                </div>
               </div>
             </div>
-          </div>
-
-          {/* Footer */}
-          <div className="px-4 py-2 bg-gray-50 border-t text-center text-xs text-gray-400">
-            {[additional?.companyAddress, additional?.companyPhone].filter(Boolean).join(' | ')}
           </div>
         </div>
       );
