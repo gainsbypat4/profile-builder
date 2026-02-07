@@ -10,8 +10,6 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-  <!-- docx loaded dynamically on export -->
-  <!-- FileSaver loaded dynamically on export -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { font-family: 'Inter', sans-serif; }
@@ -312,370 +310,169 @@
       );
     }
 
-    // ==================== DOCX EXPORT ====================
+    // ==================== WORD EXPORT (Zero Dependencies) ====================
     async function exportFullDOCX(data, additionalData, companyName, companyLogo, scoreResult, overlaps, overlapResolutions, overlapPrnShifts) {
-      // Dynamically load docx library if not already loaded
-      if (!window.docx) {
-        const cdnUrls = [
-          'https://unpkg.com/docx@8.2.0/build/index.umd.js',
-          'https://cdn.jsdelivr.net/npm/docx@8.2.0/build/index.umd.js',
-          'https://cdnjs.cloudflare.com/ajax/libs/docx/8.2.0/index.umd.js',
-          'https://unpkg.com/docx@8.0.0/build/index.umd.js',
-          'https://cdn.jsdelivr.net/npm/docx@7.8.0/build/index.umd.js',
-        ];
-        for (const url of cdnUrls) {
-          try {
-            await new Promise((resolve, reject) => {
-              const s = document.createElement('script');
-              s.src = url;
-              s.onload = () => resolve();
-              s.onerror = () => reject();
-              document.head.appendChild(s);
-            });
-            if (window.docx) { console.log('docx loaded from:', url); break; }
-          } catch(e) { console.warn('Failed to load docx from:', url); }
-        }
-      }
-      if (!window.docx) {
-        alert('Could not load DOCX library from any source. Check your internet connection and try again.');
-        return;
-      }
-      const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, BorderStyle, ShadingType, AlignmentType, WidthType, PageBreak, HeadingLevel, ImageRun } = window.docx;
-
-      const BLUE = "1e40af";
-      const LIGHT_BLUE = "dbeafe";
-      const GRAY = "6b7280";
-
-      const sections = [];
-      const page1 = [];
-
-      // ===== COMPANY HEADER =====
-      if (companyName) {
-        page1.push(new Paragraph({
-          children: [new TextRun({ text: companyName.toUpperCase(), bold: true, size: 28, color: BLUE, font: "Arial" })],
-          spacing: { after: 50 }
-        }));
-        page1.push(new Paragraph({
-          children: [new TextRun({ text: "CANDIDATE PROFILE", size: 18, color: GRAY, font: "Arial", characterSpacing: 200 })],
-          spacing: { after: 200 }
-        }));
-      }
-
-      // ===== CANDIDATE NAME =====
-      const name = data.personalInfo?.fullName || 'Candidate';
-      page1.push(new Paragraph({
-        children: [new TextRun({ text: name, bold: true, size: 40, font: "Arial" })],
-        spacing: { after: 60 }
-      }));
-
-      const contactParts = [data.personalInfo?.phone, data.personalInfo?.email, data.personalInfo?.location].filter(Boolean);
-      if (contactParts.length) {
-        page1.push(new Paragraph({
-          children: [new TextRun({ text: contactParts.join('  |  '), size: 20, color: GRAY })],
-          spacing: { after: 200 }
-        }));
-      }
-
-      // ===== BLUE HIGHLIGHT BOX =====
-      const allLicenses = dedupLicenses(data.licenses, additionalData?.licenses);
+      const name = data?.personalInfo?.fullName || 'Candidate';
+      const allLicenses = dedupLicenses(data?.licenses, additionalData?.licenses);
+      const allCertObjs = dedupCerts(data?.certifications, additionalData?.certifications);
+      const allCerts = allCertObjs.map(c => c.name).filter(Boolean);
       const licenseStates = allLicenses.map(l => l.state).filter(Boolean);
       const hasCompact = allLicenses.some(l => l.compact);
-      const allCertObjs = dedupCerts(data.certifications, additionalData?.certifications);
-      const allCerts = allCertObjs.map(c => c.name).filter(Boolean);
-      const scoreLabel = scoreResult ? `${scoreResult.total}/100` : '';
 
-      const highlightItems = [
-        `${data.yearsExperience || '—'} Years Experience`,
-        `Specialty: ${data.primarySpecialty || '—'}`,
-        `Licensed: ${licenseStates.join(', ') || '—'}${hasCompact ? ' (Compact)' : ''}`,
-        `Certs: ${allCerts.slice(0, 6).join(', ') || '—'}`,
-      ];
-      if (scoreLabel) highlightItems.push(`Profile Score: ${scoreLabel}`);
+      const sc = scoreResult?.total || 0;
+      const scoreColor = sc >= 80 ? '#16a34a' : sc >= 60 ? '#2563eb' : sc >= 40 ? '#d97706' : '#dc2626';
+      const scoreLabel = sc >= 80 ? 'Strong candidate - submit with confidence' : sc >= 60 ? 'Solid candidate - review pay/location fit' : sc >= 40 ? 'Needs work - check certs and license gaps' : 'Weak profile - may need additional experience';
 
-      page1.push(new Paragraph({
-        shading: { fill: "1e40af", type: ShadingType.CLEAR },
-        children: highlightItems.map((item, i) => new TextRun({
-          text: (i > 0 ? '   |   ' : '  ') + item + '  ',
-          bold: true, size: 18, color: "ffffff", font: "Arial"
-        })),
-        spacing: { before: 100, after: 200 },
-      }));
+      const esc = (s) => (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
-      // ===== SUMMARY BULLETS =====
+      const css = `
+        body { font-family: Calibri, Arial, sans-serif; color: #1a1a1a; line-height: 1.5; font-size: 11pt; }
+        @page { margin: 0.75in; }
+        .page-break { page-break-before: always; }
+        .header { text-align: center; margin-bottom: 10px; }
+        .company-name { font-size: 15pt; font-weight: bold; color: #1e40af; letter-spacing: 2px; text-transform: uppercase; }
+        .candidate-name { font-size: 18pt; font-weight: bold; margin: 6px 0 2px 0; }
+        .contact-info { font-size: 10pt; color: #666; }
+        .highlight-box { background-color: #1e40af; color: white; padding: 8px 14px; margin: 10px 0; font-size: 10pt; }
+        .highlight-box b { font-weight: 700; }
+        .score-inline { background: ${scoreColor}; color: white; padding: 1px 6px; font-weight: bold; }
+        .section-header { font-size: 11.5pt; font-weight: bold; color: #1e40af; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #1e40af; padding-bottom: 2px; margin: 14px 0 6px 0; }
+        .job-block { margin-bottom: 10px; }
+        .job-title { font-weight: bold; font-size: 11pt; }
+        .job-facility { color: #1e40af; font-size: 10.5pt; }
+        .job-dates { color: #888; font-size: 9.5pt; }
+        .job-meta { font-size: 9pt; color: #999; font-style: italic; background: #f9fafb; padding: 2px 6px; margin: 2px 0; }
+        .job-resp { font-size: 10pt; margin: 1px 0 1px 14px; }
+        .charge-exp { color: #7c3aed; font-size: 9.5pt; margin-left: 14px; font-weight: 600; }
+        .overlap-note { color: #b45309; font-size: 9pt; font-style: italic; margin-left: 14px; }
+        .lic-badge { display: inline; background: #dbeafe; color: #1e40af; padding: 1px 5px; font-weight: bold; font-size: 9.5pt; }
+        .compact-badge { color: #16a34a; font-weight: 600; font-size: 9pt; }
+        .cert-tag { display: inline; background: #f3f4f6; padding: 1px 6px; font-size: 9.5pt; margin-right: 4px; }
+        .bullet { font-size: 10.5pt; margin: 2px 0 2px 10px; }
+        table.tbl { width: 100%; border-collapse: collapse; font-size: 10pt; }
+        table.tbl td, table.tbl th { border: 1px solid #ccc; padding: 4px 7px; }
+        table.tbl th { background: #eef2ff; color: #1e40af; font-weight: 600; text-align: left; }
+        .footer { text-align: center; font-size: 8pt; color: #bbb; margin-top: 16px; border-top: 1px solid #eee; padding-top: 4px; }
+      `;
+
+      // PAGE 1: RESUME PROFILE
+      let p1 = '';
+      if (companyName) p1 += '<div class="header"><span class="company-name">' + esc(companyName) + '</span></div>';
+      p1 += '<div class="candidate-name">' + esc(name) + '</div>';
+      const cp = [data?.personalInfo?.phone, data?.personalInfo?.email, data?.personalInfo?.location].filter(Boolean);
+      if (cp.length) p1 += '<div class="contact-info">' + cp.map(esc).join(' &nbsp;|&nbsp; ') + '</div>';
+
+      p1 += '<div class="highlight-box">';
+      p1 += '<b>' + esc(String(data?.yearsExperience || '-')) + '</b> Years Exp &nbsp; ';
+      p1 += '<b>' + esc(data?.primarySpecialty || '-') + '</b> &nbsp; ';
+      p1 += 'Licensed: <b>' + esc(licenseStates.join(', ') || '-') + (hasCompact ? ' (Compact)' : '') + '</b> &nbsp; ';
+      p1 += 'Certs: <b>' + esc(allCerts.slice(0, 6).join(', ') || '-') + '</b>';
+      if (scoreResult) p1 += ' &nbsp; Score: <span class="score-inline">' + scoreResult.total + '/100</span>';
+      p1 += '</div>';
+
+      if (scoreResult) p1 += '<div style="font-size:9.5pt;color:' + scoreColor + ';margin-bottom:6px;"><i>' + esc(scoreLabel) + '</i></div>';
+
       if (additionalData?.summaryBullets?.some(b => b)) {
-        page1.push(new Paragraph({ children: [new TextRun({ text: "PROFESSIONAL SUMMARY", bold: true, size: 22, color: BLUE })], spacing: { before: 200, after: 100 } }));
-        additionalData.summaryBullets.filter(b => b).forEach(bullet => {
-          page1.push(new Paragraph({
-            children: [new TextRun({ text: '•  ' + bullet, size: 20 })],
-            spacing: { after: 40 }, indent: { left: 200 }
-          }));
-        });
+        additionalData.summaryBullets.filter(b => b).forEach(b => { p1 += '<div class="bullet">&bull; ' + esc(b) + '</div>'; });
       }
 
-      // ===== CREDENTIALS SECTION =====
-      page1.push(new Paragraph({ children: [new TextRun({ text: "CREDENTIALS & EDUCATION", bold: true, size: 22, color: BLUE })], spacing: { before: 300, after: 100 },
-        border: { bottom: { color: BLUE, space: 4, size: 6, style: BorderStyle.SINGLE } }
-      }));
-
-      // Licenses
+      p1 += '<div class="section-header">Credentials &amp; Education</div>';
       if (allLicenses.length) {
-        page1.push(new Paragraph({ children: [new TextRun({ text: "Licenses", bold: true, size: 20 })], spacing: { before: 100, after: 60 } }));
+        p1 += '<div style="margin-bottom:4px;"><b style="font-size:10pt;">Licenses</b></div>';
         allLicenses.forEach(lic => {
-          const parts = [lic.state, lic.type || 'RN', lic.compact ? '(Compact)' : ''].filter(Boolean).join(' - ');
-          const details = [lic.licenseNumber ? `#${lic.licenseNumber}` : '', lic.expirationDate ? `Exp: ${lic.expirationDate}` : ''].filter(Boolean).join(' | ');
-          page1.push(new Paragraph({
-            children: [
-              new TextRun({ text: '•  ' + parts, size: 20, bold: true }),
-              details ? new TextRun({ text: '  ' + details, size: 18, color: GRAY }) : new TextRun({ text: '' }),
-            ],
-            spacing: { after: 30 }, indent: { left: 200 }
-          }));
+          p1 += '<div style="margin:1px 0 1px 8px;">';
+          p1 += '<span class="lic-badge">' + esc(lic.state) + '</span> ' + esc(lic.type || 'RN');
+          if (lic.compact) p1 += ' <span class="compact-badge">Compact</span>';
+          const det = [lic.licenseNumber ? '#' + lic.licenseNumber : '', lic.expirationDate ? 'Exp: ' + lic.expirationDate : ''].filter(Boolean).join(' | ');
+          if (det) p1 += ' <span style="color:#888;font-size:9pt;">' + esc(det) + '</span>';
+          p1 += '</div>';
         });
       }
-
-      // Certifications
       if (allCerts.length) {
-        page1.push(new Paragraph({ children: [new TextRun({ text: "Certifications", bold: true, size: 20 })], spacing: { before: 100, after: 60 } }));
-        allCertObjs.filter(c => c.name).forEach(cert => {
-          const expText = cert.expirationDate ? ` (Exp: ${cert.expirationDate})` : '';
-          page1.push(new Paragraph({
-            children: [
-              new TextRun({ text: '•  ' + cert.name, size: 20, bold: true }),
-              new TextRun({ text: expText, size: 18, color: GRAY }),
-            ],
-            spacing: { after: 30 }, indent: { left: 200 }
-          }));
-        });
+        p1 += '<div style="margin:6px 0 3px 0;"><b style="font-size:10pt;">Certifications</b></div>';
+        p1 += '<div style="margin-left:8px;">';
+        allCertObjs.filter(c => c.name).forEach(c => { p1 += '<span class="cert-tag">' + esc(c.name) + '</span> '; });
+        p1 += '</div>';
+      }
+      if (data?.education) {
+        p1 += '<div style="margin:6px 0 3px 0;"><b style="font-size:10pt;">Education</b></div>';
+        p1 += '<div style="margin-left:8px;font-size:10pt;">' + esc(data.education.degree || '') + ' - ' + esc(data.education.school || '');
+        if (data.education.graduationDate) p1 += ' <span style="color:#888;">(' + esc(data.education.graduationDate) + ')</span>';
+        p1 += '</div>';
       }
 
-      // Education
-      if (data.education) {
-        page1.push(new Paragraph({ children: [new TextRun({ text: "Education", bold: true, size: 20 })], spacing: { before: 100, after: 60 } }));
-        page1.push(new Paragraph({
-          children: [
-            new TextRun({ text: '•  ' + (data.education.degree || ''), size: 20, bold: true }),
-            new TextRun({ text: ` — ${data.education.school || ''}`, size: 20 }),
-            new TextRun({ text: data.education.graduationDate ? ` (${data.education.graduationDate})` : '', size: 18, color: GRAY }),
-          ],
-          spacing: { after: 30 }, indent: { left: 200 }
-        }));
-      }
+      p1 += '<div class="section-header">Work History</div>';
+      (data?.workHistory || []).forEach((job, i) => {
+        p1 += '<div class="job-block">';
+        p1 += '<div><span class="job-title">' + esc(job.title) + '</span> <span class="job-dates">' + esc(job.startDate) + ' - ' + esc(job.endDate) + '</span></div>';
+        p1 += '<div class="job-facility">' + esc(job.facility) + ' <span style="color:#888;">- ' + esc(job.city) + ', ' + esc(job.state) + '</span></div>';
+        if (job.hospitalData) {
+          p1 += '<div class="job-meta">' + job.hospitalData.beds + ' beds | ' + esc(job.hospitalData.traumaLevel) + ' | ' + (job.hospitalData.teaching ? 'Teaching' : 'Non-Teaching') + ' | ' + esc(job.hospitalData.emr) + '</div>';
+        }
+        (job.responsibilities || []).forEach(r => { p1 += '<div class="job-resp">&bull; ' + esc(r) + '</div>'; });
+        if (job.chargeExperience) p1 += '<div class="charge-exp">* Charge Nurse Experience</div>';
+        const notes = getOverlapNoteForJob(i, overlaps || [], overlapResolutions || {}, overlapPrnShifts || {});
+        notes.forEach(n => { p1 += '<div class="overlap-note">! ' + esc(n) + '</div>'; });
+        p1 += '</div>';
+      });
 
-      // Nursys
+      // PAGE 2: SKILLS CHECKLIST
+      let p2 = '<div class="page-break"></div>';
+      if (companyName) p2 += '<div class="header"><span class="company-name">' + esc(companyName) + ' - SKILLS CHECKLIST</span></div>';
+      p2 += '<div style="font-size:13pt;font-weight:bold;margin-bottom:3px;">Skills Checklist for ' + esc(name) + '</div>';
+      p2 += '<div style="font-size:10pt;margin-bottom:10px;">Primary Specialty: ' + esc(data?.primarySpecialty || '-') + '</div>';
+      const sk = additionalData?.skills || {};
+      const cats = { 'Clinical Skills': sk.clinical || [], 'Technical Skills': sk.technical || [], 'Equipment': sk.equipment || [], 'Patient Populations': sk.populations || [], 'Documentation': sk.documentation || [], 'Other': sk.other || [] };
+      p2 += '<table class="tbl"><tr><th>Category</th><th>Skills</th></tr>';
+      Object.entries(cats).forEach(([c, items]) => { if (items.length) p2 += '<tr><td style="font-weight:600;width:25%;">' + esc(c) + '</td><td>' + items.map(esc).join(', ') + '</td></tr>'; });
+      p2 += '</table>';
+
+      // PAGE 3: CERTIFICATIONS
+      let p3 = '<div class="page-break"></div>';
+      if (companyName) p3 += '<div class="header"><span class="company-name">' + esc(companyName) + ' - CERTIFICATIONS</span></div>';
+      p3 += '<div style="font-size:13pt;font-weight:bold;margin-bottom:10px;">Certifications for ' + esc(name) + '</div>';
+      p3 += '<table class="tbl"><tr><th>Certification</th><th>Issuing Body</th><th>Number</th><th>Issue Date</th><th>Expiration</th></tr>';
+      allCertObjs.filter(c => c.name).forEach(cert => {
+        p3 += '<tr><td style="font-weight:600;">' + esc(cert.name) + '</td><td>' + esc(cert.issuingBody || '-') + '</td><td>' + esc(cert.certNumber || '-') + '</td><td>' + esc(cert.issueDate || '-') + '</td><td>' + esc(cert.expirationDate || '-') + '</td></tr>';
+      });
+      p3 += '</table>';
+
+      // PAGE 4: LICENSE VERIFICATION
+      let p4 = '<div class="page-break"></div>';
+      if (companyName) p4 += '<div class="header"><span class="company-name">' + esc(companyName) + ' - LICENSE VERIFICATION</span></div>';
+      p4 += '<div style="font-size:13pt;font-weight:bold;margin-bottom:10px;">License Verification for ' + esc(name) + '</div>';
+      allLicenses.forEach(lic => {
+        p4 += '<div style="margin-bottom:8px;">';
+        p4 += '<div style="font-weight:bold;font-size:11.5pt;">' + esc(lic.state || '') + ' - ' + esc(lic.type || 'RN');
+        if (lic.compact) p4 += ' <span class="compact-badge">(COMPACT)</span>';
+        p4 += '</div>';
+        if (lic.licenseNumber) p4 += '<div style="margin-left:10px;font-size:10pt;">License #: ' + esc(lic.licenseNumber) + '</div>';
+        if (lic.issueDate) p4 += '<div style="margin-left:10px;font-size:10pt;color:#666;">Issue Date: ' + esc(lic.issueDate) + '</div>';
+        if (lic.expirationDate) p4 += '<div style="margin-left:10px;font-size:10pt;color:#666;">Expiration: ' + esc(lic.expirationDate) + '</div>';
+        p4 += '</div>';
+      });
       if (additionalData?.nursysLink) {
-        page1.push(new Paragraph({ children: [new TextRun({ text: "Nursys Verification: ", bold: true, size: 18 }), new TextRun({ text: additionalData.nursysLink, size: 18, color: "2563eb" })], spacing: { before: 100, after: 100 }, indent: { left: 200 } }));
+        p4 += '<div style="margin-top:14px;"><b>Nursys Verification Link:</b> <span style="color:#2563eb;">' + esc(additionalData.nursysLink) + '</span></div>';
       }
 
-      // ===== WORK HISTORY SECTION =====
-      page1.push(new Paragraph({ children: [new TextRun({ text: "WORK HISTORY", bold: true, size: 22, color: BLUE })], spacing: { before: 300, after: 100 },
-        border: { bottom: { color: BLUE, space: 4, size: 6, style: BorderStyle.SINGLE } }
-      }));
+      const footer = '<div class="footer">Profile Builder Pro - ' + new Date().toLocaleDateString() + '</div>';
 
-      (data.workHistory || []).forEach((job, i) => {
-        page1.push(new Paragraph({
-          children: [new TextRun({ text: job.title || 'Nurse', bold: true, size: 22 })],
-          spacing: { before: i > 0 ? 200 : 100, after: 30 }
-        }));
-        page1.push(new Paragraph({
-          children: [
-            new TextRun({ text: job.facility || '', size: 20, bold: true, color: BLUE }),
-            new TextRun({ text: ` — ${[job.city, job.state].filter(Boolean).join(', ')}`, size: 20, color: GRAY }),
-          ],
-          spacing: { after: 20 }
-        }));
-        page1.push(new Paragraph({
-          children: [new TextRun({ text: `${job.startDate || ''} – ${job.endDate || 'Present'}`, size: 18, color: GRAY, italics: true })],
-          spacing: { after: 40 }
-        }));
+      const html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><style>' + css + '</style></head><body>' + p1 + footer + p2 + footer + p3 + footer + p4 + footer + '</body></html>';
 
-        // Hospital metadata
-        const hd = job.hospitalData;
-        if (hd) {
-          const meta = [`${hd.beds || '—'} beds`, hd.traumaLevel, hd.teaching ? 'Teaching' : 'Non-Teaching', hd.emr].filter(Boolean).join(' | ');
-          page1.push(new Paragraph({
-            shading: { fill: "f3f4f6", type: ShadingType.CLEAR },
-            children: [new TextRun({ text: '  ' + meta + '  ', size: 16, color: GRAY, italics: true })],
-            spacing: { after: 60 }
-          }));
-        }
-
-        // Overlap notes for this job
-        const jobOverlapNotes = getOverlapNoteForJob(i, overlaps || [], overlapResolutions || {}, overlapPrnShifts || {});
-        jobOverlapNotes.forEach(note => {
-          page1.push(new Paragraph({
-            children: [new TextRun({ text: '⚠ ' + note, size: 18, color: "b45309", italics: true })],
-            spacing: { after: 40 }, indent: { left: 200 }
-          }));
-        });
-
-        // Responsibilities
-        (job.responsibilities || []).forEach(resp => {
-          page1.push(new Paragraph({
-            children: [new TextRun({ text: '•  ' + resp, size: 18 })],
-            spacing: { after: 20 }, indent: { left: 300 }
-          }));
-        });
-
-        if (job.chargeExperience) {
-          page1.push(new Paragraph({
-            children: [new TextRun({ text: '★ Charge Nurse Experience', bold: true, size: 18, color: "7c3aed" })],
-            spacing: { after: 20 }, indent: { left: 300 }
-          }));
-        }
-      });
-
-      // ===== PAGE BREAK - SKILLS CHECKLIST =====
-      const page3 = [];
-      page3.push(new Paragraph({ children: [new PageBreak()] }));
-      if (companyName) {
-        page3.push(new Paragraph({
-          children: [new TextRun({ text: companyName.toUpperCase() + ' — SKILLS CHECKLIST', bold: true, size: 24, color: BLUE })],
-          spacing: { after: 200 }
-        }));
-      }
-      page3.push(new Paragraph({
-        children: [new TextRun({ text: `Skills Checklist for ${name}`, size: 22, bold: true })],
-        spacing: { after: 100 }
-      }));
-      page3.push(new Paragraph({
-        children: [new TextRun({ text: `Primary Specialty: ${data.primarySpecialty || '—'}`, size: 20 })],
-        spacing: { after: 200 }
-      }));
-
-      const skills = additionalData?.skills || {};
-      const skillCategories = {
-        'Patient Care': skills.patientCare || [],
-        'Technical Skills': skills.technical || [],
-        'Equipment': skills.equipment || [],
-        'Documentation': skills.documentation || [],
-      };
-
-      Object.entries(skillCategories).forEach(([category, items]) => {
-        if (items.length > 0) {
-          page3.push(new Paragraph({
-            children: [new TextRun({ text: category, bold: true, size: 20, color: BLUE })],
-            spacing: { before: 150, after: 80 }
-          }));
-          items.forEach(skill => {
-            page3.push(new Paragraph({
-              children: [new TextRun({ text: `✓  ${skill}`, size: 18 })],
-              spacing: { after: 20 }, indent: { left: 200 }
-            }));
-          });
-        }
-      });
-
-      // If no skills manually entered, auto-generate from unit templates
-      if (!Object.values(skillCategories).some(arr => arr.length > 0)) {
-        const specialty = (data.primarySpecialty || '').toLowerCase();
-        const unitKey = Object.keys(UNIT_TEMPLATES).find(k => specialty.includes(k));
-        if (unitKey) {
-          const template = UNIT_TEMPLATES[unitKey];
-          page3.push(new Paragraph({ children: [new TextRun({ text: 'Core Competencies', bold: true, size: 20, color: BLUE })], spacing: { before: 100, after: 80 } }));
-          template.responsibilities.forEach(r => {
-            page3.push(new Paragraph({ children: [new TextRun({ text: `✓  ${r}`, size: 18 })], spacing: { after: 20 }, indent: { left: 200 } }));
-          });
-          page3.push(new Paragraph({ children: [new TextRun({ text: 'Patient Populations', bold: true, size: 20, color: BLUE })], spacing: { before: 150, after: 80 } }));
-          template.populations.forEach(p => {
-            page3.push(new Paragraph({ children: [new TextRun({ text: `✓  ${p}`, size: 18 })], spacing: { after: 20 }, indent: { left: 200 } }));
-          });
-          page3.push(new Paragraph({ children: [new TextRun({ text: `Typical Patient Ratio: ${template.typicalRatio}`, size: 18, italics: true, color: GRAY })], spacing: { before: 100 } }));
-        }
-      }
-
-      // ===== PAGE BREAK - CERTIFICATIONS (formatted nicely) =====
-      const page4 = [];
-      page4.push(new Paragraph({ children: [new PageBreak()] }));
-      if (companyName) {
-        page4.push(new Paragraph({
-          children: [new TextRun({ text: companyName.toUpperCase() + ' — CERTIFICATIONS', bold: true, size: 24, color: BLUE })],
-          spacing: { after: 200 }
-        }));
-      }
-      page4.push(new Paragraph({
-        children: [new TextRun({ text: `Certifications for ${name}`, size: 22, bold: true })],
-        spacing: { after: 200 }
-      }));
-
-      const allCertDetails = allCertObjs;
-      allCertDetails.filter(c => c.name).forEach((cert, i) => {
-        page4.push(new Paragraph({
-          shading: { fill: i % 2 === 0 ? "f9fafb" : "ffffff", type: ShadingType.CLEAR },
-          children: [
-            new TextRun({ text: cert.name, bold: true, size: 22 }),
-            cert.issuingBody ? new TextRun({ text: `  —  ${cert.issuingBody}`, size: 18, color: GRAY }) : new TextRun({ text: '' }),
-          ],
-          spacing: { before: 80, after: 20 }
-        }));
-        const certMeta = [cert.certNumber ? `#${cert.certNumber}` : '', cert.issueDate ? `Issued: ${cert.issueDate}` : '', cert.expirationDate ? `Expires: ${cert.expirationDate}` : ''].filter(Boolean).join('  |  ');
-        if (certMeta) {
-          page4.push(new Paragraph({
-            shading: { fill: i % 2 === 0 ? "f9fafb" : "ffffff", type: ShadingType.CLEAR },
-            children: [new TextRun({ text: certMeta, size: 18, color: GRAY })],
-            spacing: { after: 60 }, indent: { left: 200 }
-          }));
-        }
-      });
-
-      // ===== PAGE BREAK - NURSYS / LICENSE VERIFICATION =====
-      const page5 = [];
-      page5.push(new Paragraph({ children: [new PageBreak()] }));
-      if (companyName) {
-        page5.push(new Paragraph({
-          children: [new TextRun({ text: companyName.toUpperCase() + ' — LICENSE VERIFICATION', bold: true, size: 24, color: BLUE })],
-          spacing: { after: 200 }
-        }));
-      }
-      page5.push(new Paragraph({ children: [new TextRun({ text: `License Verification for ${name}`, size: 22, bold: true })], spacing: { after: 200 } }));
-
-      allLicenses.forEach((lic, i) => {
-        page5.push(new Paragraph({
-          children: [
-            new TextRun({ text: `${lic.state || ''} — ${lic.type || 'RN'}`, bold: true, size: 22 }),
-            lic.compact ? new TextRun({ text: '  (COMPACT)', size: 18, color: "16a34a", bold: true }) : new TextRun({ text: '' }),
-          ],
-          spacing: { before: i > 0 ? 150 : 0, after: 40 }
-        }));
-        if (lic.licenseNumber) page5.push(new Paragraph({ children: [new TextRun({ text: `License #: ${lic.licenseNumber}`, size: 20 })], spacing: { after: 20 }, indent: { left: 200 } }));
-        if (lic.issueDate) page5.push(new Paragraph({ children: [new TextRun({ text: `Issue Date: ${lic.issueDate}`, size: 20, color: GRAY })], spacing: { after: 20 }, indent: { left: 200 } }));
-        if (lic.expirationDate) page5.push(new Paragraph({ children: [new TextRun({ text: `Expiration: ${lic.expirationDate}`, size: 20, color: GRAY })], spacing: { after: 20 }, indent: { left: 200 } }));
-      });
-
-      if (additionalData?.nursysLink) {
-        page5.push(new Paragraph({
-          children: [new TextRun({ text: "Nursys Verification Link: ", bold: true, size: 20 }), new TextRun({ text: additionalData.nursysLink, size: 20, color: "2563eb" })],
-          spacing: { before: 200 }
-        }));
-      }
-
-      // ===== ASSEMBLE DOCUMENT =====
       try {
-        const doc = new Document({
-          sections: [{
-            properties: { page: { margin: { top: 720, right: 720, bottom: 720, left: 720 } } },
-            children: [...page1, ...page3, ...page4, ...page5]
-          }]
-        });
-
-        const blob = await Packer.toBlob(doc);
-        const fileName = `${(name || 'candidate').replace(/[^a-zA-Z0-9]/g, '_')}_Profile_${new Date().toISOString().slice(0,10)}.docx`;
-        
-        // Try saveAs, fallback to native download
-        if (typeof saveAs === 'function') {
-          saveAs(blob, fileName);
-        } else {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = fileName;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        }
+        const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+        const fileName = (name || 'candidate').replace(/[^a-zA-Z0-9]/g, '_') + '_Profile_' + new Date().toISOString().slice(0,10) + '.doc';
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
       } catch (err) {
-        console.error('DOCX Export Error:', err);
-        alert('Error saving DOCX: ' + (err.message || 'Unknown error. Check console for details.'));
+        console.error('Export Error:', err);
+        alert('Error saving document: ' + err.message);
       }
     }
 
