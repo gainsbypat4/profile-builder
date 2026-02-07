@@ -10,12 +10,8 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/docx@8.2.0/build/index.umd.min.js"></script>
-  <script>
-    // Verify docx loaded
-    if (!window.docx) { console.warn('docx not at window.docx, checking alternatives...'); }
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+  <!-- docx loaded dynamically on export -->
+  <!-- FileSaver loaded dynamically on export -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { font-family: 'Inter', sans-serif; }
@@ -318,26 +314,33 @@
 
     // ==================== DOCX EXPORT ====================
     async function exportFullDOCX(data, additionalData, companyName, companyLogo, scoreResult, overlaps, overlapResolutions, overlapPrnShifts) {
-      // Try to find docx library
-      let docxLib = window.docx;
-      if (!docxLib) {
-        // Try loading dynamically as fallback
-        try {
-          await new Promise((resolve, reject) => {
-            const s = document.createElement('script');
-            s.src = 'https://unpkg.com/docx@8.2.0/build/index.umd.js';
-            s.onload = () => resolve();
-            s.onerror = () => reject(new Error('Failed to load docx library'));
-            document.head.appendChild(s);
-          });
-          docxLib = window.docx;
-        } catch(e) { /* try next */ }
+      // Dynamically load docx library if not already loaded
+      if (!window.docx) {
+        const cdnUrls = [
+          'https://unpkg.com/docx@8.2.0/build/index.umd.js',
+          'https://cdn.jsdelivr.net/npm/docx@8.2.0/build/index.umd.js',
+          'https://cdnjs.cloudflare.com/ajax/libs/docx/8.2.0/index.umd.js',
+          'https://unpkg.com/docx@8.0.0/build/index.umd.js',
+          'https://cdn.jsdelivr.net/npm/docx@7.8.0/build/index.umd.js',
+        ];
+        for (const url of cdnUrls) {
+          try {
+            await new Promise((resolve, reject) => {
+              const s = document.createElement('script');
+              s.src = url;
+              s.onload = () => resolve();
+              s.onerror = () => reject();
+              document.head.appendChild(s);
+            });
+            if (window.docx) { console.log('docx loaded from:', url); break; }
+          } catch(e) { console.warn('Failed to load docx from:', url); }
+        }
       }
-      if (!docxLib) {
-        alert('DOCX library failed to load. Please refresh the page and try again.');
+      if (!window.docx) {
+        alert('Could not load DOCX library from any source. Check your internet connection and try again.');
         return;
       }
-      const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, BorderStyle, ShadingType, AlignmentType, WidthType, PageBreak, HeadingLevel, ImageRun } = docxLib;
+      const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, BorderStyle, ShadingType, AlignmentType, WidthType, PageBreak, HeadingLevel, ImageRun } = window.docx;
 
       const BLUE = "1e40af";
       const LIGHT_BLUE = "dbeafe";
