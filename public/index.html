@@ -310,158 +310,21 @@
       );
     }
 
-    // ==================== WORD EXPORT (Zero Dependencies) ====================
+    // ==================== DOCX EXPORT (Server-Side) ====================
     async function exportFullDOCX(data, additionalData, companyName, companyLogo, scoreResult, overlaps, overlapResolutions, overlapPrnShifts) {
       const name = data?.personalInfo?.fullName || 'Candidate';
-      const allLicenses = dedupLicenses(data?.licenses, additionalData?.licenses);
-      const allCertObjs = dedupCerts(data?.certifications, additionalData?.certifications);
-      const allCerts = allCertObjs.map(c => c.name).filter(Boolean);
-      const licenseStates = allLicenses.map(l => l.state).filter(Boolean);
-      const hasCompact = allLicenses.some(l => l.compact);
-
-      const sc = scoreResult?.total || 0;
-      const scoreColor = sc >= 80 ? '#16a34a' : sc >= 60 ? '#2563eb' : sc >= 40 ? '#d97706' : '#dc2626';
-      const scoreLabel = sc >= 80 ? 'Strong candidate - submit with confidence' : sc >= 60 ? 'Solid candidate - review pay/location fit' : sc >= 40 ? 'Needs work - check certs and license gaps' : 'Weak profile - may need additional experience';
-
-      const esc = (s) => (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-
-      const css = `
-        body { font-family: Calibri, Arial, sans-serif; color: #1a1a1a; line-height: 1.5; font-size: 11pt; }
-        @page { margin: 0.75in; }
-        .page-break { page-break-before: always; }
-        .header { text-align: center; margin-bottom: 10px; }
-        .company-name { font-size: 15pt; font-weight: bold; color: #1e40af; letter-spacing: 2px; text-transform: uppercase; }
-        .candidate-name { font-size: 18pt; font-weight: bold; margin: 6px 0 2px 0; }
-        .contact-info { font-size: 10pt; color: #666; }
-        .highlight-box { background-color: #1e40af; color: white; padding: 8px 14px; margin: 10px 0; font-size: 10pt; }
-        .highlight-box b { font-weight: 700; }
-        .score-inline { background: ${scoreColor}; color: white; padding: 1px 6px; font-weight: bold; }
-        .section-header { font-size: 11.5pt; font-weight: bold; color: #1e40af; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #1e40af; padding-bottom: 2px; margin: 14px 0 6px 0; }
-        .job-block { margin-bottom: 10px; }
-        .job-title { font-weight: bold; font-size: 11pt; }
-        .job-facility { color: #1e40af; font-size: 10.5pt; }
-        .job-dates { color: #888; font-size: 9.5pt; }
-        .job-meta { font-size: 9pt; color: #999; font-style: italic; background: #f9fafb; padding: 2px 6px; margin: 2px 0; }
-        .job-resp { font-size: 10pt; margin: 1px 0 1px 14px; }
-        .charge-exp { color: #7c3aed; font-size: 9.5pt; margin-left: 14px; font-weight: 600; }
-        .overlap-note { color: #b45309; font-size: 9pt; font-style: italic; margin-left: 14px; }
-        .lic-badge { display: inline; background: #dbeafe; color: #1e40af; padding: 1px 5px; font-weight: bold; font-size: 9.5pt; }
-        .compact-badge { color: #16a34a; font-weight: 600; font-size: 9pt; }
-        .cert-tag { display: inline; background: #f3f4f6; padding: 1px 6px; font-size: 9.5pt; margin-right: 4px; }
-        .bullet { font-size: 10.5pt; margin: 2px 0 2px 10px; }
-        table.tbl { width: 100%; border-collapse: collapse; font-size: 10pt; }
-        table.tbl td, table.tbl th { border: 1px solid #ccc; padding: 4px 7px; }
-        table.tbl th { background: #eef2ff; color: #1e40af; font-weight: 600; text-align: left; }
-        .footer { text-align: center; font-size: 8pt; color: #bbb; margin-top: 16px; border-top: 1px solid #eee; padding-top: 4px; }
-      `;
-
-      // PAGE 1: RESUME PROFILE
-      let p1 = '';
-      if (companyName) p1 += '<div class="header"><span class="company-name">' + esc(companyName) + '</span></div>';
-      p1 += '<div class="candidate-name">' + esc(name) + '</div>';
-      const cp = [data?.personalInfo?.phone, data?.personalInfo?.email, data?.personalInfo?.location].filter(Boolean);
-      if (cp.length) p1 += '<div class="contact-info">' + cp.map(esc).join(' &nbsp;|&nbsp; ') + '</div>';
-
-      p1 += '<div class="highlight-box">';
-      p1 += '<b>' + esc(String(data?.yearsExperience || '-')) + '</b> Years Exp &nbsp; ';
-      p1 += '<b>' + esc(data?.primarySpecialty || '-') + '</b> &nbsp; ';
-      p1 += 'Licensed: <b>' + esc(licenseStates.join(', ') || '-') + (hasCompact ? ' (Compact)' : '') + '</b> &nbsp; ';
-      p1 += 'Certs: <b>' + esc(allCerts.slice(0, 6).join(', ') || '-') + '</b>';
-      if (scoreResult) p1 += ' &nbsp; Score: <span class="score-inline">' + scoreResult.total + '/100</span>';
-      p1 += '</div>';
-
-      if (scoreResult) p1 += '<div style="font-size:9.5pt;color:' + scoreColor + ';margin-bottom:6px;"><i>' + esc(scoreLabel) + '</i></div>';
-
-      if (additionalData?.summaryBullets?.some(b => b)) {
-        additionalData.summaryBullets.filter(b => b).forEach(b => { p1 += '<div class="bullet">&bull; ' + esc(b) + '</div>'; });
-      }
-
-      p1 += '<div class="section-header">Credentials &amp; Education</div>';
-      if (allLicenses.length) {
-        p1 += '<div style="margin-bottom:4px;"><b style="font-size:10pt;">Licenses</b></div>';
-        allLicenses.forEach(lic => {
-          p1 += '<div style="margin:1px 0 1px 8px;">';
-          p1 += '<span class="lic-badge">' + esc(lic.state) + '</span> ' + esc(lic.type || 'RN');
-          if (lic.compact) p1 += ' <span class="compact-badge">Compact</span>';
-          const det = [lic.licenseNumber ? '#' + lic.licenseNumber : '', lic.expirationDate ? 'Exp: ' + lic.expirationDate : ''].filter(Boolean).join(' | ');
-          if (det) p1 += ' <span style="color:#888;font-size:9pt;">' + esc(det) + '</span>';
-          p1 += '</div>';
-        });
-      }
-      if (allCerts.length) {
-        p1 += '<div style="margin:6px 0 3px 0;"><b style="font-size:10pt;">Certifications</b></div>';
-        p1 += '<div style="margin-left:8px;">';
-        allCertObjs.filter(c => c.name).forEach(c => { p1 += '<span class="cert-tag">' + esc(c.name) + '</span> '; });
-        p1 += '</div>';
-      }
-      if (data?.education) {
-        p1 += '<div style="margin:6px 0 3px 0;"><b style="font-size:10pt;">Education</b></div>';
-        p1 += '<div style="margin-left:8px;font-size:10pt;">' + esc(data.education.degree || '') + ' - ' + esc(data.education.school || '');
-        if (data.education.graduationDate) p1 += ' <span style="color:#888;">(' + esc(data.education.graduationDate) + ')</span>';
-        p1 += '</div>';
-      }
-
-      p1 += '<div class="section-header">Work History</div>';
-      (data?.workHistory || []).forEach((job, i) => {
-        p1 += '<div class="job-block">';
-        p1 += '<div><span class="job-title">' + esc(job.title) + '</span> <span class="job-dates">' + esc(job.startDate) + ' - ' + esc(job.endDate) + '</span></div>';
-        p1 += '<div class="job-facility">' + esc(job.facility) + ' <span style="color:#888;">- ' + esc(job.city) + ', ' + esc(job.state) + '</span></div>';
-        if (job.hospitalData) {
-          p1 += '<div class="job-meta">' + job.hospitalData.beds + ' beds | ' + esc(job.hospitalData.traumaLevel) + ' | ' + (job.hospitalData.teaching ? 'Teaching' : 'Non-Teaching') + ' | ' + esc(job.hospitalData.emr) + '</div>';
-        }
-        (job.responsibilities || []).forEach(r => { p1 += '<div class="job-resp">&bull; ' + esc(r) + '</div>'; });
-        if (job.chargeExperience) p1 += '<div class="charge-exp">* Charge Nurse Experience</div>';
-        const notes = getOverlapNoteForJob(i, overlaps || [], overlapResolutions || {}, overlapPrnShifts || {});
-        notes.forEach(n => { p1 += '<div class="overlap-note">! ' + esc(n) + '</div>'; });
-        p1 += '</div>';
-      });
-
-      // PAGE 2: SKILLS CHECKLIST
-      let p2 = '<div class="page-break"></div>';
-      if (companyName) p2 += '<div class="header"><span class="company-name">' + esc(companyName) + ' - SKILLS CHECKLIST</span></div>';
-      p2 += '<div style="font-size:13pt;font-weight:bold;margin-bottom:3px;">Skills Checklist for ' + esc(name) + '</div>';
-      p2 += '<div style="font-size:10pt;margin-bottom:10px;">Primary Specialty: ' + esc(data?.primarySpecialty || '-') + '</div>';
-      const sk = additionalData?.skills || {};
-      const cats = { 'Clinical Skills': sk.clinical || [], 'Technical Skills': sk.technical || [], 'Equipment': sk.equipment || [], 'Patient Populations': sk.populations || [], 'Documentation': sk.documentation || [], 'Other': sk.other || [] };
-      p2 += '<table class="tbl"><tr><th>Category</th><th>Skills</th></tr>';
-      Object.entries(cats).forEach(([c, items]) => { if (items.length) p2 += '<tr><td style="font-weight:600;width:25%;">' + esc(c) + '</td><td>' + items.map(esc).join(', ') + '</td></tr>'; });
-      p2 += '</table>';
-
-      // PAGE 3: CERTIFICATIONS
-      let p3 = '<div class="page-break"></div>';
-      if (companyName) p3 += '<div class="header"><span class="company-name">' + esc(companyName) + ' - CERTIFICATIONS</span></div>';
-      p3 += '<div style="font-size:13pt;font-weight:bold;margin-bottom:10px;">Certifications for ' + esc(name) + '</div>';
-      p3 += '<table class="tbl"><tr><th>Certification</th><th>Issuing Body</th><th>Number</th><th>Issue Date</th><th>Expiration</th></tr>';
-      allCertObjs.filter(c => c.name).forEach(cert => {
-        p3 += '<tr><td style="font-weight:600;">' + esc(cert.name) + '</td><td>' + esc(cert.issuingBody || '-') + '</td><td>' + esc(cert.certNumber || '-') + '</td><td>' + esc(cert.issueDate || '-') + '</td><td>' + esc(cert.expirationDate || '-') + '</td></tr>';
-      });
-      p3 += '</table>';
-
-      // PAGE 4: LICENSE VERIFICATION
-      let p4 = '<div class="page-break"></div>';
-      if (companyName) p4 += '<div class="header"><span class="company-name">' + esc(companyName) + ' - LICENSE VERIFICATION</span></div>';
-      p4 += '<div style="font-size:13pt;font-weight:bold;margin-bottom:10px;">License Verification for ' + esc(name) + '</div>';
-      allLicenses.forEach(lic => {
-        p4 += '<div style="margin-bottom:8px;">';
-        p4 += '<div style="font-weight:bold;font-size:11.5pt;">' + esc(lic.state || '') + ' - ' + esc(lic.type || 'RN');
-        if (lic.compact) p4 += ' <span class="compact-badge">(COMPACT)</span>';
-        p4 += '</div>';
-        if (lic.licenseNumber) p4 += '<div style="margin-left:10px;font-size:10pt;">License #: ' + esc(lic.licenseNumber) + '</div>';
-        if (lic.issueDate) p4 += '<div style="margin-left:10px;font-size:10pt;color:#666;">Issue Date: ' + esc(lic.issueDate) + '</div>';
-        if (lic.expirationDate) p4 += '<div style="margin-left:10px;font-size:10pt;color:#666;">Expiration: ' + esc(lic.expirationDate) + '</div>';
-        p4 += '</div>';
-      });
-      if (additionalData?.nursysLink) {
-        p4 += '<div style="margin-top:14px;"><b>Nursys Verification Link:</b> <span style="color:#2563eb;">' + esc(additionalData.nursysLink) + '</span></div>';
-      }
-
-      const footer = '<div class="footer">Profile Builder Pro - ' + new Date().toLocaleDateString() + '</div>';
-
-      const html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><style>' + css + '</style></head><body>' + p1 + footer + p2 + footer + p3 + footer + p4 + footer + '</body></html>';
-
       try {
-        const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
-        const fileName = (name || 'candidate').replace(/[^a-zA-Z0-9]/g, '_') + '_Profile_' + new Date().toISOString().slice(0,10) + '.doc';
+        const resp = await fetch('/api/generate-docx', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ data, additionalData, companyName, scoreResult, overlaps, overlapResolutions, overlapPrnShifts })
+        });
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({}));
+          throw new Error(err.error || 'Server error generating DOCX');
+        }
+        const blob = await resp.blob();
+        const fileName = (name || 'candidate').replace(/[^a-zA-Z0-9 ]/g, '_') + '_Profile_' + new Date().toISOString().slice(0,10) + '.docx';
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -472,7 +335,7 @@
         URL.revokeObjectURL(url);
       } catch (err) {
         console.error('Export Error:', err);
-        alert('Error saving document: ' + err.message);
+        alert('Error generating profile: ' + err.message);
       }
     }
 
