@@ -1,4 +1,5 @@
 export default async function handler(req, res) {
+  // CORS headers
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -22,60 +23,69 @@ export default async function handler(req, res) {
         max_tokens: 4000,
         messages: [{
           role: "user",
-          content: `Parse this nurse resume and extract ALL data. Return ONLY valid JSON with no markdown.
+          content: `You are an expert healthcare staffing recruiter. Extract ALL structured data from this nurse resume. Be THOROUGH — do not miss any certifications, licenses, or work history entries.
 
-RESUME:
-${resumeText}
+CRITICAL RULES:
+- Extract EVERY certification mentioned anywhere in the resume (BLS, ACLS, PALS, TNCC, CCRN, CNOR, CEN, NRP, ENPC, NIH Stroke Scale, AWHONN, RNC-OB, PCCN, OCN, MEDSURG-BC, etc.)
+- Certifications can appear in headers, bullet points, after names, in skills sections, or anywhere else
+- Extract EVERY license with state, type, compact status, and any license numbers/expiration dates
+- Extract ALL work history entries with full details
+- Look for charge nurse experience, preceptor experience, committee participation
+- Identify the primary specialty from the most recent/prominent experience
 
-INSTRUCTIONS:
-1. Extract the person's FULL NAME (look at top of resume)
-2. Extract ALL nursing licenses with STATE ABBREVIATIONS (FL, OH, TX, etc)
-3. If license says "Compact" or "Multistate", mark compact as true
-4. Extract ALL certifications (BLS, ACLS, PALS, CCRN, TNCC, etc)
-5. Extract education with degree type, school name, graduation date
-6. For each job: get title, hospital, city, state, unit type, dates, and ALL responsibilities/bullets
-7. Note if they have charge nurse experience
+Return ONLY valid JSON with this exact structure (no markdown, no backticks, no explanation):
 
-Return this JSON structure:
 {
   "personalInfo": {
-    "fullName": "The actual name from resume",
-    "phone": "phone number",
-    "email": "email address",
-    "location": "City, State"
+    "fullName": "First Middle Last, Credentials",
+    "phone": "(xxx) xxx-xxxx",
+    "email": "email@example.com",
+    "location": "City, State ZIP"
   },
   "licenses": [
-    {"state": "FL", "type": "RN", "compact": true},
-    {"state": "OH", "type": "RN", "compact": false}
+    {
+      "state": "XX",
+      "type": "RN",
+      "compact": true,
+      "licenseNumber": "if found",
+      "issueDate": "if found",
+      "expirationDate": "if found"
+    }
   ],
-  "certifications": ["BLS", "ACLS", "PALS", "CCRN", "TNCC"],
+  "certifications": [
+    {
+      "name": "BLS",
+      "issuingBody": "AHA",
+      "certNumber": "if found",
+      "issueDate": "if found",
+      "expirationDate": "if found"
+    }
+  ],
   "education": {
-    "degree": "BSN",
+    "degree": "BSN/MSN/ADN",
     "school": "University Name",
-    "graduationDate": "May 2016"
+    "graduationDate": "Month Year"
   },
   "workHistory": [
     {
-      "title": "ICU Staff RN",
-      "facility": "Tampa General Hospital",
-      "city": "Tampa",
-      "state": "FL",
-      "unit": "ICU",
-      "startDate": "March 2021",
-      "endDate": "Present",
+      "title": "Job Title — Unit Type",
+      "facility": "Hospital/Facility Name",
+      "city": "City",
+      "state": "ST",
+      "unit": "ICU/ER/Med-Surg/etc",
+      "startDate": "Month Year",
+      "endDate": "Month Year or Present",
+      "responsibilities": ["responsibility 1", "responsibility 2"],
       "chargeExperience": true,
-      "responsibilities": [
-        "First bullet point from resume",
-        "Second bullet point",
-        "Third bullet point"
-      ]
+      "preceptorExperience": false
     }
   ],
-  "yearsExperience": 7,
+  "yearsExperience": 6,
   "primarySpecialty": "ICU"
 }
 
-CRITICAL: fullName must be the REAL name from the resume. licenses must have state abbreviations.`
+RESUME TEXT:
+${resumeText}`
         }]
       })
     });
@@ -83,18 +93,44 @@ CRITICAL: fullName must be the REAL name from the resume. licenses must have sta
     const data = await response.json();
     
     if (data.error) {
-      return res.status(500).json({ error: data.error.message });
+      console.error("Claude API error:", data.error);
+      return res.status(500).json({ error: data.error.message || "API error" });
     }
 
-    const responseText = data.content?.[0]?.text || "";
+    if (!data.content || !data.content[0] || !data.content[0].text) {
+      console.error("Unexpected API response:", JSON.stringify(data));
+      return res.status(500).json({ error: "Empty response from AI" });
+    }
+
+    const responseText = data.content[0].text;
     
-    let cleanJson = responseText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-    const jsonMatch = cleanJson.match(/\{[\s\S]*\}/);
-    if (jsonMatch) cleanJson = jsonMatch[0];
+    // Clean JSON - remove any markdown backticks or extra text
+    let cleanJson = responseText;
+    
+    // Remove ```json ... ``` wrapper if present
+    const jsonMatch = cleanJson.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (jsonMatch) {
+      cleanJson = jsonMatch[1];
+    }
+    
+    cleanJson = cleanJson.trim();
+    
+    // Try to find JSON object if there's extra text
+    if (!cleanJson.startsWith('{')) {
+      const firstBrace = cleanJson.indexOf('{');
+      if (firstBrace !== -1) {
+        cleanJson = cleanJson.substring(firstBrace);
+      }
+    }
     
     const parsed = JSON.parse(cleanJson);
     return res.status(200).json(parsed);
+    
   } catch (error) {
-    return res.status(500).json({ error: error.message || "Failed to extract data" });
+    console.error("Extract function error:", error);
+    return res.status(500).json({ 
+      error: error.message || "Failed to extract data",
+      details: error.toString()
+    });
   }
 }
