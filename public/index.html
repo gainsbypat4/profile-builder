@@ -222,6 +222,59 @@
       return null;
     }
 
+    // ==================== DEDUP HELPERS ====================
+    function dedupLicenses(extractedLicenses, additionalLicenses) {
+      const all = [...(extractedLicenses || []), ...(additionalLicenses || [])];
+      const seen = new Set();
+      return all.filter(lic => {
+        const key = `${(lic.state || '').toUpperCase()}-${(lic.type || 'RN').toUpperCase()}-${lic.compact ? 'C' : 'N'}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    }
+
+    function dedupCerts(extractedCerts, additionalCerts) {
+      const normalize = (c) => (typeof c === 'string' ? c : (c.name || '')).toUpperCase().trim();
+      const all = [
+        ...(extractedCerts || []).map(c => typeof c === 'string' ? { name: c } : c),
+        ...(additionalCerts || [])
+      ];
+      const seen = new Set();
+      return all.filter(cert => {
+        const key = normalize(cert);
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    }
+
+    // ==================== OVERLAP NOTE GENERATION ====================
+    const OVERLAP_LABELS = {
+      'prn': 'Concurrent PRN/Per Diem position',
+      'staff_and_travel': 'Staff position held alongside travel assignment',
+      'transition': 'Transition period between positions',
+      'error': 'Date discrepancy — needs correction on resume',
+    };
+
+    function getOverlapNoteForJob(jobIndex, overlaps, overlapResolutions, overlapPrnShifts) {
+      const notes = [];
+      overlaps.forEach((o, oi) => {
+        if (o.job1Index === jobIndex || o.job2Index === jobIndex) {
+          const res = overlapResolutions[oi];
+          if (res) {
+            const otherJob = o.job1Index === jobIndex ? o.job2 : o.job1;
+            let note = `${OVERLAP_LABELS[res] || res} — overlaps with ${otherJob.title} at ${otherJob.facility}`;
+            if (res === 'prn' && overlapPrnShifts[oi]) {
+              note += ` (avg ${overlapPrnShifts[oi]} shifts/week)`;
+            }
+            notes.push(note);
+          }
+        }
+      });
+      return notes;
+    }
+
     // ==================== PDF & DOCX EXTRACTION ====================
     async function extractPDF(file) {
       const arrayBuffer = await file.arrayBuffer();
@@ -260,7 +313,7 @@
     }
 
     // ==================== DOCX EXPORT ====================
-    async function exportFullDOCX(data, additionalData, companyName, companyLogo, scoreResult) {
+    async function exportFullDOCX(data, additionalData, companyName, companyLogo, scoreResult, overlaps, overlapResolutions, overlapPrnShifts) {
       const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, BorderStyle, ShadingType, AlignmentType, WidthType, PageBreak, HeadingLevel, ImageRun } = window.docx;
 
       const BLUE = "1e40af";
@@ -298,9 +351,11 @@
       }
 
       // ===== BLUE HIGHLIGHT BOX =====
-      const licenseStates = [...(data.licenses || []), ...(additionalData?.licenses || [])].map(l => l.state).filter(Boolean);
-      const hasCompact = [...(data.licenses || []), ...(additionalData?.licenses || [])].some(l => l.compact);
-      const allCerts = [...(data.certifications || []).map(c => typeof c === 'string' ? c : c.name), ...(additionalData?.certifications || []).map(c => c.name)].filter(Boolean);
+      const allLicenses = dedupLicenses(data.licenses, additionalData?.licenses);
+      const licenseStates = allLicenses.map(l => l.state).filter(Boolean);
+      const hasCompact = allLicenses.some(l => l.compact);
+      const allCertObjs = dedupCerts(data.certifications, additionalData?.certifications);
+      const allCerts = allCertObjs.map(c => c.name).filter(Boolean);
       const scoreLabel = scoreResult ? `${scoreResult.total}/100` : '';
 
       const highlightItems = [
@@ -337,7 +392,6 @@
       }));
 
       // Licenses
-      const allLicenses = [...(data.licenses || []), ...(additionalData?.licenses || [])];
       if (allLicenses.length) {
         page1.push(new Paragraph({ children: [new TextRun({ text: "Licenses", bold: true, size: 20 })], spacing: { before: 100, after: 60 } }));
         allLicenses.forEach(lic => {
@@ -356,8 +410,7 @@
       // Certifications
       if (allCerts.length) {
         page1.push(new Paragraph({ children: [new TextRun({ text: "Certifications", bold: true, size: 20 })], spacing: { before: 100, after: 60 } }));
-        const certDetails = [...(data.certifications || []).map(c => typeof c === 'string' ? { name: c } : c), ...(additionalData?.certifications || [])];
-        certDetails.filter(c => c.name).forEach(cert => {
+        allCertObjs.filter(c => c.name).forEach(cert => {
           const expText = cert.expirationDate ? ` (Exp: ${cert.expirationDate})` : '';
           page1.push(new Paragraph({
             children: [
@@ -420,13 +473,14 @@
           }));
         }
 
-        // Overlap warning for this job
-        if (job.overlapNote) {
+        // Overlap notes for this job
+        const jobOverlapNotes = getOverlapNoteForJob(i, overlaps || [], overlapResolutions || {}, overlapPrnShifts || {});
+        jobOverlapNotes.forEach(note => {
           page1.push(new Paragraph({
-            children: [new TextRun({ text: '⚠ ' + job.overlapNote, size: 18, color: "b45309", italics: true })],
-            spacing: { after: 40 }
+            children: [new TextRun({ text: '⚠ ' + note, size: 18, color: "b45309", italics: true })],
+            spacing: { after: 40 }, indent: { left: 200 }
           }));
-        }
+        });
 
         // Responsibilities
         (job.responsibilities || []).forEach(resp => {
@@ -548,7 +602,7 @@
         spacing: { after: 200 }
       }));
 
-      const allCertDetails = [...(data.certifications || []).map(c => typeof c === 'string' ? { name: c } : c), ...(additionalData?.certifications || [])];
+      const allCertDetails = allCertObjs;
       allCertDetails.filter(c => c.name).forEach((cert, i) => {
         page4.push(new Paragraph({
           shading: { fill: i % 2 === 0 ? "f9fafb" : "ffffff", type: ShadingType.CLEAR },
@@ -625,6 +679,7 @@
       const [scoreResult, setScoreResult] = useState(null);
       const [overlaps, setOverlaps] = useState([]);
       const [overlapResolutions, setOverlapResolutions] = useState({});
+      const [overlapPrnShifts, setOverlapPrnShifts] = useState({});
       const fileInputRef = useRef(null);
       const logoInputRef = useRef(null);
 
@@ -854,7 +909,7 @@
               <button onClick={() => setStep('input')} className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg">
                 ← New Resume
               </button>
-              <button onClick={() => exportFullDOCX(extractedData, additionalData, companyName, companyLogo, scoreResult)}
+              <button onClick={() => exportFullDOCX(extractedData, additionalData, companyName, companyLogo, scoreResult, overlaps, overlapResolutions, overlapPrnShifts)}
                 className="px-4 py-1.5 text-sm bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition">
                 Download DOCX
               </button>
@@ -862,19 +917,26 @@
           </div>
 
           {/* Overlap Warnings */}
-          {overlaps.length > 0 && (
-            <div className="bg-amber-50 border border-amber-300 rounded-xl p-4 mb-4 overlap-warning">
-              <h3 className="font-semibold text-amber-800 mb-2">⚠ Overlapping Employment Dates Detected</h3>
-              {overlaps.map((o, i) => (
-                <div key={i} className="mb-3 last:mb-0">
-                  <p className="text-sm text-amber-700">
+          {overlaps.length > 0 && (() => {
+            const allResolved = overlaps.every((_, i) => overlapResolutions[i]);
+            return (
+            <div className={`rounded-xl p-4 mb-4 border ${allResolved ? 'bg-green-50 border-green-300' : 'bg-amber-50 border-amber-300 overlap-warning'}`}>
+              <h3 className={`font-semibold mb-2 ${allResolved ? 'text-green-800' : 'text-amber-800'}`}>
+                {allResolved ? '✓ All Overlapping Dates Clarified' : '⚠ Overlapping Employment Dates Detected'}
+              </h3>
+              {overlaps.map((o, i) => {
+                const resolved = !!overlapResolutions[i];
+                return (
+                <div key={i} className={`mb-3 last:mb-0 p-2 rounded-lg ${resolved ? 'bg-green-100/50' : ''}`}>
+                  <p className={`text-sm ${resolved ? 'text-green-700' : 'text-amber-700'}`}>
+                    {resolved && <span className="mr-1">✓</span>}
                     <strong>{o.job1.title}</strong> at {o.job1.facility} ({o.job1.startDate} – {o.job1.endDate}) overlaps with{' '}
                     <strong>{o.job2.title}</strong> at {o.job2.facility} ({o.job2.startDate} – {o.job2.endDate})
                   </p>
-                  <div className="mt-2 flex gap-2 items-center">
-                    <span className="text-xs text-amber-600 font-medium">Clarification:</span>
+                  <div className="mt-2 flex gap-2 items-center flex-wrap">
+                    <span className={`text-xs font-medium ${resolved ? 'text-green-600' : 'text-amber-600'}`}>Clarification:</span>
                     <select value={overlapResolutions[i] || ''} onChange={e => setOverlapResolutions(prev => ({ ...prev, [i]: e.target.value }))}
-                      className="text-xs border border-amber-300 rounded px-2 py-1 bg-white">
+                      className={`text-xs border rounded px-2 py-1 bg-white ${resolved ? 'border-green-300' : 'border-amber-300'}`}>
                       <option value="">Select reason...</option>
                       <option value="prn">PRN / Per Diem alongside travel</option>
                       <option value="staff_and_travel">Staff position + travel assignment</option>
@@ -882,13 +944,21 @@
                       <option value="error">Date error on resume (needs correction)</option>
                     </select>
                     {overlapResolutions[i] === 'prn' && (
-                      <input type="text" placeholder="Avg shifts/week at PRN?" className="text-xs border border-amber-300 rounded px-2 py-1 w-40" />
+                      <input type="text" value={overlapPrnShifts[i] || ''} 
+                        onChange={e => setOverlapPrnShifts(prev => ({ ...prev, [i]: e.target.value }))}
+                        placeholder="Avg shifts/week?" className="text-xs border border-amber-300 rounded px-2 py-1 w-36" />
+                    )}
+                    {resolved && overlapResolutions[i] !== 'prn' && (
+                      <span className="text-xs text-green-600 italic">{OVERLAP_LABELS[overlapResolutions[i]]}</span>
+                    )}
+                    {resolved && overlapResolutions[i] === 'prn' && overlapPrnShifts[i] && (
+                      <span className="text-xs text-green-600 italic">PRN — {overlapPrnShifts[i]} shifts/week</span>
                     )}
                   </div>
                 </div>
-              ))}
+              );})}
             </div>
-          )}
+          );})()}
 
           <div className="grid grid-cols-12 gap-4">
             {/* Left Panel: Score + Tabs */}
@@ -1141,7 +1211,7 @@
                           </div>
                         ))}
                       </div>
-                      <button onClick={() => exportFullDOCX(extractedData, additionalData, companyName, companyLogo, scoreResult)}
+                      <button onClick={() => exportFullDOCX(extractedData, additionalData, companyName, companyLogo, scoreResult, overlaps, overlapResolutions, overlapPrnShifts)}
                         className="w-full mt-4 py-2 bg-blue-600 text-white rounded-lg font-medium text-sm hover:bg-blue-700 transition">
                         Download Complete Profile Packet (DOCX)
                       </button>
@@ -1170,20 +1240,26 @@
                 </div>
 
                 {/* BLUE HIGHLIGHT BOX */}
+                {(() => {
+                  const dl = dedupLicenses(extractedData?.licenses, additionalData?.licenses);
+                  const dc = dedupCerts(extractedData?.certifications, additionalData?.certifications);
+                  return (
                 <div className="mx-6 mb-4 highlight-box rounded-lg px-5 py-3">
                   <div className="flex flex-wrap gap-x-6 gap-y-1 text-white text-sm">
                     <span><strong>{extractedData?.yearsExperience || '—'}</strong> Years Exp</span>
                     <span><strong>{extractedData?.primarySpecialty || '—'}</strong></span>
                     <span>Licensed: <strong>
-                      {[...(extractedData?.licenses || []), ...(additionalData?.licenses || [])].map(l => l.state).filter(Boolean).join(', ') || '—'}
-                      {[...(extractedData?.licenses || []), ...(additionalData?.licenses || [])].some(l => l.compact) ? ' (Compact)' : ''}
+                      {dl.map(l => l.state).filter(Boolean).join(', ') || '—'}
+                      {dl.some(l => l.compact) ? ' (Compact)' : ''}
                     </strong></span>
                     <span>Certs: <strong>
-                      {[...(extractedData?.certifications || []).map(c => typeof c === 'string' ? c : c.name), ...(additionalData?.certifications || []).map(c => c.name)].filter(Boolean).slice(0, 5).join(', ') || '—'}
+                      {dc.map(c => c.name).filter(Boolean).slice(0, 5).join(', ') || '—'}
                     </strong></span>
                     {scoreResult && <span>Score: <strong>{scoreResult.total}/100</strong></span>}
                   </div>
                 </div>
+                  );
+                })()}
 
                 {/* Summary Bullets */}
                 {additionalData.summaryBullets.some(b => b) && (
@@ -1197,10 +1273,14 @@
                 {/* CREDENTIALS & EDUCATION */}
                 <div className="px-6 py-3 border-t border-gray-100">
                   <h2 className="text-sm font-bold text-blue-800 uppercase tracking-wide border-b-2 border-blue-800 pb-1 mb-3">Credentials & Education</h2>
+                  {(() => {
+                    const dl = dedupLicenses(extractedData?.licenses, additionalData?.licenses);
+                    const dc = dedupCerts(extractedData?.certifications, additionalData?.certifications);
+                    return (
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <h3 className="text-xs font-semibold text-gray-500 mb-1">Licenses</h3>
-                      {[...(extractedData?.licenses || []), ...(additionalData?.licenses || [])].map((lic, i) => (
+                      {dl.map((lic, i) => (
                         <div key={i} className="flex items-center gap-2 mb-1">
                           <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs font-bold rounded">{lic.state}</span>
                           <span className="text-xs text-gray-700">{lic.type || 'RN'}</span>
@@ -1212,8 +1292,8 @@
                     <div>
                       <h3 className="text-xs font-semibold text-gray-500 mb-1">Certifications</h3>
                       <div className="flex flex-wrap gap-1">
-                        {[...(extractedData?.certifications || []).map(c => typeof c === 'string' ? c : c.name), ...(additionalData?.certifications || []).map(c => c.name)].filter(Boolean).map((cert, i) => (
-                          <span key={i} className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded font-medium">{cert}</span>
+                        {dc.map((cert, i) => (
+                          <span key={i} className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded font-medium">{cert.name}</span>
                         ))}
                       </div>
                       {extractedData?.education && (
@@ -1225,6 +1305,8 @@
                       )}
                     </div>
                   </div>
+                    );
+                  })()}
                 </div>
 
                 {/* WORK HISTORY */}
@@ -1248,6 +1330,10 @@
                         ))}
                       </div>
                       {job.chargeExperience && <p className="text-xs text-purple-600 ml-3 mt-1">★ Charge Nurse Experience</p>}
+                      {/* Overlap notes */}
+                      {getOverlapNoteForJob(i, overlaps, overlapResolutions, overlapPrnShifts).map((note, ni) => (
+                        <p key={ni} className="text-xs text-amber-600 ml-3 mt-1 italic">⚠ {note}</p>
+                      ))}
                     </div>
                   ))}
                 </div>
